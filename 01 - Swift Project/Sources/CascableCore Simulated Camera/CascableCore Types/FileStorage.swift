@@ -35,7 +35,7 @@ public typealias FileStorageFilesModifiedObserver = (_ storage: FileStorage,
 public typealias FileStorageObserverToken = String
 
 /// Represents a file storage container in a camera, such as an SD card.
-public protocol FileStorage {
+public protocol FileStorage: AnyObject {
 
     /// Returns the description of the storage container as reported by the camera.
     var storageDescription: String? { get }
@@ -84,12 +84,12 @@ public protocol FileStorage {
     ///
     /// @param observer The observer block to be called when the filesystem changes.
     /// @return Returns an observer token to be used when removing the observer.
-    func addFileSystemObserver(_ observer: FileStorageFilesModifiedObserver) -> FileStorageObserverToken
+    func addFileSystemObserver(_ observer: @escaping FileStorageFilesModifiedObserver) -> FileStorageObserverToken
 
     /// Remove an observer to the storage's filesystem.
     ///
     /// @note It is safe for a triggered observer block to remove itself during execution, allowing easy one-shot observations.
     ///
     /// @param observer The existing observer token to remove.
-    func removeFileSystemObserverWithToken(_ token: FileStorageObserverToken)
+    func removeFileSystemObserver(withToken token: FileStorageObserverToken)
 }

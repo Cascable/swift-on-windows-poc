@@ -163,7 +163,7 @@ public protocol CameraProperty: AnyObject {
     ///
     /// @param observerCallback The observer block to be triggered, on the main thread, when changes occur.
     /// @return Returns an object to manage the lifecycle of the observation.
-    func addObserver(_ observer: CameraPropertyObservationCallback) -> CameraPropertyObservation
+    func addObserver(_ observer: @escaping CameraPropertyObservationCallback) -> CameraPropertyObservation
 
     /// Remove a previously-registered observer from this property. Equivalent to calling `-invalidate` on the observer object.
     ///
@@ -186,7 +186,7 @@ public protocol CameraProperty: AnyObject {
     ///
     /// @param commonValue The common value to find a value for. The intent must match the property identifier.
     /// @return Returns a valid settable value for the given intent, or `nil` if no value matches.
-    func validValueMatchingCommonValue(_ commonValue: PropertyCommonValue) -> PropertyValue?
+    func validValue(matchingCommonValue commonValue: PropertyCommonValue) -> PropertyValue?
 
     /// Attempt to set a new value for the property. The value must be in the `validSettableValues` property. As such,
     /// this method is only useable if the property's `valueSetType` contains `CBLPropertyValueSetTypeEnumeration`.
@@ -194,14 +194,14 @@ public protocol CameraProperty: AnyObject {
     /// @param newValue The value to set.
     /// @param queue The queue on which to call the completion handler.
     /// @param completionHandler The completion handler to call when the operation succeeds or fails.
-    func setValue(_ newValue: PropertyValue, completionQueue: DispatchQueue, completionHandler: ErrorableOperationCallback)
+    func setValue(_ newValue: PropertyValue, completionQueue: DispatchQueue, completionHandler: @escaping ErrorableOperationCallback)
 
     /// Attempt to set a new value for the property. The value must be in the `validSettableValues` property. As such,
     /// this method is only useable if the property's `valueSetType` contains `CBLPropertyValueSetTypeEnumeration`.
     ///
     /// @param newValue The value to set.
     /// @param completionHandler The completion handler to call on the main queue when the operation succeeds or fails.
-    func setValue(_ newValue: PropertyValue, completionHandler: ErrorableOperationCallback)
+    func setValue(_ newValue: PropertyValue, completionHandler: @escaping ErrorableOperationCallback)
 
     // -------------
     // @name Property Setting: CBLPropertyValueSetTypeStepping
@@ -215,7 +215,7 @@ public protocol CameraProperty: AnyObject {
     /// words, this method is moving the value towards the end of a list of values.
     ///
     /// @param completionHandler The completion handler to call on the main queue when the operation succeeds or fails.
-    func incrementValue(completionHandler: ErrorableOperationCallback)
+    func incrementValue(completionHandler: @escaping ErrorableOperationCallback)
 
     /// Increment the property's value by one step. Only useable if the property's `valueSetType` contains
     /// `CBLPropertyValueSetTypeStepping`.
@@ -226,7 +226,7 @@ public protocol CameraProperty: AnyObject {
     ///
     /// @param completionQueue The queue on which to call the completion handler.
     /// @param completionHandler The completion handler to call when the operation succeeds or fails.
-    func incrementValue(completionQueue: DispatchQueue, completionHandler: ErrorableOperationCallback)
+    func incrementValue(completionQueue: DispatchQueue, completionHandler: @escaping ErrorableOperationCallback)
 
     /// Decrement the property's value by one step. Only useable if the property's `valueSetType` contains
     /// `CBLPropertyValueSetTypeStepping`.
@@ -236,7 +236,7 @@ public protocol CameraProperty: AnyObject {
     /// words, this method is moving the value towards the beginning of a list of values.
     ///
     /// @param completionHandler The completion handler to call on the main queue when the operation succeeds or fails.
-    func decrementValue(completionHandler: ErrorableOperationCallback)
+    func decrementValue(completionHandler: @escaping ErrorableOperationCallback)
 
     /// Decrement the property's value by one step. Only useable if the property's `valueSetType` contains
     /// `CBLPropertyValueSetTypeStepping`.
@@ -247,7 +247,7 @@ public protocol CameraProperty: AnyObject {
     ///
     /// @param completionQueue The queue on which to call the completion handler.
     /// @param completionHandler The completion handler to call when the operation succeeds or fails.
-    func decrementValue(completionQueue: DispatchQueue, completionHandler: ErrorableOperationCallback)
+    func decrementValue(completionQueue: DispatchQueue, completionHandler: @escaping ErrorableOperationCallback)
 }
 
 /// A property that exposes its values as universal exposure values.
@@ -279,7 +279,7 @@ public protocol ExposureProperty: CameraProperty {
     ///
     /// @param exposureValue The exposure value to find a value for. The type must match the property identifier.
     /// @return Returns a valid settable value for the given exposure value, or `nil` if no value matches.
-    func validValueMatchingExposureValue(_ exposureValue: UniversalExposurePropertyValue) -> ExposurePropertyValue?
+    func validValue(matchingExposureValue exposureValue: UniversalExposurePropertyValue) -> ExposurePropertyValue?
 }
 
 /// A property that exposes its values as universal video format description values.
@@ -299,7 +299,7 @@ public protocol LiveViewZoomLevelProperty: CameraProperty {
     var currentLiveViewZoomLevelValue: LiveViewZoomLevelPropertyValue? { get }
 
     /// Returns the valid settable values as an array of universal live view zoom level values.
-    var validSettableLiveViewZoomValueValues: [LiveViewZoomLevelPropertyValue]? { get }
+    var validSettableLiveViewZoomLevelValues: [LiveViewZoomLevelPropertyValue]? { get }
 }
 
 /// A property value. This could either be the current value of a property, or something in the list of values that can be set.

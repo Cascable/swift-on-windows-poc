@@ -24,5 +24,5 @@ public protocol FileSystemFolderItem: FileSystemItem {
     /// of any of its child folders - you need to iterate the filesystem in a manner that best fits your application.
     ///
     /// @param callback The callback to trigger when the operation succeeds (or fails).
-    func loadChildren(_ completionHandler: ErrorableOperationCallback)
+    func loadChildren(_ completionHandler: @escaping ErrorableOperationCallback)
 }

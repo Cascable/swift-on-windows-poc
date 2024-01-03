@@ -1,17 +1,6 @@
 import Foundation
 
-/// The block callback signature for an async operation that can fail with an error.
-/// @param error The error that occurred, if any. If `nil`, the operation succeeded.
-public typealias ErrorableOperationCallback = (Error?) -> Void
-
-public typealias UniversalExposurePropertyValue = Any
-
-public typealias PlatformImageType = Any
-
 public typealias CameraFamily = Int
-
-
-// ---
 
 /// Methods of authenticating with a camera.
 public enum CameraAuthenticationType: Int {
@@ -198,9 +187,8 @@ public let CBLDisconnectionFlagPowerOffCamera: String = "CBLDisconnectionFlagPow
 /// - `CameraProperties` for operations involving getting and setting camera settings/properties.
 /// - `CameraFileSystem` for operations involving accessing the camera's file system.
 /// - `CameraVideoRecording` for operations involving video recording.
-public protocol Camera: AnyObject {
-
-}
+public protocol Camera: CameraCore, CameraLiveView, CameraFileSystem, CameraProperties,
+    CameraFocusAndShutter, CameraVideoRecording, AnyObject {}
 
 /// Camera connection, disconnection and status methods.
 public protocol CameraCore {
@@ -274,9 +262,9 @@ public protocol CameraCore {
     /// @param authenticationResolvedCallback The callback to be invoked when a camera's authentication request has been resolved.
     /// @param callback The callback to be called when the connection succeeds or fails.
     func connect(flags: [String: Any]?,
-                authenticationRequestCallback: CameraAuthenticationRequestBlock,
-                authenticationResolvedCallback: CameraAuthenticationResolvedBlock,
-                completionCallback: ConnectionCompleteCallback)
+                authenticationRequestCallback: @escaping CameraAuthenticationRequestBlock,
+                authenticationResolvedCallback: @escaping CameraAuthenticationResolvedBlock,
+                completionCallback: @escaping ConnectionCompleteCallback)
 
     /// Attempt to connect to the device with the given client name.
     ///
@@ -289,9 +277,9 @@ public protocol CameraCore {
     /// @param authenticationRequestCallback The callback to be invoked when a camera needs user authentication.
     /// @param authenticationResolvedCallback The callback to be invoked when a camera's authentication request has been resolved.
     /// @param callback The callback to be called when the connection succeeds or fails.
-    func connect(authenticationRequestCallback: CameraAuthenticationRequestBlock,
-                authenticationResolvedCallback: CameraAuthenticationResolvedBlock,
-                completionCallback: ConnectionCompleteCallback)
+    func connect(authenticationRequestCallback: @escaping CameraAuthenticationRequestBlock,
+                authenticationResolvedCallback: @escaping CameraAuthenticationResolvedBlock,
+                completionCallback: @escaping ConnectionCompleteCallback)
 
     /// Attempt to disconnect from the device.
     ///
@@ -301,7 +289,7 @@ public protocol CameraCore {
     /// @param flags The disconnection flags.
     /// @param callback The callback to be called when disconnection succeeds or fails.
     /// @param queue The queue on which to trigger the callback.
-    func disconnect(flags: [String: Any]?, completionCallback: ErrorableOperationCallback?, callbackQueue: DispatchQueue?)
+    func disconnect(withFlags: [String: Any]?, completionCallback: ErrorableOperationCallback?, callbackQueue: DispatchQueue?)
 
     /// Attempt to disconnect from the device.
     ///
@@ -312,7 +300,7 @@ public protocol CameraCore {
     ///
     /// @param callback The callback to be called when disconnection succeeds or fails.
     /// @param queue The queue on which to trigger the callback.
-    func disconnect(completionCallback: ErrorableOperationCallback?, callbackQueue: DispatchQueue?)
+    func disconnect(_ completionCallback: ErrorableOperationCallback?, callbackQueue: DispatchQueue?)
 
     // -------------
     // @name Querying Available Functionality
@@ -332,7 +320,7 @@ public protocol CameraCore {
     /// Returns `YES` if the camera currently supports the given category, otherwise `NO`.
     ///
     /// @param category The category to test for.
-    func currentCommandCategoriesContainsCategory(_ category: AvailableCommandCategory) -> Bool
+    func currentCommandCategoriesContains(_ category: AvailableCommandCategory) -> Bool
 
     /// Returns `YES` if the camera is able to switch to the given category combination, otherwise `NO`.
     ///
@@ -355,7 +343,7 @@ public protocol CameraCore {
     ///
     /// @param categories The command categories the camera should accept.
     /// @param block The block to be called when the camera has switched modes and is able to accept commands in the given categories, or an error occurs.
-    func setCurrentCommandCategories(_ categories: AvailableCommandCategory, completionCallback: ErrorableOperationCallback)
+    func setCurrentCommandCategories(_ categories: AvailableCommandCategory, completionCallback: @escaping ErrorableOperationCallback)
 }
 
 // MARK: - Live View
@@ -411,9 +399,9 @@ public protocol CameraLiveView {
     /// @param delivery The frame delivery block.
     /// @param deliveryQueue The queue on which to deliver frames. If you pass `nil`, the main queue will be used.
     /// @param terminationHandler The callback to call when the live view stream ends. Will be called on the main queue.
-    func beginLiveViewStreamWithDelivery(_ delivery: LiveViewFrameDelivery,
-                                        deliveryQueue: DispatchQueue?,
-                                        terminationHandler: LiveViewTerminationHandler)
+    func beginStream(delivery: @escaping LiveViewFrameDelivery,
+                     deliveryQueue: DispatchQueue?,
+                     terminationHandler: @escaping LiveViewTerminationHandler)
 
     /// Start streaming the live view image from the camera with the given options.
     ///
@@ -425,10 +413,10 @@ public protocol CameraLiveView {
     /// @param deliveryQueue The queue on which to deliver frames. If you pass `nil`, the main queue will be used.
     /// @param options Custom options for the live view session. See `CBLLiveViewOption…` constants for details.
     /// @param terminationHandler The callback to call when the live view stream ends. Will be called on the main queue.
-    func beginLiveViewStreamWithDelivery(_ delivery: LiveViewFrameDelivery,
-                                        deliveryQueue: DispatchQueue?,
-                                        options: [String: Any]?,
-                                        terminationHandler: LiveViewTerminationHandler)
+    func beginStream(delivery: @escaping LiveViewFrameDelivery,
+                     deliveryQueue: DispatchQueue?,
+                     options: [String: Any]?,
+                     terminationHandler: @escaping LiveViewTerminationHandler)
 
     /// Apply new options to the running stream live view stream. Options not included in the passed dictionary will not be changed.
     ///
@@ -438,10 +426,10 @@ public protocol CameraLiveView {
     /// @note If no live view stream is running, this method has no effect.
     ///
     /// @param options The options to apply to the running live view stream.
-    func applyLiveViewStreamOptions(_ options: [String: Any])
+    func applyStreamOptions(_ options: [String: Any])
 
     /// Ends the current live view stream, if one is running. Will cause the stream's termination handler to be called with `CBLCameraLiveViewTerminationReasonEndedNormally`.
-    func endLiveViewStream()
+    func endStream()
 
     /// Returns `YES` if the camera is currently streaming a live view image.
     var liveViewStreamActive: Bool { get }
@@ -521,14 +509,14 @@ public protocol CameraProperties {
     // -------------
 
     /// Returns the latest auto exposure measurement from the camera, or `nil` if AE is not currently running.
-    var autoexposureResult: AEResult { get }
+    var autoexposureResult: AEResult? { get }
 
     // -------------
     // @name Camera Properties
     // -------------
 
     /// The known property identifiers, encoded as `CBLPropertyIdentifier` values in `NSNumber` objects. Observable with key-value observing.
-    var knownPropertyIdentifiers: [PropertyIdentifier] { get }
+    var knownPropertyIdentifiers: [NSNumber] { get }
 
     /// Returns a property object for the given identifier. If the property is currently unknown, returns an object
     /// with `currentValue`, `validSettableValues`, etc set to `nil`.
@@ -537,7 +525,7 @@ public protocol CameraProperties {
     /// method with the same identifier.
     ///
     /// @param identifier The property identifier to get a property object for.
-    func propertyWithIdentifier(_ identifier: PropertyIdentifier) -> CameraProperty
+    func property(with identifier: PropertyIdentifier) -> CameraProperty
 
     /// Returns an array of property objects for the given category that have a non-nil `currentValue`.
     ///
@@ -597,7 +585,7 @@ public protocol CameraFocusAndShutter {
     ///
     /// @param center The centre of the touch AF point, expressed in the current live view frame's aspect.
     /// @param block The callback to call when the operation is complete.
-    func touchAFAtPoint(_ center: CGPoint, completionCallback: ErrorableOperationCallback?)
+    func touchAF(at center: CGPoint, completionCallback: ErrorableOperationCallback?)
 
     // -------------
     // @name Engaging Autofocus and Shutter
@@ -671,7 +659,7 @@ public protocol CameraFocusAndShutter {
     ///
     /// @param handler The handler to be called when a camera-initiated transfer request is received.
     ///                Will be called on the main thread.
-    func addCameraInitiatedTransferHandler(_ handler: CameraInitiatedTransferRequestHandler) -> ObserverToken
+    func addCameraInitiatedTransferHandler(_ handler: @escaping CameraInitiatedTransferRequestHandler) -> ObserverToken
 
     /// Removes a previously registered camera-initiated transfer handler.
     ///

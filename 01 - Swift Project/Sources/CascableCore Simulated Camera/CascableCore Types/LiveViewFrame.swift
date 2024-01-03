@@ -16,7 +16,7 @@ public enum LiveViewFrameOrientation: UInt {
 /// Defines the format of the pixel data of a live view frame.
 public enum LiveViewFramePixelFormat: UInt {
     /// The live view frame's pixel data is a fully-formed JPEG image.
-    case jpeg = 0
+    case JPEG = 0
     /// The live view frame's pixel data is a pixel buffer.
     case rawPixelBuffer = 1
 }
@@ -107,7 +107,7 @@ public protocol LiveViewFrame: AnyObject {
     /// @param liveViewPoint The pont inside the receiver's aspect.
     /// @param targetContainer The rect defining the bounds of the target container.
     /// @return The point representing `liveViewPoint` inside `targetContainer`.
-    func translatePointInASpect(_ liveViewPoint: CGPoint, toPointIn targetContainer: CGRect) -> CGPoint
+    func translatePointInAspect(_ liveViewPoint: CGPoint, toPointIn targetContainer: CGRect) -> CGPoint
 
     /// Translates the given point inside the given rect into a point inside the receiver's aspect. Useful for
     /// translating a point in a view into the live view aspect, for example.

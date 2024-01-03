@@ -62,7 +62,7 @@ public protocol CameraInitiatedTransferRequest {
     var availableRepresentations: CameraInitiatedTransferRepresentation { get }
 
     /// Returns `YES` if the receiver can provide the given representation, otherwise `NO`.
-    func canProvideRepresentation(_ representation: CameraInitiatedTransferRepresentation) -> Bool
+    func canProvide(_ representation: CameraInitiatedTransferRepresentation) -> Bool
 
     /// Returns the state of the transfer. A camera-initiated transfer can only be performed once.
     var transferState: CameraInitiatedTransferState { get }
@@ -86,7 +86,7 @@ public protocol CameraInitiatedTransferRequest {
     ///                        `availableRepresentations` property.
     /// @param completionHandler The completion handler, to be called on the main queue, when the transfer succeeds or fails.
     func executeTransfer(for representations: CameraInitiatedTransferRepresentation,
-                        completionHandler: CameraInitiatedTransferCompletionHandler)
+                        completionHandler: @escaping CameraInitiatedTransferCompletionHandler)
 
     /// Execute the camera-initiated transfer if it's still valid.
     ///
@@ -103,7 +103,7 @@ public protocol CameraInitiatedTransferRequest {
     /// @param completionHandler The completion handler to be calle when the transfer succeeds or fails.
     func executeTransfer(for representations: CameraInitiatedTransferRepresentation,
                         completionQueue: DispatchQueue,
-                        completionHandler: CameraInitiatedTransferCompletionHandler)
+                        completionHandler: @escaping CameraInitiatedTransferCompletionHandler)
 }
 
 /// The result of a camera-initiated transfer.
@@ -121,7 +121,7 @@ public protocol CameraInitiatedTransferResult {
     var availableRepresentations: CameraInitiatedTransferRepresentation { get }
 
     /// Returns `YES` if the receiver can provide the given representation, otherwise `NO`.
-    func containsRepresentation(_ representation: CameraInitiatedTransferRepresentation) -> Bool
+    func contains(_ representation: CameraInitiatedTransferRepresentation) -> Bool
 
     /// Returns `YES` if not saving the contents of this result may cause data loss. For example, a camera
     /// set to only save images to the connected host would set this to `YES`.
@@ -156,7 +156,7 @@ public protocol CameraInitiatedTransferResult {
     /// @param destinationUrl The URL at which to write the representation. CascableCore will attempt to create the parent
     ///                       directory tree if it isn't already present.
     /// @param completionHandler The completion handler, called on the main queue, when the operation succeeds or fails.
-    func write(_ representation: CameraInitiatedTransferRepresentation, to url: URL, completionHandler: ErrorableOperationCallback)
+    func write(_ representation: CameraInitiatedTransferRepresentation, to url: URL, completionHandler: @escaping ErrorableOperationCallback)
 
     /// Retrieve the given representation as an in-memory data object.
     ///

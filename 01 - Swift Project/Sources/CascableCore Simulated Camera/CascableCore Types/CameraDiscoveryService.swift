@@ -38,13 +38,13 @@ public protocol CameraDiscoveryService {
     ///
     /// @param block The block to be called when resolution fails or succeeds.
     /// @param blockQueue The queue on which to trigger the callback block.
-    func resolveService(_ completionHandler: CameraDiscoveryServiceResolveCallback, queue: DispatchQueue)
+    func resolve(_ completionHandler: @escaping CameraDiscoveryServiceResolveCallback, queue: DispatchQueue)
 
     /// Attempt to resolve the service enough to be able to query camera metadata.
     ///
     /// @param block The block to be called when resolution fails or succeeds.
     /// @param blockQueue The queue on which to trigger the callback block.
-    func resolveMetadata(_ completionHandler: CameraDiscoveryMetadataResolveCallback, queue: DispatchQueue)
+    func resolveMetadata(_ completionHandler: @escaping CameraDiscoveryMetadataResolveCallback, queue: DispatchQueue)
 
     /// Inform the service that it should be forcibly removed from available device lists.
     func forceRemoval()

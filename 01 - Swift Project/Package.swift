@@ -15,6 +15,7 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(name: "CascableCore Simulated Camera",
-                resources: [.copy("Resources/Live View Images")]),
+                resources: [.copy("Resources/Live View Images")],
+                swiftSettings: [.unsafeFlags(["-Xfrontend", "-validate-tbd-against-ir=none"])]),
     ]
 )

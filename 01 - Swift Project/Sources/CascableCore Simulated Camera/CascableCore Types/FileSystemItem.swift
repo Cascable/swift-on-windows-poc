@@ -84,7 +84,7 @@ public protocol FileSystemItem {
     var name: String? { get }
 
     /// Returns the size of the file, or zero for directories or items whose metadata hasn't been loaded.
-    var size: UInt? { get }
+    var size: UInt { get }
 
     /// Returns the internal handle to the file.
     var handle: Any? { get }
@@ -111,7 +111,7 @@ public protocol FileSystemItem {
     var isKnownVideoType: Bool { get }
 
     /// Permanently removes the file from the device.
-    func removeFromDevice(_ completionHandler: ErrorableOperationCallback)
+    func removeFromDevice(_ completionHandler: @escaping ErrorableOperationCallback)
 
     /// Returns `YES` if removing this item could have side effects — for example, removing one image from a RAW+JPEG pair will also remove the other.
     var removalRemovesPairedItems: Bool { get }
@@ -121,15 +121,15 @@ public protocol FileSystemItem {
     /// If metadata has already been loaded, the callback block will be immediately called with no error.
     ///
     /// @param block The block to trigger after loading completes or fails. Will be called on the main queue.
-    func loadMetadata(_ completionHandler: ErrorableOperationCallback)
+    func loadMetadata(_ completionHandler: @escaping ErrorableOperationCallback)
 
     /// Fetch the thumbnail of the given file system item.
     ///
     /// @param preflight A block that will be called when the thumbnail is about to be fetched. Return `YES` to allow the
     /// operation to continue, or `NO` to cancel.
     /// @param delivery The block that will be called when the thumbnail has successfully been fetched, or an error occurred.
-    func fetchThumbnailWithPreflightBlock(_ preflight: PreviewImagePreflight,
-                                        thumbnailDeliveryBlock delivery: PreviewImageDelivery)
+    func fetchThumbnail(preflightBlock: @escaping PreviewImagePreflight,
+                        thumbnailDeliveryBlock delivery: @escaping PreviewImageDelivery)
 
     /// Fetch the thumbnail of the given file system item.
     ///
@@ -137,9 +137,9 @@ public protocol FileSystemItem {
     /// operation to continue, or `NO` to cancel.
     /// @param delivery The block that will be called when the thumbnail has successfully been fetched, or an error occurred.
     /// @param deliveryQueue The queue on which the delivery block will be called.
-    func fetchThumbnailWithPreflightBlock(_ preflight: PreviewImagePreflight,
-                                        thumbnailDeliveryBlock delivery: PreviewImageDelivery,
-                                        deliveryQueue: DispatchQueue)
+    func fetchThumbnail(preflightBlock: @escaping PreviewImagePreflight,
+                        thumbnailDeliveryBlock delivery: @escaping PreviewImageDelivery,
+                        deliveryQueue: DispatchQueue)
 
     /// Fetch image metadata (EXIF, IPTC, etc) for the given file system item. Only works with known image types.
 
@@ -148,8 +148,8 @@ public protocol FileSystemItem {
     /// @param preflight A block that will be called when the metadata is about to be fetched. Return `YES` to allow the
     /// operation to continue, or `NO` to cancel.
     /// @param delivery The block that will be called when the metadata has successfully been fetched, or an error occurred.
-    func fetchEXIFMetadataWithPreflightBlock(_ preflight: EXIFPreflight,
-                                            metadataDeliveryBlock delivery: EXIFDelivery)
+    func fetchEXIFMetadata(preflightBlock: @escaping EXIFPreflight,
+                           metadataDeliveryBlock delivery: @escaping EXIFDelivery)
 
     /// Fetch image metadata (EXIF, IPTC, etc) for the given file system item. Only works with known image types.
     ///
@@ -159,17 +159,17 @@ public protocol FileSystemItem {
     /// operation to continue, or `NO` to cancel.
     /// @param delivery The block that will be called when the metadata has successfully been fetched, or an error occurred.
     /// @param deliveryQueue The queue on which the delivery block will be called.
-    func fetchEXIFMetadataWithPreflightBlock(_ preflight: EXIFPreflight,
-                                            metadataDeliveryBlock delivery: EXIFDelivery,
-                                            deliveryQueue: DispatchQueue)
+    func fetchEXIFMetadata(preflightBlock: @escaping EXIFPreflight,
+                           metadataDeliveryBlock delivery: @escaping EXIFDelivery,
+                           deliveryQueue: DispatchQueue)
 
     /// Fetch a preview of the given file system item.
     ///
     /// @param preflight A block that will be called when the preview is about to be fetched. Return `YES` to allow the
     /// operation to continue, or `NO` to cancel.
     /// @param delivery The block that will be called when the preview has successfully been fetched, or an error occurred.
-    func fetchPreviewWithPreflightBlock(_ preflight: PreviewImagePreflight,
-                                        previewDeliveryBlock delivery: PreviewImageDelivery)
+    func fetchPreview(preflightBlock: @escaping PreviewImagePreflight,
+                      previewDeliveryBlock delivery: @escaping PreviewImageDelivery)
 
     /// Fetch a preview of the given file system item.
     ///
@@ -177,9 +177,9 @@ public protocol FileSystemItem {
     /// operation to continue, or `NO` to cancel.
     /// @param delivery The block that will be called when the preview has successfully been fetched, or an error occurred.
     /// @param deliveryQueue The queue on which the delivery block will be called.
-    func fetchPreviewWithPreflightBlock(_ preflight: PreviewImagePreflight,
-                                        previewDeliveryBlock delivery: PreviewImageDelivery,
-                                        deliveryQueue: DispatchQueue)
+    func fetchPreview(preflightBlock: @escaping PreviewImagePreflight,
+                      previewDeliveryBlock delivery: @escaping PreviewImageDelivery,
+                      deliveryQueue: DispatchQueue)
 
     /// Stream a file from the device.
     ///
@@ -204,9 +204,9 @@ public protocol FileSystemItem {
     /// contain the value returned in the `preflight` block.
     ///
     /// @returns Returns a progress object that can be use to track the progress of the transfer.
-    func streamItemWithPreflightBlock(_ preflight: FileStreamPreflight,
-                                    chunkDeliveryBlock chunkDelivery: FileStreamChunkDelivery,
-                                    completeBlock complete: FileStreamCompletion) -> Progress
+    func streamItem(preflightBlock: @escaping FileStreamPreflight,
+                    chunkDeliveryBlock chunkDelivery: @escaping FileStreamChunkDelivery,
+                    complete: @escaping FileStreamCompletion) -> Progress
 
     /// Stream a file from the device.
     ///
@@ -235,10 +235,10 @@ public protocol FileSystemItem {
     /// @param completeQueue The queue on which to execute the completion block.
     ///
     /// @returns Returns a progress object that can be use to track the progress of the transfer.
-    func streamItemWithPreflightBlock(_ preflight: FileStreamPreflight,
-                                    preflightQueue: DispatchQueue,
-                                    chunkDeliveryBlock chunkDelivery: FileStreamChunkDelivery,
-                                    deliveryQueue: DispatchQueue,
-                                    completeBlock complete: FileStreamCompletion,
-                                    completeQueue: DispatchQueue) -> Progress
+    func streamItem(preflightBlock: @escaping FileStreamPreflight,
+                    preflightQueue: DispatchQueue,
+                    chunkDeliveryBlock chunkDelivery: @escaping FileStreamChunkDelivery,
+                    deliveryQueue: DispatchQueue,
+                    complete: @escaping FileStreamCompletion,
+                    complete completeQueue: DispatchQueue) -> Progress
 }
