@@ -2,7 +2,7 @@ import Foundation
 
 /// Defines the orientation of the image of the live view frame. If rotating the image,
 /// the focal points etc should be rotated too.
-enum LiveViewFrameOrientation: UInt {
+public enum LiveViewFrameOrientation: UInt {
     /// The image is "normal" landscape - no translation is required.
     case landscape = 0
     /// The camera is rotated 90° to the right.
@@ -14,7 +14,7 @@ enum LiveViewFrameOrientation: UInt {
 }
 
 /// Defines the format of the pixel data of a live view frame.
-enum LiveViewFramePixelFormat: UInt {
+public enum LiveViewFramePixelFormat: UInt {
     /// The live view frame's pixel data is a fully-formed JPEG image.
     case jpeg = 0
     /// The live view frame's pixel data is a pixel buffer.
@@ -22,7 +22,7 @@ enum LiveViewFramePixelFormat: UInt {
 }
 
 /// Represents an autofocus area in a camera's focus aspect. Typically rendered as a rectangle on top of the live view image.
-protocol LiveViewAFArea {
+public protocol LiveViewAFArea {
 
     /// Returns `YES` if the AF area is focused, otherwise `NO`.
     var focused: Bool { get }
@@ -35,7 +35,7 @@ protocol LiveViewAFArea {
 }
 
 /// Represents a single frame of a streaming live view image, along with any associated metadata.
-protocol LiveViewFrame: AnyObject {
+public protocol LiveViewFrame: AnyObject {
 
     /// Returns the date and time at which this frame was generated.
     var dateProduced: Date { get }

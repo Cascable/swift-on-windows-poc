@@ -1,7 +1,7 @@
 import Foundation
 
 /// Property identifiers.
-enum PropertyIdentifier: UInt {
+public enum PropertyIdentifier: UInt {
     /// The camera's ISO speed setting.
     case isoSpeed
     /// The camera's shutter speed setting.
@@ -67,7 +67,7 @@ enum PropertyIdentifier: UInt {
 }
 
 /// Property categories, which can be useful for grouping properties into sections for the user.
-enum PropertyCategory: Int {
+public enum PropertyCategory: Int {
     /// The category of the property is unknown.
     case unknown
     /// Shutter speed, ISO, EV, etc. These properties are guaranteed to conform to `CBLExposureProperty`.
@@ -88,51 +88,53 @@ enum PropertyCategory: Int {
 
 /// Option set for identifying the type of change that occurred to a property. For performance reasons, CascableCore
 /// may group value and valid values changes into one callback.
-struct PropertyChangeType: OptionSet {
-    let rawValue: UInt
+public struct PropertyChangeType: OptionSet {
+    public let rawValue: UInt
+    public init(rawValue: UInt) { self.rawValue = rawValue }
 
     /// If the option set contains this value, the current value of the property changed.
-    static let value = PropertyChangeType(rawValue: 1 << 0)
+    public static let value = PropertyChangeType(rawValue: 1 << 0)
     /// If the option set contains this value, the pending value of the property changed.
-    static let pendingValue = PropertyChangeType(rawValue: 1 << 1)
+    public static let pendingValue = PropertyChangeType(rawValue: 1 << 1)
     /// If the option set contains this value, the valid settable values and/or the valueSetType of the property changed.
-    static let validSettableValues = PropertyChangeType(rawValue: 1 << 2)
+    public static let validSettableValues = PropertyChangeType(rawValue: 1 << 2)
 }
 
 /// Option set identifying how the property can be changed. An empty value means the property is read-only,
 /// information about the property has not yet been loaded, or the property isn't supported by the camera.
-struct PropertyValueSetType: OptionSet {
-    let rawValue: Int
+public struct PropertyValueSetType: OptionSet {
+    public let rawValue: Int
+    public init(rawValue: Int) { self.rawValue = rawValue }
 
     /// The property provides a list of values to be set via the `validSettableValues` property, and values can be
     /// set with the `-setValue:…` methods.
-    static let enumeration = PropertyValueSetType(rawValue: 1 << 0)
+    public static let enumeration = PropertyValueSetType(rawValue: 1 << 0)
     /// The property's value can be increased or decreased with the `incrementValue:…` and `decrementValue:…` methods.
-    static let stepping = PropertyValueSetType(rawValue: 1 << 1)
+    public static let stepping = PropertyValueSetType(rawValue: 1 << 1)
 }
 
 /// A property common value. Values will be from one of the appropriate common value enums as defined below.
-typealias PropertyCommonValue = Int
+public typealias PropertyCommonValue = Int
 
 /// If there isn't a common value translation for a property value, APIs will instead return this value.
-let PropertyCommonValueNone: PropertyCommonValue = -1
+public let PropertyCommonValueNone: PropertyCommonValue = -1
 
 /// The block callback signature for property observations.
 ///
 /// @param property The property that fired the change.
 /// @param type The change type(s) that occurred. See `CBLPropertyChangeType` for details.
-typealias CameraPropertyObservationCallback = (_ property: CameraProperty, _ type: PropertyChangeType) -> Void
+public typealias CameraPropertyObservationCallback = (_ property: CameraProperty, _ type: PropertyChangeType) -> Void
 
 /// An object for managing property value change notifications. When you add an observer to a property, store the returned
 /// token somewhere in order to keep the observation alive. To remove the observation, you can simply remove all strong
 /// references to its token, or explicitly call `invalidate` on it.
-protocol CameraPropertyObservation: AnyObject {
+public protocol CameraPropertyObservation: AnyObject {
     /// Invalidate the observation. Will also be called on `dealloc`.
     func invalidate()
 }
 
 /// An object representing the values for a property on the camera.
-protocol CameraProperty: AnyObject {
+public protocol CameraProperty: AnyObject {
 
     /// The property's category.
     var category: PropertyCategory { get }
@@ -249,7 +251,7 @@ protocol CameraProperty: AnyObject {
 }
 
 /// A property that exposes its values as universal exposure values.
-protocol ExposureProperty: CameraProperty {
+public protocol ExposureProperty: CameraProperty {
 
     /// Returns the current value as a universal exposure value.
     var currentExposureValue: ExposurePropertyValue? { get }
@@ -281,7 +283,7 @@ protocol ExposureProperty: CameraProperty {
 }
 
 /// A property that exposes its values as universal video format description values.
-protocol VideoFormatProperty: CameraProperty {
+public protocol VideoFormatProperty: CameraProperty {
 
     /// Returns the current value as a universal video format description value.
     var currentVideoFormatValue: VideoFormatPropertyValue? { get }
@@ -291,7 +293,7 @@ protocol VideoFormatProperty: CameraProperty {
 }
 
 /// A property that exposes its values as universal live view zoom level values.
-protocol LiveViewZoomLevelProperty: CameraProperty {
+public protocol LiveViewZoomLevelProperty: CameraProperty {
 
     /// Returns the current value as a universal live view zoom level value.
     var currentLiveViewZoomLevelValue: LiveViewZoomLevelPropertyValue? { get }
@@ -301,7 +303,7 @@ protocol LiveViewZoomLevelProperty: CameraProperty {
 }
 
 /// A property value. This could either be the current value of a property, or something in the list of values that can be set.
-protocol PropertyValue: AnyObject {
+public protocol PropertyValue: AnyObject {
 
     /// The common value that this value matches, or `CBLPropertyCommonValueNone` if it doesn't match any common value.
     var commonValue: PropertyCommonValue { get }
@@ -320,7 +322,7 @@ protocol PropertyValue: AnyObject {
 }
 
 /// A property value that exposes its values as universal exposure values.
-protocol ExposurePropertyValue: PropertyValue {
+public protocol ExposurePropertyValue: PropertyValue {
 
     /// Returns the value as a universal exposure value.
     var exposureValue: UniversalExposurePropertyValue { get }
@@ -328,7 +330,7 @@ protocol ExposurePropertyValue: PropertyValue {
 
 /// Values representing the level of video compression for a `CBLVideoFormatPropertyValue` value. In general,
 /// higher values have *more* compression (i.e., smaller file sizes).
-enum VideoFormatCompressionLevel: Int {
+public enum VideoFormatCompressionLevel: Int {
     /// The compression level is unavailable.
     case unknown = 0
 
@@ -352,7 +354,7 @@ enum VideoFormatCompressionLevel: Int {
 }
 
 /// A property value that represents a video format description.
-protocol VideoFormatPropertyValue: PropertyValue {
+public protocol VideoFormatPropertyValue: PropertyValue {
 
     /// Returns the video format's frame rate, if available. If not available, returns `NSNotFound`.
     var frameRate: Int { get }
@@ -365,7 +367,7 @@ protocol VideoFormatPropertyValue: PropertyValue {
 }
 
 /// A property value that represents a live view zoom level.
-protocol LiveViewZoomLevelPropertyValue: PropertyValue {
+public protocol LiveViewZoomLevelPropertyValue: PropertyValue {
 
     /// Returns `YES` if the value represents a "zoomed in" value, otherwise `NO`.
     var isZoomedIn: Bool { get }
@@ -379,7 +381,7 @@ protocol LiveViewZoomLevelPropertyValue: PropertyValue {
 // MARK: - Common Values
 
 /// Boolean common values.
-enum PropertyCommonValueBoolean: PropertyCommonValue {
+public enum PropertyCommonValueBoolean: PropertyCommonValue {
     /// The value is equivalent to "false" or "off".
     case `false` = 0
     /// The value is equivalent to "true" or "on".
@@ -387,7 +389,7 @@ enum PropertyCommonValueBoolean: PropertyCommonValue {
 }
 
 /// Autoexposure mode common values.
-enum PropertyCommonValueAutoExposureMode: PropertyCommonValue {
+public enum PropertyCommonValueAutoExposureMode: PropertyCommonValue {
     /// The value is equivalent to a fully automatic/"green box" mode.
     case fullyAutomatic = 50
     /// The value is equivalent to the P/Program mode.
@@ -405,7 +407,7 @@ enum PropertyCommonValueAutoExposureMode: PropertyCommonValue {
 }
 
 /// White balance common values.
-enum PropertyCommonValueWhiteBalance: PropertyCommonValue {
+public enum PropertyCommonValueWhiteBalance: PropertyCommonValue {
     /// The value is equivalent to an automatic white balance setting.
     case auto = 100
     /// The value is equivalent to daylight/sunny white balance.
@@ -429,7 +431,7 @@ enum PropertyCommonValueWhiteBalance: PropertyCommonValue {
 }
 
 /// Focus mode common values.
-enum PropertyCommonValueFocusMode: PropertyCommonValue {
+public enum PropertyCommonValueFocusMode: PropertyCommonValue {
     /// The value is equivalent to the manual focus mode.
     case manual = 150
     /// The value is equivalent to the single drive focus mode (once focus is acquired, the camera stops focusing).
@@ -439,7 +441,7 @@ enum PropertyCommonValueFocusMode: PropertyCommonValue {
 }
 
 /// Battery level common values.
-enum PropertyCommonValueBatteryLevel: PropertyCommonValue {
+public enum PropertyCommonValueBatteryLevel: PropertyCommonValue {
     /// The value is equivalent to a full battery.
     case full = 200
     /// The value is equivalent to a 75% full battery.
@@ -453,7 +455,7 @@ enum PropertyCommonValueBatteryLevel: PropertyCommonValue {
 }
 
 /// Power source common values.
-enum PropertyCommonValuePowerSource: PropertyCommonValue {
+public enum PropertyCommonValuePowerSource: PropertyCommonValue {
     /// The value is equivalent to a battery power source.
     case battery = 210
     /// The value is equivalent to a mains or external power source.
@@ -461,7 +463,7 @@ enum PropertyCommonValuePowerSource: PropertyCommonValue {
 }
 
 /// Light meter common values.
-enum PropertyCommonValueLightMeterStatus: PropertyCommonValue {
+public enum PropertyCommonValueLightMeterStatus: PropertyCommonValue {
     /// The value is equivalent to the camera's light meter not being in use.
     case notInUse = 250
     /// The value is equivalent to the camera's light meter being operational and providing a valid reading.
@@ -472,7 +474,7 @@ enum PropertyCommonValueLightMeterStatus: PropertyCommonValue {
 }
 
 /// Mirror lockup common values.
-enum PropertyCommonValueMirrorLockupStage: PropertyCommonValue {
+public enum PropertyCommonValueMirrorLockupStage: PropertyCommonValue {
     /// The value is equivalent to the camera's mirror lockup feature being disabled.
     case disabled = 300
     /// The value is equivalent to the camera's mirror lockup feature being enabled and ready to operate.
@@ -482,7 +484,7 @@ enum PropertyCommonValueMirrorLockupStage: PropertyCommonValue {
 }
 
 /// Autofocus system common values.
-enum PropertyCommonValueAFSystem: PropertyCommonValue {
+public enum PropertyCommonValueAFSystem: PropertyCommonValue {
     /// The value is equivalent to using a "traditional" off-sensor array of autofocus points for autofocus.
     case viewfinderAFPoints = 350
     /// The value is equivalent to using a single area on the sensor for autofocus.
@@ -499,7 +501,7 @@ enum PropertyCommonValueAFSystem: PropertyCommonValue {
 }
 
 /// Drive mode common values.
-enum PropertyCommonValueDriveMode: PropertyCommonValue {
+public enum PropertyCommonValueDriveMode: PropertyCommonValue {
     /// The value is equivalent to a single shot drive mode.
     case singleShot = 400
     /// The value is equivalent to a single shot, electronic first-curtain drive mode. Often called quiet, vibration
@@ -536,7 +538,7 @@ enum PropertyCommonValueDriveMode: PropertyCommonValue {
 }
 
 /// Image destination setting common values.
-enum PropertyCommonValueImageDestination: PropertyCommonValue {
+public enum PropertyCommonValueImageDestination: PropertyCommonValue {
     /// Images will be saved to the camera storage only.
     case camera = 501
     /// Images will be saved to the connected host (i.e., the CascableCore client) and *not* camera storage.

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Represents an individual focus point.
-protocol FocusPoint {
+public protocol FocusPoint {
 
     /// Returns whether the point is active or not — that is, whether the camera will use the point for autofocus.
     var active: Bool { get }
@@ -14,7 +14,7 @@ protocol FocusPoint {
 }
 
 /// Represents an autofocus state of the camera.
-protocol FocusInfo {
+public protocol FocusInfo {
 
     /// Returns the aspect of the autofocus, typically representing the area of the viewfinder.
     var aspect: CGSize { get }

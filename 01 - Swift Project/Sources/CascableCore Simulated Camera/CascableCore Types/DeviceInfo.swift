@@ -1,7 +1,7 @@
 import Foundation
 
 /// Information about a connected camera.
-protocol DeviceInfo {
+public protocol DeviceInfo {
 
     /// Returns the device's manufacturer (for instance, 'Canon').
     var manufacturer: String? { get }
