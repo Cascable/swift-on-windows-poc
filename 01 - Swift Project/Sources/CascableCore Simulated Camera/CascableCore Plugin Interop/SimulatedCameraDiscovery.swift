@@ -28,7 +28,7 @@ internal class SimulatedCameraDiscovery: CameraDiscoveryProvider, SimulatedCamer
     func startDiscovery(in discoveryMode: CameraDiscoveryMode, clientName: String) {
         isDiscovering = true
         let configuration = self.configuration
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + configuration.connectionSpeed.largeOperationDuration) {
             guard self.isDiscovering else { return }
 
             let canBeDiscovered: Bool = {

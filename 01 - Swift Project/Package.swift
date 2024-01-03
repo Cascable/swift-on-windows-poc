@@ -17,5 +17,6 @@ let package = Package(
         .target(name: "CascableCore Simulated Camera",
                 resources: [.copy("Resources/Live View Images")],
                 swiftSettings: [.unsafeFlags(["-Xfrontend", "-validate-tbd-against-ir=none"])]),
+        .testTarget(name: "CascableCore Simulated Camera Tests", dependencies: ["CascableCore Simulated Camera"])
     ]
 )
