@@ -6,6 +6,9 @@
 //  Copyright © 2016 Cascable AB. All rights reserved.
 //
 
+import Foundation
+import StopKit
+
 #if os(iOS) || targetEnvironment(macCatalyst)
 import UIKit
 import MobileCoreServices
@@ -455,11 +458,9 @@ class SimulatedCamera: NSObject, Camera {
                 let aeModes = self.createAEModeValues()
                 self.immediatelySetValue(of: .autoExposureMode, to: aeModes.defaultValue, in: aeModes.validValues)
 
-                #if !os(Windows)
                 let ISOs = [ISOValue.automaticISO, ISOValue.iso100, ISOValue.iso200, ISOValue.iso400, ISOValue.iso800, ISOValue.iso1600]
                 self.immediatelySetValue(of: .isoSpeed, to: SimulatedExposurePropertyValue(ISOValue.iso100),
                                          in: ISOs.map({ SimulatedExposurePropertyValue($0) }))
-                #endif
 
                 self.handleChangeOfAutoExposureMode()
 
@@ -866,15 +867,19 @@ class SimulatedCamera: NSObject, Camera {
                             to: valueToSet(for: property(with: .exposureCompensation), from: evValues),
                             in: evValues.validValues)
 
-        let apertureValues = createApertureValues(for: exposureMode)
-        immediatelySetValue(of: .aperture,
-                            to: valueToSet(for: property(with: .aperture), from: apertureValues),
-                            in: apertureValues.validValues)
+        do {
+            let apertureValues = try createApertureValues(for: exposureMode)
+            immediatelySetValue(of: .aperture,
+                                to: valueToSet(for: property(with: .aperture), from: apertureValues),
+                                in: apertureValues.validValues)
+        } catch {}
 
-        let shutterValues = createShutterSpeedValues(for: exposureMode)
-        immediatelySetValue(of: .shutterSpeed,
-                            to: valueToSet(for: property(with: .shutterSpeed), from: shutterValues),
-                            in: shutterValues.validValues)
+        do {
+            let shutterValues = try createShutterSpeedValues(for: exposureMode)
+            immediatelySetValue(of: .shutterSpeed,
+                                to: valueToSet(for: property(with: .shutterSpeed), from: shutterValues),
+                                in: shutterValues.validValues)
+        } catch {}
     }
 
     //MARK: - Storage

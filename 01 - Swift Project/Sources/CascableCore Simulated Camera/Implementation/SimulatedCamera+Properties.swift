@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import StopKit
 
 // MARK: - Property Identifier and Category Mapping
 // Note: This should be in our "CascableCore+Swift" API. It's also in the Phase One target.
@@ -53,9 +54,6 @@ internal extension PropertyIdentifier {
             return .liveViewZoomLevel
 
         case .max, .unknown:
-            return .unknown
-
-        @unknown default:
             return .unknown
         }
     }
@@ -116,8 +114,6 @@ internal class SimulatedCameraProperty: NSObject, CameraProperty {
         case .liveViewZoomLevel:
             return SimulatedLiveViewZoomLevelProperty(identifier: identifier, camera: camera, localizedDisplayName: name,
                                                       valueSetType: valueSetType, currentValue: nil, validSettableValues: nil)
-        @unknown default:
-            fatalError("Got property category we don't know how to present")
         }
     }
 
@@ -349,21 +345,18 @@ internal class SimulatedExposureProperty: SimulatedCameraProperty, ExposurePrope
 
     class func keyPathsForValuesAffectingValidZeroValue() -> Set<String> { return ["validSettableValues"] }
     var validZeroValue: ExposurePropertyValue? {
-        #if !os(Windows)
         if identifier == .exposureCompensation {
             let zeroEV = ExposureCompensationValue.zeroEV
             if let matching = validSettableExposureValues?.first(where: { $0.exposureValue.isEqual(zeroEV) }) {
                 return matching
             }
         }
-        #endif
 
         return validSettableExposureValues?.first
     }
 
     class func keyPathsForValuesAffectingValidAutomaticValue() -> Set<String> { return ["validSettableValues"] }
     var validAutomaticValue: ExposurePropertyValue? {
-        #if !os(Windows)
         if identifier == .isoSpeed || identifier == .aperture {
             return validSettableExposureValues?.first(where: { !$0.exposureValue.isDeterminate })
         } else if identifier == .shutterSpeed {
@@ -372,16 +365,11 @@ internal class SimulatedExposureProperty: SimulatedCameraProperty, ExposurePrope
                 return !shutter.isDeterminate && !shutter.isBulb
             })
         }
-        #endif
         return nil
     }
 
-    func validValue(matchingExposureValue exposureValue: UniversalExposurePropertyValue) -> ExposurePropertyValue? {
-        #if os(Windows)
-        return nil
-        #else
+    func validValue(matchingExposureValue exposureValue: any UniversalExposurePropertyValue) -> ExposurePropertyValue? {
         return validSettableExposureValues?.first(where: { $0.exposureValue.isEqual(exposureValue) })
-        #endif
     }
 }
 
@@ -438,10 +426,9 @@ internal class SimulatedPropertyValue: NSObject, PropertyValue {
     var opaqueValue: Any { return self }
 }
 
-#if !os(Windows)
 internal class SimulatedExposurePropertyValue: SimulatedPropertyValue, ExposurePropertyValue {
 
-    init(_ exposureValue: UniversalExposurePropertyValue) {
+    init(_ exposureValue: any UniversalExposurePropertyValue) {
         self.exposureValue = exposureValue
         super.init(commonValue: PropertyCommonValueNone,
                    localizedDisplayValue: exposureValue.localizedDisplayValue ?? exposureValue.succinctDescription)
@@ -452,9 +439,8 @@ internal class SimulatedExposurePropertyValue: SimulatedPropertyValue, ExposureP
         return other.exposureValue.isEqual(self.exposureValue)
     }
 
-    let exposureValue: UniversalExposurePropertyValue
+    let exposureValue: any UniversalExposurePropertyValue
 }
-#endif
 
 internal class SimulatedVideoFormatPropertyValue: SimulatedPropertyValue, VideoFormatPropertyValue {
 

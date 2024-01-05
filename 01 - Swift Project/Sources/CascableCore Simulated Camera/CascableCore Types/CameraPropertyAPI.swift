@@ -1,4 +1,5 @@
 import Foundation
+import StopKit
 
 /// Property identifiers.
 public enum PropertyIdentifier: UInt {
@@ -279,7 +280,7 @@ public protocol ExposureProperty: CameraProperty {
     ///
     /// @param exposureValue The exposure value to find a value for. The type must match the property identifier.
     /// @return Returns a valid settable value for the given exposure value, or `nil` if no value matches.
-    func validValue(matchingExposureValue exposureValue: UniversalExposurePropertyValue) -> ExposurePropertyValue?
+    func validValue(matchingExposureValue exposureValue: any UniversalExposurePropertyValue) -> ExposurePropertyValue?
 }
 
 /// A property that exposes its values as universal video format description values.
@@ -319,13 +320,16 @@ public protocol PropertyValue: AnyObject {
     /// An opaque value representing the property. Not guaranteed to be anything in particular, as this is an internal
     /// implementation detail for each particular camera.
     var opaqueValue: Any { get }
+
+    /// Returns `true` if the other value is equal to the receiver, otherwise `false`.
+    func isEqual(_ other: Any?) -> Bool
 }
 
 /// A property value that exposes its values as universal exposure values.
 public protocol ExposurePropertyValue: PropertyValue {
 
     /// Returns the value as a universal exposure value.
-    var exposureValue: UniversalExposurePropertyValue { get }
+    var exposureValue: any UniversalExposurePropertyValue { get }
 }
 
 /// Values representing the level of video compression for a `CBLVideoFormatPropertyValue` value. In general,

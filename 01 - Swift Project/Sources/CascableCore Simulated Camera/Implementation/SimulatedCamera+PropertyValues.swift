@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import StopKit
 
 struct PropertyValuesWithSuggestedDefault {
     let defaultValue: SimulatedPropertyValue?
@@ -107,44 +108,34 @@ extension SimulatedCamera {
             return PropertyValuesWithSuggestedDefault(defaultValue: nil, validValues: [])
 
         case .fullyAutomatic, .programAuto, .flexiblePriority, .shutterPriority, .aperturePriority:
-            #if os(Windows)
-            return PropertyValuesWithSuggestedDefault(defaultValue: nil, validValues: [])
-            #else
             let EVs: [ExposureCompensationValue] = [
-                ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 3, fraction: [], isNegative: true)),
+                ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 3, fraction: .none, isNegative: true)),
                 ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 2, fraction: .twoThirds, isNegative: true)),
                 ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 2, fraction: .oneThird, isNegative: true)),
-                ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 2, fraction: [], isNegative: true)),
+                ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 2, fraction: .none, isNegative: true)),
                 ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 1, fraction: .twoThirds, isNegative: true)),
                 ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 1, fraction: .oneThird, isNegative: true)),
-                ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 1, fraction: [], isNegative: true)),
+                ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 1, fraction: .none, isNegative: true)),
                 ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 0, fraction: .twoThirds, isNegative: true)),
                 ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 0, fraction: .oneThird, isNegative: true)),
                 ExposureCompensationValue.zeroEV,
                 ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 0, fraction: .oneThird, isNegative: false)),
                 ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 0, fraction: .twoThirds, isNegative: false)),
-                ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 1, fraction: [], isNegative: false)),
+                ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 1, fraction: .none, isNegative: false)),
                 ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 1, fraction: .oneThird, isNegative: false)),
                 ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 1, fraction: .twoThirds, isNegative: false)),
-                ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 2, fraction: [], isNegative: false)),
+                ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 2, fraction: .none, isNegative: false)),
                 ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 2, fraction: .oneThird, isNegative: false)),
                 ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 2, fraction: .twoThirds, isNegative: false)),
-                ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 3, fraction: [], isNegative: false))
+                ExposureCompensationValue(stopsFromZeroEV: ExposureStops(wholeStops: 3, fraction: .none, isNegative: false))
             ]
 
             return PropertyValuesWithSuggestedDefault(defaultValue: SimulatedExposurePropertyValue(ExposureCompensationValue.zeroEV),
                                                       validValues: EVs.map({ SimulatedExposurePropertyValue($0) }))
-            #endif
-
-        @unknown default:
-            return PropertyValuesWithSuggestedDefault(defaultValue: nil, validValues: [])
         }
     }
 
-    func createApertureValues(for aeMode: PropertyCommonValueAutoExposureMode) -> PropertyValuesWithSuggestedDefault {
-        #if os(Windows)
-        return PropertyValuesWithSuggestedDefault(defaultValue: nil, validValues: [])
-        #else
+    func createApertureValues(for aeMode: PropertyCommonValueAutoExposureMode) throws -> PropertyValuesWithSuggestedDefault {
         switch aeMode {
         case .fullyManual, .bulb, .aperturePriority:
             var apertures = [ApertureValue]()
@@ -152,8 +143,8 @@ extension SimulatedCamera {
             let f16: ApertureValue = ApertureValue.f16
             var lastAperture: ApertureValue = ApertureValue.f2Point8
 
-            while lastAperture.compare(f16) == ComparisonResult.orderedDescending {
-                lastAperture = lastAperture.adding(ExposureStops(wholeStops: 0, fraction: .oneThird, isNegative: true)) as! ApertureValue
+            while try lastAperture.compare(to: f16) == ComparisonResult.orderedDescending {
+                lastAperture = try lastAperture.valueByAdding(ExposureStops(wholeStops: 0, fraction: .oneThird, isNegative: true))
                 apertures.append(lastAperture)
             }
 
@@ -162,34 +153,23 @@ extension SimulatedCamera {
 
         case .fullyAutomatic, .programAuto, .flexiblePriority, .shutterPriority:
             return PropertyValuesWithSuggestedDefault(defaultValue: nil, validValues: [])
-
-        @unknown default:
-            return PropertyValuesWithSuggestedDefault(defaultValue: nil, validValues: [])
         }
-        #endif
     }
 
-    func createShutterSpeedValues(for aeMode: PropertyCommonValueAutoExposureMode) -> PropertyValuesWithSuggestedDefault {
-        #if os(Windows)
-        return PropertyValuesWithSuggestedDefault(defaultValue: nil, validValues: [])
-        #else
+    func createShutterSpeedValues(for aeMode: PropertyCommonValueAutoExposureMode) throws -> PropertyValuesWithSuggestedDefault {
         switch aeMode {
         case .fullyManual, .bulb, .shutterPriority:
             let thirtySec = ShutterSpeedValue(approximateDuration: 30.0)!
             let one8000 = ShutterSpeedValue(approximateDuration: 1.0 / 8000.0)!
-            var shutterSpeeds = Array(ShutterSpeedValue.shutterSpeedsBetween(one8000, and: thirtySec)!.reversed())
-            shutterSpeeds.insert(ShutterSpeedValue.bulbShutterSpeed, at: 0)
+            var shutterSpeeds = Array(try ShutterSpeedValue.shutterSpeeds(between: one8000, and: thirtySec).reversed())
+            shutterSpeeds.insert(ShutterSpeedValue.bulb, at: 0)
 
-            return PropertyValuesWithSuggestedDefault(defaultValue: SimulatedExposurePropertyValue(ShutterSpeedValue.oneTwoHundredFiftiethShutterSpeed),
+            return PropertyValuesWithSuggestedDefault(defaultValue: SimulatedExposurePropertyValue(ShutterSpeedValue.oneTwoHundredFiftieth),
                                                       validValues: shutterSpeeds.map({ SimulatedExposurePropertyValue($0) }))
 
         case .fullyAutomatic, .programAuto, .flexiblePriority, .aperturePriority:
             return PropertyValuesWithSuggestedDefault(defaultValue: nil, validValues: [])
-
-        @unknown default:
-            return PropertyValuesWithSuggestedDefault(defaultValue: nil, validValues: [])
         }
-        #endif
     }
 
     // MARK: - Property Identifiers
