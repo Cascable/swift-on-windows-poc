@@ -2,6 +2,21 @@ import Foundation
 
 public typealias CameraFamily = Int
 
+#if os(iOS) || targetEnvironment(macCatalyst)
+import UIKit
+import MobileCoreServices
+public typealias PlatformImageType = UIImage
+#elseif canImport(AppKit)
+import AppKit
+public typealias PlatformImageType = NSImage
+#else
+public struct ImagePlaceholder {
+    public init(data: Data) { self.imageData = data }
+    public let imageData: Data
+}
+public typealias PlatformImageType = ImagePlaceholder
+#endif
+
 /// Methods of authenticating with a camera.
 public enum CameraAuthenticationType: Int {
     /// The user must authenticate by interacting with the camera itself.

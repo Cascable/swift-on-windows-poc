@@ -1,6 +1,6 @@
 
 /// Options for discovering cameras.
-enum CameraDiscoveryMode: Int {
+public enum CameraDiscoveryMode: Int {
     /// Only search for cameras on the network.
     case networkOnly = 0
     /// Only search for cameras via USB.

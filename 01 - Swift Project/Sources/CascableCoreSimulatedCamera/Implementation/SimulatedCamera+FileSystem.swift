@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CascableCoreAPI
 
 class SimulatedCameraStorage: NSObject, FileStorage {
 
@@ -469,7 +470,7 @@ class SimulatedCameraFile: NSObject, FileSystemItem {
 
         if let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil),
             let thumbnail = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options as CFDictionary) {
-            let finalThumbnail = CBLPlatformImageType(cgImage: thumbnail, size: CGSize.zero)
+            let finalThumbnail = PlatformImageType(cgImage: thumbnail, size: CGSize.zero)
             return finalThumbnail.jpegData(compressionQuality: 0.8)
         }
         #endif

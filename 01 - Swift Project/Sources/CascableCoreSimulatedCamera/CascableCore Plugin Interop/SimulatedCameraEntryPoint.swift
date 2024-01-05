@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CascableCoreAPI
 
 /// The `CameraFamily` of simulated cameras.
 public let SimulatedCameraFamily: CameraFamily = 99

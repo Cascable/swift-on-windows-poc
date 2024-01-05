@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CascableCoreAPI
 
 internal class SimulatedCameraDiscovery: CameraDiscoveryProvider, SimulatedCameraDelegate {
 

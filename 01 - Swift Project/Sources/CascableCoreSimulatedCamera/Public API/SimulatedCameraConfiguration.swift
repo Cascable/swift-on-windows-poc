@@ -7,16 +7,17 @@
 //
 
 import Foundation
+import CascableCoreAPI
 
 /// Configuration values for simulated cameras.
 public struct SimulatedCameraConfiguration {
-    
+
     /// The simulated camera's manufacturer name. The default value is `Cascable`.
     public var manufacturer: String
-    
+
     /// The simulated camera's model name. The default value is `Simulated Camera`.
     public var model: String
-    
+
     /// The simulated camera's identifier, which will be used for serial numbers, authentication identifiers, etc.
     /// The default value is the plugin's identifier (`se.cascable.CascableCore.plugin.simulated-camera`).
     public var identifier: String
@@ -27,10 +28,10 @@ public struct SimulatedCameraConfiguration {
 
     /// The simulated connection speed. The default value is `.fast`.
     public var connectionSpeed: SimulatedConnectionSpeed
-    
+
     /// Which transport(s) the simulated camera will be discovered on. The default value is `[.network, .USB]`.
     public var connectionTransports: Set<CameraTransport>
-    
+
     /// How simulated exposure properties (aperture, shutter speed, ISO, etc) are set. Defaults to `.enumerated`.
     public var exposurePropertyType: SimulatedPropertySetType
 
@@ -89,7 +90,7 @@ public struct SimulatedConnectionSpeed {
 
     /// Simulates a camera connected via USB or a fast network connection.
     public static let fast = SimulatedConnectionSpeed(small: 1.0 / 25.0, medium: 1.0 / 15.0, large: 1.0 / 10.0)
-    
+
     /// Simulates a camera that performs all operations instantly. Not realistic, but can be useful for UI tests and etc.
     public static let instant = SimulatedConnectionSpeed(small: 0.0, medium: 0.0, large: 0.0)
 

@@ -7,5 +7,3 @@ extension Bundle {
         return Bundle.module
     }
 }
-
-public typealias PlatformImageType = ImagePlaceholder

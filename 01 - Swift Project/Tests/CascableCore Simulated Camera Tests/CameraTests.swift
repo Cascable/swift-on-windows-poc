@@ -1,6 +1,7 @@
 import Foundation
 import XCTest
-@testable import CascableCore_Simulated_Camera
+import CascableCoreAPI
+@testable import CascableCoreSimulatedCamera
 
 class CameraTests: XCTestCase, CameraDiscoveryProviderDelegate {
 

@@ -8,22 +8,7 @@
 
 import Foundation
 import StopKit
-
-#if os(iOS) || targetEnvironment(macCatalyst)
-import UIKit
-import MobileCoreServices
-typealias CBLPlatformImageType = UIImage
-#elseif canImport(AppKit)
-import AppKit
-typealias CBLPlatformImageType = NSImage
-#else
-public struct ImagePlaceholder {
-    init(data: Data) { self.imageData = data }
-    public let imageData: Data
-}
-typealias CBLPlatformImageType = ImagePlaceholder
-#endif
-import Foundation
+import CascableCoreAPI
 
 #if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
@@ -194,13 +179,13 @@ class SimulatedLiveViewFrame: NSObject, NSCopying, LiveViewFrame {
         self.aspect = size
         self.imageFrameInAspect = CGRect(origin: .zero, size: size)
         if decodeImage {
-            image = CBLPlatformImageType(data: imageData)
+            image = PlatformImageType(data: imageData)
         } else {
             image = nil
         }
     }
 
-    var image: CBLPlatformImageType?
+    var image: PlatformImageType?
     var rawPixelData: Data
     var aspect: CGSize
     var rawPixelSize: CGSize
@@ -353,12 +338,12 @@ class SimulatedCameraInitiatedTransferResult: NSObject, CameraInitiatedTransferR
         completionHandler(jpegData, nil)
     }
 
-    func generatePreviewImage(completionHandler: @escaping (CBLPlatformImageType?, Error?) -> Void) {
+    func generatePreviewImage(completionHandler: @escaping (PlatformImageType?, Error?) -> Void) {
         guard availableRepresentations.contains(.preview) else {
             completionHandler(nil, NSError(cblErrorCode: .noThumbnail))
             return
         }
-        let image = CBLPlatformImageType(data: jpegData)
+        let image = PlatformImageType(data: jpegData)
         completionHandler(image, nil)
     }
 }

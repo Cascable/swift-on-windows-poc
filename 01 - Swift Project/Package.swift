@@ -7,21 +7,18 @@ let package = Package(
     name: "CascableCore Simulated Camera",
     defaultLocalization: "en",
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
-        .library(
-            name: "CascableCore Simulated Camera",
-            targets: ["CascableCore Simulated Camera"]),
-        .library(name: "StopKit", targets: ["StopKit"])
+        .library(name: "CascableCoreAPI", targets: ["CascableCoreAPI"]),
+        .library(name: "StopKit", targets: ["StopKit"]),
+        .library(name: "CascableCore Simulated Camera", targets: ["CascableCoreSimulatedCamera"])
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
-        .target(name: "CascableCore Simulated Camera",
-                dependencies: ["StopKit"],
+        .target(name: "CascableCoreAPI", dependencies: ["StopKit"]), // The public CascableCore API.
+        .target(name: "StopKit"), // StopKit, a library for working with units of light.
+        .testTarget(name: "StopKit Tests", dependencies: ["StopKit"]), // StopKit tests.
+        .target(name: "CascableCoreSimulatedCamera", // The simulated camera - an example implementation of the CascableCore API.
+                dependencies: ["StopKit", "CascableCoreAPI"],
                 resources: [.copy("Resources/Live View Images")],
                 swiftSettings: [.unsafeFlags(["-Xfrontend", "-validate-tbd-against-ir=none"])]),
-        .testTarget(name: "CascableCore Simulated Camera Tests", dependencies: ["CascableCore Simulated Camera"]),
-        .target(name: "StopKit"),
-        .testTarget(name: "StopKit Tests", dependencies: ["StopKit"])
+        .testTarget(name: "CascableCore Simulated Camera Tests", dependencies: ["CascableCoreSimulatedCamera"]) // Simulated camera tests.
     ]
 )

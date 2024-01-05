@@ -137,8 +137,7 @@ public extension CascableCoreErrorCode {
 
 public let CascableCoreErrorDomain: String = "se.cascable"
 
-extension NSError {
-
+public extension NSError {
     convenience init(cblErrorCode: CascableCoreErrorCode) {
         self.init(domain: CascableCoreErrorDomain, code: Int(cblErrorCode.rawValue), userInfo: [NSLocalizedDescriptionKey: cblErrorCode.stringValue])
     }
