@@ -8,7 +8,7 @@
 
 import Foundation
 import StopKit
-import CascableCoreAPI
+import CascableCore
 
 struct PropertyValuesWithSuggestedDefault {
     let defaultValue: SimulatedPropertyValue?

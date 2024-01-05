@@ -8,7 +8,7 @@
 
 import Foundation
 import StopKit
-import CascableCoreAPI
+import CascableCore
 
 // MARK: - Property Identifier and Category Mapping
 // Note: This should be in our "CascableCore+Swift" API. It's also in the Phase One target.

@@ -8,7 +8,7 @@
 
 import Foundation
 import StopKit
-import CascableCoreAPI
+import CascableCore
 
 #if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers

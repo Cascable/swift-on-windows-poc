@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import CascableCoreAPI
+import CascableCore
 
 /// Configuration values for simulated cameras.
 public struct SimulatedCameraConfiguration {

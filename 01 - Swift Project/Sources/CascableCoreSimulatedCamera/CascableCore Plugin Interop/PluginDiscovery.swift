@@ -1,5 +1,5 @@
 import Foundation
-import CascableCoreAPI
+import CascableCore
 
 /// Implement the CBLCoreCameraDiscoveryProvider protocol in order to provide custom cameras and camera discovery
 /// to CascableCore. You can then register your camera provider with CascableCore in the plugin entrypoint.

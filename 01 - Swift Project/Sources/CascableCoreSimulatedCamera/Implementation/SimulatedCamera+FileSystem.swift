@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import CascableCoreAPI
+import CascableCore
 
 class SimulatedCameraStorage: NSObject, FileStorage {
 
