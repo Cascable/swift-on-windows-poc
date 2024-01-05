@@ -8,7 +8,7 @@ class CameraTests: XCTestCase, CameraDiscoveryProviderDelegate {
     var gotCameraExpectation: XCTestExpectation? = nil
     var discoveredCamera: Camera? = nil
 
-    func testCameraDiscovery() throws {
+    func testCameraDiscoveryAndConnection() throws {
         let modelName = "Windows Camera"
 
         var config = SimulatedCameraConfiguration.default
@@ -24,6 +24,57 @@ class CameraTests: XCTestCase, CameraDiscoveryProviderDelegate {
         wait(for: [gotCameraExpectation!], timeout: 1.0)
         let camera = try XCTUnwrap(discoveredCamera)
         XCTAssertEqual(camera.service.model, modelName)
+
+        let connectedToCameraExpectation = XCTestExpectation(description: "Connected to camera")
+        camera.connect(authenticationRequestCallback: { context in
+            XCTFail("Camera was configured for no auth, but we got an auth request!")
+        }, authenticationResolvedCallback: {
+            XCTFail("Camera was configured for no auth, but we got an auth resolution!")
+        }, completionCallback: { error, warnings in
+            XCTAssertNil(error)
+            connectedToCameraExpectation.fulfill()
+        })
+
+        wait(for: [connectedToCameraExpectation], timeout: 1.0)
+        XCTAssert(camera.connectionState == .connected)
+
+        let exposureModeProperty = camera.property(with: .autoExposureMode)
+
+        // Check we're in P and have the properties we'd expect.
+        let exposureModeValue = try XCTUnwrap(exposureModeProperty.currentValue)
+        XCTAssertEqual(exposureModeValue.commonValue, PropertyCommonValueAutoExposureMode.programAuto.rawValue)
+
+        let populatedInPProperties = camera.populatedProperties(in: .exposureSetting)
+        XCTAssertEqual(populatedInPProperties.count, 2)
+        XCTAssert(populatedInPProperties.contains(where: { $0.identifier == .exposureCompensation }))
+        XCTAssert(populatedInPProperties.contains(where: { $0.identifier == .isoSpeed }))
+
+        // Switch to M and make sure we get the properties we'd expect.
+        let manualValue = try XCTUnwrap(exposureModeProperty.validValue(matchingCommonValue: PropertyCommonValueAutoExposureMode.fullyManual.rawValue))
+        let setManualExpectation = XCTestExpectation(description: "Setting M")
+
+        exposureModeProperty.setValue(manualValue, completionHandler: { error in
+            XCTAssertNil(error)
+            setManualExpectation.fulfill()
+        })
+
+        wait(for: [setManualExpectation], timeout: 1.0)
+
+        let populatedInMProperties = camera.populatedProperties(in: .exposureSetting)
+        XCTAssertEqual(populatedInMProperties.count, 3)
+        XCTAssert(populatedInMProperties.contains(where: { $0.identifier == .aperture }))
+        XCTAssert(populatedInMProperties.contains(where: { $0.identifier == .shutterSpeed }))
+        XCTAssert(populatedInMProperties.contains(where: { $0.identifier == .isoSpeed }))
+
+        for property in camera.knownPropertyIdentifiers {
+            guard let identifier = PropertyIdentifier(rawValue: property.uintValue) else { continue }
+            let property = camera.property(with: identifier)
+            let currentValue = property.currentValue
+            print("Current value of \(property.localizedDisplayName ?? "??") is \(currentValue?.localizedDisplayValue ?? "nil")")
+            if property.localizedDisplayName == "Unknown" {
+                print(property.identifier)
+            }
+        }
     }
 
     /// Inform CascableCore that a new camera has been discovered.
@@ -33,7 +84,6 @@ class CameraTests: XCTestCase, CameraDiscoveryProviderDelegate {
     /// @param provider The provider that has discovered the new camera.
     /// @param camera The camera that has been discovered.
     func cameraDiscoveryProvider(_ provider: CameraDiscoveryProvider, didDiscover camera: Camera) {
-        print(camera)
         discoveredCamera = camera
         gotCameraExpectation?.fulfill()
     }

@@ -1,0 +1,10 @@
+/* 
+  SonyPTPPowerSources.strings
+  CascableCore
+
+  Created by Daniel Kennett on 2022-01-05.
+  Copyright © 2022 Cascable AB. All rights reserved.
+*/
+
+"Battery" = "Battery";
+"ExternalPower" = "External Power";

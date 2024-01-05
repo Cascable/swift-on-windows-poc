@@ -80,7 +80,7 @@ public class ExposureCompensationValue: NSObject, NSCopying, NSSecureCoding, Uni
         }()
 
         let numberString: String = {
-            if stopsFromZeroEV.wholeStopsFromZero != 0 || (stopsFromZeroEV.wholeStopsFromZero == 0 && stopsFromZeroEV.fraction != .none) {
+            if stopsFromZeroEV.wholeStopsFromZero != 0 || (stopsFromZeroEV.wholeStopsFromZero == 0 && stopsFromZeroEV.fraction == .none) {
                 return formatter.string(from: NSNumber(value: stopsFromZeroEV.wholeStopsFromZero)) ?? "\(stopsFromZeroEV.wholeStopsFromZero)"
             } else {
                 return ""

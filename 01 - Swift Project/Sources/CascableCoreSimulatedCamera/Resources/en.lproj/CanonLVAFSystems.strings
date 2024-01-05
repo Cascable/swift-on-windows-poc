@@ -1,0 +1,20 @@
+/* 
+  This file contains translations for the autofocus systems provided 
+  by Canon cameras. The values must match the wording used by the
+  camera (if provided) when set to this language.
+*/
+
+"EOSLiveViewAFSystemQuick" = "Quick Focus";
+"EOSLiveViewAFSystemSinglePointFlexiZone" = "FlexiZone Single";
+"EOSLiveViewAFSystemFaceDetect" = "Face Detection";
+"EOSLiveViewAFSystemFlexiZoneMulti" = "FlexiZone Multi";
+"EOSLiveViewAFSystemZone" = "Zone AF";
+"EOSLiveViewAFSystemExpandPlus" = "Expand AF Area: +";
+"EOSLiveViewAFSystemExpandAround" = "Expand AF Area: Around";
+"EOSLiveViewAFSystemLargeZoneHorizontal" = "Large Zone AF: Horizontal";
+"EOSLiveViewAFSystemLargeZoneVertical" = "Large Zone AF: Vertical";
+"EOSLiveViewAFSystemSpot" = "Spot AF";
+"EOSLiveViewAFSystemFlexiZoneAF1" = "Flexible Zone AF 1";
+"EOSLiveViewAFSystemFlexiZoneAF2" = "Flexible Zone AF 2";
+"EOSLiveViewAFSystemFlexiZoneAF3" = "Flexible Zone AF 3";
+"EOSLiveViewAFSystemWholeArea" = "Whole area AF";

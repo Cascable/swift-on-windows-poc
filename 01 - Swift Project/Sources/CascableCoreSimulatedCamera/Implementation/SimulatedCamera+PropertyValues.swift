@@ -226,7 +226,23 @@ extension SimulatedCamera {
             return localizedUniversalProperty(key: "CBLPropertyIdentifierShutterSpeed")
         case .whiteBalance:
             return localizedUniversalProperty(key: "CBLPropertyIdentifierWhiteBalance")
-        default:
+        case .exposureMeteringMode:
+            return localizedUniversalProperty(key: "CBLPropertyIdentifierExposureMeteringMode")
+        case .imageDestination:
+            return localizedUniversalProperty(key: "CBLPropertyIdentifierImageDestination")
+        case .lightMeterReading:
+            return localizedUniversalProperty(key: "CBLPropertyIdentifierLightMeterReading")
+        case .lightMeterStatus:
+            return localizedUniversalProperty(key: "CBLPropertyIdentifierLightMeterStatus")
+        case .liveViewZoomLevel:
+            return localizedUniversalProperty(key: "CBLPropertyIdentifierLiveViewZoomLevel")
+        case .readyForCapture:
+            return localizedUniversalProperty(key: "CBLPropertyIdentifierReadyForCapture")
+        case .videoRecordingFormat:
+            return localizedUniversalProperty(key: "CBLPropertyIdentifierVideoRecordingFormat")
+        case .max:
+            return "Unknown"
+        case .unknown:
             return "Unknown"
         }
     }
