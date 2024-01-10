@@ -1,0 +1,5 @@
+module clang {
+    header "Index.h"
+    link "clang"
+    export *
+}
