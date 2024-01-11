@@ -19,7 +19,16 @@ let package = Package(
             swiftSettings: [clangSwiftSettings],
             linkerSettings: [clangLinkerSettings]
         ),
-        .target(name: "clang", publicHeadersPath: "include", cSettings: [.headerSearchPath("include")])
+        .target(
+            name: "clang",
+            publicHeadersPath: "include",
+            cSettings: [.headerSearchPath("include")]
+        ),
+        .testTarget(
+            name: "SwiftToCLRTests",
+            dependencies: [.target(name: "SwiftToCLR"), .target(name: "clang")],
+            resources: [.copy("Resources")]
+        )
     ]
 )
 

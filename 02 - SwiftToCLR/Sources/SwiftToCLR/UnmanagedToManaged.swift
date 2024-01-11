@@ -17,19 +17,43 @@ struct UnmanagedToManaged: ParsableCommand {
 
     mutating func run() throws {
         
-        print("Using clang version:", clang_getClangVersion().consumeToString)
-
         guard FileManager.default.fileExists(atPath: commonOptions.inputHeader) else {
             throw ValidationError("Input file doesn't exist!")
         }
 
         guard FileManager.default.fileExists(atPath: outputDirectory) else {
-            throw ValidationError("Output direction doesn't exist!")
+            throw ValidationError("Output directory doesn't exist!")
         }
+
+        print("Using clang version:", clang_getClangVersion().consumeToString)
+
+        let generatedFiles: [GeneratedFile] = try UnmanagedToManagedOperation.execute(
+            inputHeaderPath: commonOptions.inputHeader,
+            inputNamespace: commonOptions.inputNamespace,
+            wrappedObjectVariableName: wrappedObjectVariableName,
+            outputNamespace: commonOptions.outputNamespace,
+            platformRoot: commonOptions.platformRoot,
+            verbose: commonOptions.verbose
+        )
+
+        for file in generatedFiles {
+            let outputPath = URL(filePath: outputDirectory, directoryHint: .isDirectory)
+                .appending(component: file.name, directoryHint: .notDirectory)
+            try file.contents.write(to: outputPath)
+        }
+    }
+}
+
+// MARK: - Work
+
+struct UnmanagedToManagedOperation {
+
+    static func execute(inputHeaderPath: String, inputNamespace: String, wrappedObjectVariableName: String,
+                 outputNamespace: String, platformRoot: String?, verbose: Bool) throws -> [GeneratedFile] {
 
         // Config & Setup
 
-        let sdkRootPath: String = commonOptions.platformRoot ?? Platform.defaultSDKRoot
+        let sdkRootPath: String = platformRoot ?? Platform.defaultSDKRoot
 
         let clangArguments: [String] = [
             "-x", "c++",
@@ -42,11 +66,13 @@ struct UnmanagedToManaged: ParsableCommand {
         var argumentPointers = clangArguments.map({ UnsafePointer<Int8>(strdup($0)) })
         var unit: CXTranslationUnit? = nil
 
-        let inputFilePath: URL = URL(filePath: commonOptions.inputHeader)
+        let inputFilePath: URL = URL(filePath: inputHeaderPath)
         let inputFileName: String = inputFilePath.lastPathComponent
 
+        guard let index: CXIndex = clang_createIndex(0, 0) else { throw ValidationError("Failed to initialise clang") }
+        defer { clang_disposeIndex(index) }
+
         argumentPointers.withUnsafeBufferPointer { ptr in
-            let index: CXIndex! = clang_createIndex(0, 0)
             let argumentsBasePtr = ptr.baseAddress!
             unit = clang_parseTranslationUnit(index, inputFilePath.path(percentEncoded: false),
                                               argumentsBasePtr, Int32(argumentPointers.count),
@@ -73,10 +99,8 @@ struct UnmanagedToManaged: ParsableCommand {
 
         var wrapperClasses: [String: ManagedCPPWrapperClass] = [:]
         let translationCursor: CXCursor = clang_getTranslationUnitCursor(unit)
-        
+
         // We have to do this to avoid captuing self
-        let commonOptions = commonOptions
-        let wrappedObjectVariableName = wrappedObjectVariableName
 
         clang_visitChildrenWithBlock(translationCursor) { (cursor, parent) -> CXChildVisitResult in
             let range: CXSourceRange = clang_getCursorExtent(cursor)
@@ -101,8 +125,8 @@ struct UnmanagedToManaged: ParsableCommand {
             if cursorKind == CXCursor_ClassDecl && parentKind == CXCursor_Namespace {
                 let className = displayName
                 let namespaceName = clang_getCursorDisplayName(parent).consumeToString
-                if namespaceName == commonOptions.inputNamespace {
-                    if commonOptions.verbose { print("Got class \(className) in target namespace \(namespaceName) - adding to wrapper list.") }
+                if namespaceName == inputNamespace {
+                    if verbose { print("Got class \(className) in target namespace \(namespaceName) - adding to wrapper list.") }
                     let wrapperClass = ManagedCPPWrapperClass(unmanagedClassName: className,
                                                               unmanagedNamespace: namespaceName,
                                                               unmanagedObjectName: wrappedObjectVariableName,
@@ -114,7 +138,7 @@ struct UnmanagedToManaged: ParsableCommand {
             if type.kind == CXType_FunctionProto && cursorKind == CXCursor_CXXMethod && parentKind == CXCursor_ClassDecl {
                 let className = clang_getCursorDisplayName(parent).consumeToString
                 if var wrapperClass = wrapperClasses[className], clang_getCXXAccessSpecifier(cursor) == CX_CXXPublic {
-                    if commonOptions.verbose { print("Got public method \(displayName) in class \(className) - adding to wrapper list.") }
+                    if verbose { print("Got public method \(displayName) in class \(className) - adding to wrapper list.") }
                     wrapperClass.generateWrappedMethodForUnmanagedMethod(at: cursor)
                     wrapperClasses[className] = wrapperClass // CoW and all that
                 }
@@ -126,7 +150,7 @@ struct UnmanagedToManaged: ParsableCommand {
         }
 
         // Generate content.
-        
+
         // TODO: Have these deal with multiple platforms properly.
         let hppContent: [String] = [
             "#pragma once",
@@ -138,16 +162,16 @@ struct UnmanagedToManaged: ParsableCommand {
         var cppContent: [String] = [
             "// This is an auto-generated file. Do not modify.",
             "",
-            "#include \"" + commonOptions.outputNamespace + ".h\"",
+            "#include \"" + outputNamespace + ".h\"",
             "#include <" + inputFileName + ">",
             "#include <msclr/marshal_cppstd.h>",
             "",
-            "using namespace " + commonOptions.inputNamespace + ";",
+            "using namespace " + inputNamespace + ";",
             "using namespace msclr::interop;",
             ""
         ]
 
-        cppContent.append("namespace " + commonOptions.outputNamespace + " {")
+        cppContent.append("namespace " + outputNamespace + " {")
 
         for wrapperDefinition in wrapperClasses.values {
             cppContent.append(contentsOf: wrapperDefinition.generateClassDefinition().map({ "    " + $0 }))
@@ -165,14 +189,10 @@ struct UnmanagedToManaged: ParsableCommand {
         let headerData = Data(hppContent.joined(separator: newLineCharacters).utf8)
         let implementationData = Data(cppContent.joined(separator: newLineCharacters).utf8)
 
-        let headerOutputPath = URL(filePath: outputDirectory, directoryHint: .isDirectory)
-            .appending(path: "\(commonOptions.outputNamespace).h", directoryHint: .notDirectory)
+        let headerFile = GeneratedFile(name: "\(outputNamespace).h", contents: headerData)
+        let implementationFile = GeneratedFile(name: "\(outputNamespace).cpp", contents: implementationData)
 
-        let implementationOutputPath = URL(filePath: outputDirectory, directoryHint: .isDirectory)
-            .appending(path: "\(commonOptions.outputNamespace).cpp", directoryHint: .notDirectory)
-
-        try headerData.write(to: headerOutputPath)
-        try implementationData.write(to: implementationOutputPath)
+        return [headerFile, implementationFile]
     }
 }
 

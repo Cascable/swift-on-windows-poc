@@ -40,3 +40,8 @@ struct TypeMapping: Hashable {
     let convertManagedToUnmanaged: (_ variableName: String) -> String
     let convertUnmanagedToManaged: (_ variableName: String) -> String
 }
+
+struct GeneratedFile {
+    let name: String
+    let contents: Data
+}
