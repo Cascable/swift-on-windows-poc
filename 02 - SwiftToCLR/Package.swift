@@ -8,12 +8,14 @@ let package = Package(
     platforms: [.macOS("13.0")],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
+        .package(url: "https://github.com/apple/swift-collections.git", from: "1.0.6")
     ],
     targets: [
         .executableTarget(
             name: "SwiftToCLR",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "OrderedCollections", package: "swift-collections"),
                 .target(name: "clang")
             ],
             swiftSettings: [clangSwiftSettings],

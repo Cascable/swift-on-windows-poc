@@ -1,5 +1,6 @@
 import Foundation
 import ArgumentParser
+import OrderedCollections
 import clang
 
 struct UnmanagedToManaged: ParsableCommand {
@@ -97,7 +98,9 @@ struct UnmanagedToManagedOperation {
 
         // Logic
 
-        var wrapperClasses: [String: ManagedCPPWrapperClass] = [:]
+        var wrapperClasses: OrderedDictionary<String, ManagedCPPWrapperClass> = [:]
+        var internalTypeMappings: [String: TypeMapping] = [:]
+
         let translationCursor: CXCursor = clang_getTranslationUnitCursor(unit)
 
         // We have to do this to avoid captuing self
@@ -131,7 +134,20 @@ struct UnmanagedToManagedOperation {
                                                               unmanagedNamespace: namespaceName,
                                                               unmanagedObjectName: wrappedObjectVariableName,
                                                               managedClassName: className, generatedMethods: [])
+
+                    // We also need to be able to adapt to/from it.
+                    // TODO: We'll need to either create these from forward-declarations *or* do two passes
+                    // to collect all of the types before we start method generation.
+                    let mapping = TypeMapping(unmanagedTypeName: wrapperClass.unmanagedNamespace + "::" + wrapperClass.unmanagedClassName,
+                                              managedTypeName: wrapperClass.managedClassName + "^",
+                                              convertManagedToUnmanaged: {
+                                                  return "\($0)->\(wrapperClass.unmanagedObjectName)"
+                                              }, convertUnmanagedToManaged: {
+                                                  return "\(wrapperClass.managedClassName)(\($0))"
+                                              })
+
                     wrapperClasses[className] = wrapperClass
+                    internalTypeMappings[className + " *"] = mapping // This seems fragile.
                 }
             }
 
@@ -139,7 +155,7 @@ struct UnmanagedToManagedOperation {
                 let className = clang_getCursorDisplayName(parent).consumeToString
                 if var wrapperClass = wrapperClasses[className], clang_getCXXAccessSpecifier(cursor) == CX_CXXPublic {
                     if verbose { print("Got public method \(displayName) in class \(className) - adding to wrapper list.") }
-                    wrapperClass.generateWrappedMethodForUnmanagedMethod(at: cursor)
+                    wrapperClass.generateWrappedMethodForUnmanagedMethod(at: cursor, internalTypeMappings: internalTypeMappings)
                     wrapperClasses[className] = wrapperClass // CoW and all that
                 }
             }
@@ -174,6 +190,7 @@ struct UnmanagedToManagedOperation {
         cppContent.append("namespace " + outputNamespace + " {")
 
         for wrapperDefinition in wrapperClasses.values {
+            cppContent.append("")
             cppContent.append(contentsOf: wrapperDefinition.generateClassDefinition().map({ "    " + $0 }))
         }
 
@@ -227,8 +244,8 @@ struct UnmanagedToManagedTypeMappings {
         stdStringMapping.managedTypeName: stdStringMapping
     ]
 
-    static func managedMapping(from unmanagedTypeName: String) -> TypeMapping {
-        return mappingsByUnManagedType[unmanagedTypeName] ?? .direct(for: unmanagedTypeName)
+    static func managedMapping(from unmanagedTypeName: String) -> TypeMapping? {
+        return mappingsByUnManagedType[unmanagedTypeName]
     }
 }
 
@@ -242,7 +259,7 @@ struct ManagedCPPWrapperClass {
 
     var generatedMethods: [[String]]
 
-    mutating func generateWrappedMethodForUnmanagedMethod(at cursor: CXCursor) {
+    mutating func generateWrappedMethodForUnmanagedMethod(at cursor: CXCursor, internalTypeMappings: [String: TypeMapping]) {
         let cursorType: CXType = clang_getCursorType(cursor)
         let cursorKind: CXCursorKind = clang_getCursorKind(cursor)
         assert(cursorType.kind == CXType_FunctionProto, "Passed wrong cursor type")
@@ -267,11 +284,17 @@ struct ManagedCPPWrapperClass {
 
         // We have everything we need to wrap the method now!
 
-        let returnTypeMapping = UnmanagedToManagedTypeMappings.managedMapping(from: unmanagedReturnTypeName)
+        func wrapping(for unmanagedTypeName: String) -> TypeMapping {
+            if let stdMapping = UnmanagedToManagedTypeMappings.managedMapping(from: unmanagedTypeName) { return stdMapping }
+            if let internalMapping = internalTypeMappings[unmanagedTypeName] { return internalMapping }
+            return .direct(for: unmanagedTypeName)
+        }
+
+        let returnTypeMapping = wrapping(for: unmanagedReturnTypeName)
         let managedReturnTypeName = returnTypeMapping.managedTypeName
 
         let managedMethodArguments: [String] = unmanagedArguments.map({ argument in
-            return "\(UnmanagedToManagedTypeMappings.managedMapping(from: argument.typeName).managedTypeName) \(argument.argumentName)"
+            return "\(wrapping(for: argument.typeName).managedTypeName) \(argument.argumentName)"
         })
 
         let openingLine = managedReturnTypeName + " " + unmanagedMethodName + "(" +
@@ -284,7 +307,7 @@ struct ManagedCPPWrapperClass {
         for (index, argument) in unmanagedArguments.enumerated() {
             // We need to bridge each argument to the unmanaged type.
             let unmanagedType = argument.typeName
-            let mapping = UnmanagedToManagedTypeMappings.managedMapping(from: unmanagedType)
+            let mapping = wrapping(for: unmanagedType)
             let adaptedArgument: String = unmanagedType + " " + parameterName + "\(index) = " + mapping.convertManagedToUnmanaged(argument.argumentName) + ";"
             methodLines.append("    " + adaptedArgument)
         }
@@ -318,12 +341,13 @@ struct ManagedCPPWrapperClass {
         lines.append("    " + scopedUnmanagedTypeName + " *" + unmanagedObjectName + ";")
         lines.append("public:")
         lines.append("    " + managedClassName + "() : " + unmanagedObjectName + "(new " + scopedUnmanagedTypeName + "()) {}")
+        lines.append("    " + managedClassName + "(" + scopedUnmanagedTypeName + " * wrapped) : " + unmanagedObjectName + "(wrapped) {}")
+        // TODO: This might be bad when wrapping. We might want to use shared_ptr.
         lines.append("    ~" + managedClassName + "() { delete " + unmanagedObjectName + "; }")
-        lines.append("")
 
         for methodLines in generatedMethods {
-            lines.append(contentsOf: methodLines.map({ "    " + $0 }))
             lines.append("")
+            lines.append(contentsOf: methodLines.map({ "    " + $0 }))
         }
 
         lines.append("};")

@@ -7,6 +7,7 @@
 #include <string>
 
 class UnmanagedAPIInternal;
+class CustomDataObject;
 
 namespace UnmanagedSwiftWrapper {
 
@@ -23,6 +24,16 @@ namespace UnmanagedSwiftWrapper {
         void SayHello(const std::string& name);
         
         void PerformMagic(void);
+
+        CustomDataObject *ProcessDataObject(CustomDataObject *object);
+    };
+
+    class CustomDataObject {
+    public:
+        CustomDataObject();
+        ~CustomDataObject();
+
+        std::string MyCoolProperty(void);
     };
 }
 
