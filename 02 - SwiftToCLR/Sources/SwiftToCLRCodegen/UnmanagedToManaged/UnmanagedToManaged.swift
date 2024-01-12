@@ -88,18 +88,19 @@ public struct UnmanagedToManagedOperation {
                     let wrapperClass = ManagedCPPWrapperClass(unmanagedClassName: className,
                                                               unmanagedNamespace: namespaceName,
                                                               unmanagedObjectName: wrappedObjectVariableName,
-                                                              managedClassName: className, generatedMethods: [])
+                                                              managedClassName: className,
+                                                              managedNamespace: outputNamespace)
 
                     // We also need to be able to adapt to/from it.
                     // As long the header we're wrapping forward-declares everything within the namespace, this works
                     // alright. Without, we'd need to do two passes - one to collect all the types, then another to
                     // adapt the method calls.
                     let mapping = TypeMapping(wrappedTypeName: wrapperClass.unmanagedNamespace + "::" + wrapperClass.unmanagedClassName + " *",
-                                              wrapperTypeName: wrapperClass.managedClassName + "^",
+                                              wrapperTypeName: wrapperClass.managedNamespace + "::" + wrapperClass.managedClassName + "^",
                                               convertWrapperToWrapped: {
                                                   return "\($0)->\(wrapperClass.unmanagedObjectName)"
                                               }, convertWrappedToWrapper: {
-                                                  return "gcnew \(wrapperClass.managedClassName)(\($0))"
+                                                  return "gcnew \(wrapperClass.managedNamespace)::\(wrapperClass.managedClassName)(\($0))"
                                               })
 
                     wrapperClasses[className] = wrapperClass
@@ -124,33 +125,47 @@ public struct UnmanagedToManagedOperation {
         // Generate content.
 
         // TODO: Have these deal with multiple platforms properly.
-        let hppContent: [String] = [
+        var hppContent: [String] = [
+            "// This is an auto-generated file. Do not modify.",
             "#pragma once",
             "#define WIN32_LEAN_AND_MEAN",
             "#include <windows.h>",
+            "#include <" + inputFileName + ">",
             ""
         ]
+
+        hppContent.append("namespace " + outputNamespace + " {")
+        hppContent.append("")
+
+        // We need to forward-declare all of our classes in case they reference each other.
+        for wrapperClass in wrapperClasses.values {
+            hppContent.append("    " + "ref class " + wrapperClass.managedClassName + ";")
+        }
+
+        for wrapperClass in wrapperClasses.values {
+            hppContent.append("")
+            hppContent.append(contentsOf: wrapperClass.generateClassDefinition().map({ "    " + $0 }))
+        }
+
+        hppContent.append("}")
+        hppContent.append("")
 
         var cppContent: [String] = [
             "// This is an auto-generated file. Do not modify.",
             "",
             "#include \"" + outputNamespace + ".h\"",
-            "#include <" + inputFileName + ">",
             "#include <msclr/marshal_cppstd.h>",
             "",
-            "using namespace " + inputNamespace + ";",
             "using namespace msclr::interop;",
             ""
         ]
 
-        cppContent.append("namespace " + outputNamespace + " {")
-
-        for wrapperDefinition in wrapperClasses.values {
+        for wrapperClass in wrapperClasses.values {
+            cppContent.append("// Implementation of " + wrapperClass.managedNamespace + "::" + wrapperClass.managedClassName)
             cppContent.append("")
-            cppContent.append(contentsOf: wrapperDefinition.generateClassDefinition().map({ "    " + $0 }))
+            cppContent.append(contentsOf: wrapperClass.generateClassImplementation())
         }
 
-        cppContent.append("}")
         cppContent.append("")
 
         #if os(Windows)
@@ -212,8 +227,20 @@ struct ManagedCPPWrapperClass {
     let unmanagedObjectName: String
 
     let managedClassName: String
+    let managedNamespace: String
 
-    var generatedMethods: [[String]]
+    var generatedMethodDefinitions: [String] // For the header file
+    var generatedMethodImplementations: [[String]]  // For the implementation file.
+
+    init(unmanagedClassName: String, unmanagedNamespace: String, unmanagedObjectName: String, managedClassName: String, managedNamespace: String) {
+        self.unmanagedClassName = unmanagedClassName
+        self.unmanagedNamespace = unmanagedNamespace
+        self.unmanagedObjectName = unmanagedObjectName
+        self.managedClassName = managedClassName
+        self.managedNamespace = managedNamespace
+        self.generatedMethodDefinitions = []
+        self.generatedMethodImplementations = []
+    }
 
     mutating func generateWrappedMethodForUnmanagedMethod(at cursor: CXCursor, internalTypeMappings: [String: TypeMapping]) {
         let cursorType: CXType = clang_getCursorType(cursor)
@@ -253,8 +280,16 @@ struct ManagedCPPWrapperClass {
             return "\(wrapping(for: argument.typeName).wrapperTypeName) \(argument.argumentName)"
         })
 
-        let openingLine = managedReturnTypeName + " " + unmanagedMethodName + "(" +
-        managedMethodArguments.joined(separator: ", ") + ") {"
+        // Header definition.
+        let methodDefinition = managedReturnTypeName + " " + unmanagedMethodName + "(" +
+            managedMethodArguments.joined(separator: ", ") + ");"
+        generatedMethodDefinitions.append(methodDefinition)
+
+        // Implementation
+
+        let openingLine: String = managedReturnTypeName + " " + managedNamespace + "::" + managedClassName + "::" +
+            unmanagedMethodName + "(" + managedMethodArguments.joined(separator: ", ") + ") {"
+
         var methodLines: [String] = [openingLine]
 
         let parameterName: String = "arg"
@@ -285,7 +320,7 @@ struct ManagedCPPWrapperClass {
         }
 
         methodLines.append("}")
-        generatedMethods.append(methodLines)
+        generatedMethodImplementations.append(methodLines)
     }
 
     func generateClassDefinition() -> [String] {
@@ -301,13 +336,22 @@ struct ManagedCPPWrapperClass {
         lines.append("    " + managedClassName + "(" + scopedUnmanagedTypeName + " * wrapped) : " + unmanagedObjectName + "(wrapped) {}")
         // TODO: This might be bad when wrapping. We might want to use shared_ptr.
         lines.append("    ~" + managedClassName + "() { delete " + unmanagedObjectName + "; }")
+        lines.append("")
 
-        for methodLines in generatedMethods {
-            lines.append("")
-            lines.append(contentsOf: methodLines.map({ "    " + $0 }))
+        for methodDefinition in generatedMethodDefinitions {
+            lines.append("    "  + methodDefinition)
         }
 
         lines.append("};")
+        return lines
+    }
+
+    func generateClassImplementation() -> [String] {
+        var lines: [String] = []
+        for implementation in generatedMethodImplementations {
+            lines.append(contentsOf: implementation)
+            lines.append("")
+        }
         return lines
     }
 }
