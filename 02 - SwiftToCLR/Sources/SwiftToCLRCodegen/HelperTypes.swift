@@ -17,28 +17,30 @@ struct Platform {
 /// A representation of a mapping between two related types (such as `swift::string` and `std::string`).
 struct TypeMapping: Hashable {
     static func == (lhs: TypeMapping, rhs: TypeMapping) -> Bool {
-        return lhs.unmanagedTypeName == rhs.unmanagedTypeName && lhs.managedTypeName == rhs.unmanagedTypeName
+        return lhs.wrappedTypeName == rhs.wrappedTypeName && lhs.wrapperTypeName == rhs.wrapperTypeName
     }
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(unmanagedTypeName)
-        hasher.combine(managedTypeName)
+        hasher.combine(wrappedTypeName)
+        hasher.combine(wrapperTypeName)
     }
 
     /// Returns a "direct" mapping (i.e., no work needs to be done) for a given type.
     static func direct(for typeName: String) -> TypeMapping {
-        return TypeMapping(unmanagedTypeName: typeName, managedTypeName: typeName, convertManagedToUnmanaged: {
+        return TypeMapping(wrappedTypeName: typeName, wrapperTypeName: typeName, convertWrapperToWrapped: {
             return $0
-        }, convertUnmanagedToManaged: {
+        }, convertWrappedToWrapper: {
             return $0
         })
     }
 
-    let unmanagedTypeName: String
-    let managedTypeName: String
+    /// The "inside" type, such as `std::string`.
+    let wrappedTypeName: String
+    /// The "outside" type, such as `system::string`.
+    let wrapperTypeName: String
 
-    let convertManagedToUnmanaged: (_ variableName: String) -> String
-    let convertUnmanagedToManaged: (_ variableName: String) -> String
+    let convertWrapperToWrapped:(_ variableName: String) -> String
+    let convertWrappedToWrapper: (_ variableName: String) -> String
 }
 
 public struct GeneratedFile {

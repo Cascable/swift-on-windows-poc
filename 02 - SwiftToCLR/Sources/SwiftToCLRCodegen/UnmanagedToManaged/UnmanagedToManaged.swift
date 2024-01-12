@@ -91,14 +91,15 @@ public struct UnmanagedToManagedOperation {
                                                               managedClassName: className, generatedMethods: [])
 
                     // We also need to be able to adapt to/from it.
-                    // TODO: We'll need to either create these from forward-declarations *or* do two passes
-                    // to collect all of the types before we start method generation.
-                    let mapping = TypeMapping(unmanagedTypeName: wrapperClass.unmanagedNamespace + "::" + wrapperClass.unmanagedClassName,
-                                              managedTypeName: wrapperClass.managedClassName + "^",
-                                              convertManagedToUnmanaged: {
+                    // As long the header we're wrapping forward-declares everything within the namespace, this works
+                    // alright. Without, we'd need to do two passes - one to collect all the types, then another to
+                    // adapt the method calls.
+                    let mapping = TypeMapping(wrappedTypeName: wrapperClass.unmanagedNamespace + "::" + wrapperClass.unmanagedClassName + " *",
+                                              wrapperTypeName: wrapperClass.managedClassName + "^",
+                                              convertWrapperToWrapped: {
                                                   return "\($0)->\(wrapperClass.unmanagedObjectName)"
-                                              }, convertUnmanagedToManaged: {
-                                                  return "\(wrapperClass.managedClassName)(\($0))"
+                                              }, convertWrappedToWrapper: {
+                                                  return "gcnew \(wrapperClass.managedClassName)(\($0))"
                                               })
 
                     wrapperClasses[className] = wrapperClass
@@ -173,30 +174,30 @@ public struct UnmanagedToManagedOperation {
 struct UnmanagedToManagedTypeMappings {
 
     static let stdStringMapping: TypeMapping =
-        TypeMapping(unmanagedTypeName: "std::string",
-                    managedTypeName: "System::String^",
-                    convertManagedToUnmanaged: {
+        TypeMapping(wrappedTypeName: "std::string",
+                    wrapperTypeName: "System::String^",
+                    convertWrapperToWrapped: {
             return "marshal_as<std::string>(\($0))"
-        }, convertUnmanagedToManaged: {
+        }, convertWrappedToWrapper: {
             return "marshal_as<System::String^>(\($0))"
         })
 
     static let constStdStringMapping: TypeMapping =
-        TypeMapping(unmanagedTypeName: "const std::string &",
-                    managedTypeName: "System::String^",
-                    convertManagedToUnmanaged: {
+        TypeMapping(wrappedTypeName: "const std::string &",
+                    wrapperTypeName: "System::String^",
+                    convertWrapperToWrapped: {
             return "marshal_as<std::string>(\($0))"
-        }, convertUnmanagedToManaged: {
+        }, convertWrappedToWrapper: {
             return "marshal_as<System::String^>(\($0))"
         })
 
     static let mappingsByUnManagedType: [String: TypeMapping] = [
-        stdStringMapping.unmanagedTypeName: stdStringMapping,
-        constStdStringMapping.unmanagedTypeName: constStdStringMapping
+        stdStringMapping.wrappedTypeName: stdStringMapping,
+        constStdStringMapping.wrappedTypeName: constStdStringMapping
     ]
 
     static let mappingsByManagedType: [String: TypeMapping] = [
-        stdStringMapping.managedTypeName: stdStringMapping
+        stdStringMapping.wrapperTypeName: stdStringMapping
     ]
 
     static func managedMapping(from unmanagedTypeName: String) -> TypeMapping? {
@@ -246,10 +247,10 @@ struct ManagedCPPWrapperClass {
         }
 
         let returnTypeMapping = wrapping(for: unmanagedReturnTypeName)
-        let managedReturnTypeName = returnTypeMapping.managedTypeName
+        let managedReturnTypeName = returnTypeMapping.wrapperTypeName
 
         let managedMethodArguments: [String] = unmanagedArguments.map({ argument in
-            return "\(wrapping(for: argument.typeName).managedTypeName) \(argument.argumentName)"
+            return "\(wrapping(for: argument.typeName).wrapperTypeName) \(argument.argumentName)"
         })
 
         let openingLine = managedReturnTypeName + " " + unmanagedMethodName + "(" +
@@ -263,7 +264,7 @@ struct ManagedCPPWrapperClass {
             // We need to bridge each argument to the unmanaged type.
             let unmanagedType = argument.typeName
             let mapping = wrapping(for: unmanagedType)
-            let adaptedArgument: String = unmanagedType + " " + parameterName + "\(index) = " + mapping.convertManagedToUnmanaged(argument.argumentName) + ";"
+            let adaptedArgument: String = mapping.wrappedTypeName + " " + parameterName + "\(index) = " + mapping.convertWrapperToWrapped(argument.argumentName) + ";"
             methodLines.append("    " + adaptedArgument)
         }
 
@@ -274,11 +275,12 @@ struct ManagedCPPWrapperClass {
             methodLines.append("    " + methodCall)
         } else {
             // Call the method!
-            let methodCall: String = unmanagedReturnTypeName + " unmanagedResult = " + unmanagedObjectName + "->" + unmanagedMethodName + "(" + args + ");"
+            let methodCall: String = returnTypeMapping.wrappedTypeName + " unmanagedResult = " + unmanagedObjectName
+                                        + "->" + unmanagedMethodName + "(" + args + ");"
             methodLines.append("    " + methodCall)
 
             // Finally, translate back to the managed type and return it.
-            let returnLine = "return " + returnTypeMapping.convertUnmanagedToManaged("unmanagedResult") + ";"
+            let returnLine = "return " + returnTypeMapping.convertWrappedToWrapper("unmanagedResult") + ";"
             methodLines.append("    " + returnLine)
         }
 
@@ -293,8 +295,8 @@ struct ManagedCPPWrapperClass {
 
         lines.append("public ref class " + managedClassName + " {")
         lines.append("private:")
-        lines.append("    " + scopedUnmanagedTypeName + " *" + unmanagedObjectName + ";")
         lines.append("public:")
+        lines.append("    " + scopedUnmanagedTypeName + " *" + unmanagedObjectName + ";")
         lines.append("    " + managedClassName + "() : " + unmanagedObjectName + "(new " + scopedUnmanagedTypeName + "()) {}")
         lines.append("    " + managedClassName + "(" + scopedUnmanagedTypeName + " * wrapped) : " + unmanagedObjectName + "(wrapped) {}")
         // TODO: This might be bad when wrapping. We might want to use shared_ptr.

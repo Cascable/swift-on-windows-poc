@@ -6,10 +6,15 @@
 #include <stdlib.h>
 #include <string>
 
+#ifndef UNMANAGED_SWIFT_WRAPPER
+#define UNMANAGED_SWIFT_WRAPPER
+
 class UnmanagedAPIInternal;
-class CustomDataObject;
 
 namespace UnmanagedSwiftWrapper {
+
+    class UnmanagedAPI;
+    class CustomDataObject;
 
     class UnmanagedAPI {
     private:
@@ -20,9 +25,9 @@ namespace UnmanagedSwiftWrapper {
         ~UnmanagedAPI();
 
         std::string Greet(const std::string& name);
-        
+
         void SayHello(const std::string& name);
-        
+
         void PerformMagic(void);
 
         CustomDataObject *ProcessDataObject(CustomDataObject *object);
@@ -37,3 +42,4 @@ namespace UnmanagedSwiftWrapper {
     };
 }
 
+#endif //UNMANAGED_SWIFT_WRAPPER
