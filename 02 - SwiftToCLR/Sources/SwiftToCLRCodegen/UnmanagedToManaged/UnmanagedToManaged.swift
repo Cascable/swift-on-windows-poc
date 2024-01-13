@@ -19,7 +19,13 @@ public struct UnmanagedToManagedOperation {
             //"-I/path/to/swift/cxx-interop-headers" // Parent folder of swiftToCxx - not needed here.
         ]
 
-        var argumentPointers = clangArguments.map({ UnsafePointer<Int8>(_strdup($0)) })
+        var argumentPointers = clangArguments.map({
+            #if os(Windows)
+            return UnsafePointer<Int8>(_strdup($0))
+            #else
+            return UnsafePointer<Int8>(strdup($0))
+            #endif
+        })
         var unit: CXTranslationUnit? = nil
 
         let inputFilePath: URL = URL(fileURLWithPath: inputHeaderPath)
