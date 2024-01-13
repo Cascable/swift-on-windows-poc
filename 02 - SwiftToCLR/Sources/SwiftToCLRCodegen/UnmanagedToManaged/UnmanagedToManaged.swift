@@ -1,55 +1,10 @@
 import Foundation
-import ArgumentParser
-import OrderedCollections
 import clang
+import OrderedCollections
 
-struct UnmanagedToManaged: ParsableCommand {
+public struct UnmanagedToManagedOperation {
 
-    static var configuration = CommandConfiguration(commandName: "unmanaged-to-managed",
-                                                    abstract: "Wrap an 'unmanaged' C++ API into a 'managed' one, accessible by the .NET CLR.")
-
-    @OptionGroup var commonOptions: CommonOptions
-
-    @Option(name: .shortAndLong, help: "The output directory. C++ implementation and header files will be emitted here, named after the output namespace.")
-    var outputDirectory: String
-
-    @Option(name: .customLong("wrapped-object-name"), help: "The variable name of the wrapped object. Defaults to 'wrappedObj'.")
-    var wrappedObjectVariableName: String = "wrappedObj"
-
-    mutating func run() throws {
-        
-        guard FileManager.default.fileExists(atPath: commonOptions.inputHeader) else {
-            throw ValidationError("Input file doesn't exist!")
-        }
-
-        guard FileManager.default.fileExists(atPath: outputDirectory) else {
-            throw ValidationError("Output directory doesn't exist!")
-        }
-
-        print("Using clang version:", clang_getClangVersion().consumeToString)
-
-        let generatedFiles: [GeneratedFile] = try UnmanagedToManagedOperation.execute(
-            inputHeaderPath: commonOptions.inputHeader,
-            inputNamespace: commonOptions.inputNamespace,
-            wrappedObjectVariableName: wrappedObjectVariableName,
-            outputNamespace: commonOptions.outputNamespace,
-            platformRoot: commonOptions.platformRoot,
-            verbose: commonOptions.verbose
-        )
-
-        for file in generatedFiles {
-            let outputPath = URL(filePath: outputDirectory, directoryHint: .isDirectory)
-                .appending(component: file.name, directoryHint: .notDirectory)
-            try file.contents.write(to: outputPath)
-        }
-    }
-}
-
-// MARK: - Work
-
-struct UnmanagedToManagedOperation {
-
-    static func execute(inputHeaderPath: String, inputNamespace: String, wrappedObjectVariableName: String,
+    public static func execute(inputHeaderPath: String, inputNamespace: String, wrappedObjectVariableName: String,
                  outputNamespace: String, platformRoot: String?, verbose: Bool) throws -> [GeneratedFile] {
 
         // Config & Setup
@@ -64,27 +19,27 @@ struct UnmanagedToManagedOperation {
             //"-I/path/to/swift/cxx-interop-headers" // Parent folder of swiftToCxx - not needed here.
         ]
 
-        var argumentPointers = clangArguments.map({ UnsafePointer<Int8>(strdup($0)) })
+        var argumentPointers = clangArguments.map({ UnsafePointer<Int8>(_strdup($0)) })
         var unit: CXTranslationUnit? = nil
 
-        let inputFilePath: URL = URL(filePath: inputHeaderPath)
+        let inputFilePath: URL = URL(fileURLWithPath: inputHeaderPath)
         let inputFileName: String = inputFilePath.lastPathComponent
 
-        guard let index: CXIndex = clang_createIndex(0, 0) else { throw ValidationError("Failed to initialise clang") }
+        guard let index: CXIndex = clang_createIndex(0, 0) else { throw ClangError.initialization("Failed to initialise clang") }
         defer { clang_disposeIndex(index) }
 
         argumentPointers.withUnsafeBufferPointer { ptr in
             let argumentsBasePtr = ptr.baseAddress!
-            unit = clang_parseTranslationUnit(index, inputFilePath.path(percentEncoded: false),
+            unit = clang_parseTranslationUnit(index, inputFilePath.path,
                                               argumentsBasePtr, Int32(argumentPointers.count),
-                                              nil, 0, CXTranslationUnit_None.rawValue)
+                                              nil, 0, UInt32(CXTranslationUnit_None.rawValue))
         }
 
         argumentPointers.forEach({ free(UnsafeMutablePointer(mutating: $0)) })
         argumentPointers = []
 
         guard let unit else {
-            throw ValidationError("Failed to initialise clang with the given input. Make sure it's a valid C++ header file.")
+            throw ClangError.initialization("Failed to initialise clang with the given input. Make sure it's a valid C++ header file.")
         }
 
         let numberOfDiagnosticMessages = clang_getNumDiagnostics(unit)
@@ -216,7 +171,7 @@ struct UnmanagedToManagedOperation {
 // MARK: - Types
 
 struct UnmanagedToManagedTypeMappings {
-    
+
     static let stdStringMapping: TypeMapping =
         TypeMapping(unmanagedTypeName: "std::string",
                     managedTypeName: "System::String^",

@@ -15,6 +15,12 @@ let package = Package(
             name: "SwiftToCLR",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .target(name: "SwiftToCLRCodegen")
+            ]
+        ),
+        .target(
+            name: "SwiftToCLRCodegen",
+            dependencies: [
                 .product(name: "OrderedCollections", package: "swift-collections"),
                 .target(name: "clang")
             ],
@@ -28,13 +34,74 @@ let package = Package(
         ),
         .testTarget(
             name: "SwiftToCLRTests",
-            dependencies: [.target(name: "SwiftToCLR"), .target(name: "clang")],
+            dependencies: [.target(name: "SwiftToCLRCodegen"), .target(name: "clang")],
             resources: [.copy("Resources")]
         )
     ]
 )
 
-// On the Mac, clang's binary is in the Xcode toolchain. We'll need to have platform-specific values for this.
+#if os(Windows)
+
+var pathSeparator: String { return "\\" }
+
+// On the Windows, clang's binary is in the Swift toolchain.
+var clangSwiftSettings: SwiftSetting {
+    let libPath = findLibPath()
+    return .unsafeFlags([
+        "-I\(libPath)" + pathSeparator + "libclang.lib"
+    ])
+}
+
+var clangLinkerSettings: LinkerSetting {
+    let libPath = findLibPath()
+    return .unsafeFlags([
+        "-L\(libPath)",
+        "-llibclang"
+    ])
+}
+
+func findLibPath() -> String {
+    let developerPath = findDeveloperPath()
+    let toolchain = findToolchain(in: developerPath)
+    return [toolchain, "usr", "lib"].joined(separator: pathSeparator)
+}
+
+func findDeveloperPath() -> String {
+    // Dev snapshots seem to install into AppData.
+    let userLocalDirectory = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent("AppData")
+        .appendingPathComponent("Local")
+        .appendingPathComponent("Programs")
+        .appendingPathComponent("Swift")
+
+    if (try? userLocalDirectory.checkResourceIsReachable()) == true {
+        return userLocalDirectory.pathComponents.joined(separator: pathSeparator)
+    }
+
+    // Earlier/release builds install into <boot>/Library/Developer.
+    // The assumption here is that the first drive not reserved for floppies is the boot drive.
+    let volumes = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: [], options: .skipHiddenVolumes)
+    let bootVolume = volumes?.compactMap({ $0.pathComponents.first }).first(where: { !$0.hasPrefix("A:") && !$0.hasPrefix("B:") })
+    return [(bootVolume ?? "C:"), "Library", "Developer"].joined(separator: pathSeparator)
+}
+
+func findToolchain(in developerPath: String) -> String {
+    let toolchainsPath = URL(fileURLWithPath: developerPath + pathSeparator + "Toolchains")
+    guard let children = try? FileManager.default.contentsOfDirectory(
+        at: toolchainsPath,
+        includingPropertiesForKeys: [.isDirectoryKey],
+        options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants, .skipsPackageDescendants]
+    ) else {
+        fatalError("Developer path doesn't exist or contain any toolchains: " + developerPath)
+    }
+    let toolchain = children.first(where: { (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true })
+    let toolchainName = toolchain?.lastPathComponent ?? "???"
+    return [developerPath, "Toolchains", toolchainName].joined(separator: pathSeparator)
+}
+
+#else
+
+// On the Mac, clang's binary is in the Xcode toolchain.
 var clangSwiftSettings: SwiftSetting {
     let developerPath = findDeveloperPath()
     return .unsafeFlags([
@@ -84,3 +151,5 @@ func findDeveloperPath() -> String {
 
     return output
 }
+
+#endif

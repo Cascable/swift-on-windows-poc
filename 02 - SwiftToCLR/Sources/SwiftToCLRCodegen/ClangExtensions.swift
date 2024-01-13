@@ -1,6 +1,14 @@
 import Foundation
 import clang
 
+enum ClangError: Error {
+    case initialization(String)
+}
+
+public func clangVersionString() -> String {
+    return clang_getClangVersion().consumeToString
+}
+
 extension CXString: CustomStringConvertible, CustomDebugStringConvertible {
 
     public var description: String {

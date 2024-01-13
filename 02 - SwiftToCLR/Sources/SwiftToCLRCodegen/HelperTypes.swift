@@ -24,7 +24,7 @@ struct TypeMapping: Hashable {
         hasher.combine(unmanagedTypeName)
         hasher.combine(managedTypeName)
     }
-    
+
     /// Returns a "direct" mapping (i.e., no work needs to be done) for a given type.
     static func direct(for typeName: String) -> TypeMapping {
         return TypeMapping(unmanagedTypeName: typeName, managedTypeName: typeName, convertManagedToUnmanaged: {
@@ -41,7 +41,7 @@ struct TypeMapping: Hashable {
     let convertUnmanagedToManaged: (_ variableName: String) -> String
 }
 
-struct GeneratedFile {
-    let name: String
-    let contents: Data
+public struct GeneratedFile {
+    public let name: String
+    public let contents: Data
 }

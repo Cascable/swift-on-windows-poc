@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import SwiftToCLR
+@testable import SwiftToCLRCodegen
 
 class UnmanagedToManagedTests: XCTestCase {
 
@@ -9,8 +9,8 @@ class UnmanagedToManagedTests: XCTestCase {
         let inputFile = try XCTUnwrap(testFile(named: "UnmanagedSwiftWrapper", extension: "h"))
 
         let resultFiles = try UnmanagedToManagedOperation.execute(
-            inputHeaderPath: inputFile.path(percentEncoded: false),
-            inputNamespace: "UnmanagedSwiftWrapper", 
+            inputHeaderPath: inputFile.path,
+            inputNamespace: "UnmanagedSwiftWrapper",
             wrappedObjectVariableName: "wrappedObj",
             outputNamespace: "ManagedWrapper",
             platformRoot: nil,

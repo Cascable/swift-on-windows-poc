@@ -1,6 +1,6 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
-// 
+//
 // Swift Argument Parser
 // https://swiftpackageindex.com/apple/swift-argument-parser/documentation
 
@@ -11,7 +11,7 @@ import ArgumentParser
 struct SwiftToCLR: ParsableCommand {
     static var configuration = CommandConfiguration(
         abstract: "Code generation for calling Swift code from the .NET CLR",
-        subcommands: [UnmanagedToManaged.self]
+        subcommands: [UnmanagedToManagedCommand.self]
     )
 }
 
