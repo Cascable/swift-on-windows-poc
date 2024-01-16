@@ -6,14 +6,6 @@ struct MethodArgument: Hashable {
     let argumentName: String
 }
 
-/// Platform helpers.
-struct Platform {
-    static var defaultSDKRoot: String {
-        // TODO: Try and make this smarter. Also Windows.
-        return "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
-    }
-}
-
 /// A representation of a mapping between two related types (such as `swift::string` and `std::string`).
 struct TypeMapping: Hashable {
     static func == (lhs: TypeMapping, rhs: TypeMapping) -> Bool {
