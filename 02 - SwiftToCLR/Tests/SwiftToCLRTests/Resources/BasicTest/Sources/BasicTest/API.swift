@@ -28,4 +28,9 @@ public class APIClass: APIProtocol {
     public func sayHello(to name: String) -> String {
         return "Hello from Swift, \(name)!"
     }
+
+    public func doWork(with structValue: APIStruct) -> APIStruct {
+        print("structValue is", structValue)
+        return APIStruct(enumValue: structValue.enumValue)
+    }
 }
