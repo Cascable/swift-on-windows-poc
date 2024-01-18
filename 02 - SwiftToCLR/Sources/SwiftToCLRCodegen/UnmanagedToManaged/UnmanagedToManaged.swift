@@ -159,7 +159,7 @@ public struct UnmanagedToManagedOperation {
         var cppContent: [String] = [
             "// This is an auto-generated file. Do not modify.",
             "",
-            "#include \"" + outputNamespace + ".h\"",
+            "#include \"" + outputNamespace + ".hpp\"",
             "#include <msclr/marshal_cppstd.h>",
             "",
             "using namespace msclr::interop;",
@@ -183,8 +183,8 @@ public struct UnmanagedToManagedOperation {
         let headerData = Data(hppContent.joined(separator: newLineCharacters).utf8)
         let implementationData = Data(cppContent.joined(separator: newLineCharacters).utf8)
 
-        let headerFile = GeneratedFile(name: "\(outputNamespace).h", contents: headerData)
-        let implementationFile = GeneratedFile(name: "\(outputNamespace).cpp", contents: implementationData)
+        let headerFile = GeneratedFile(kind: .header, name: "\(outputNamespace).hpp", contents: headerData)
+        let implementationFile = GeneratedFile(kind: .implementation, name: "\(outputNamespace).cpp", contents: implementationData)
 
         return [headerFile, implementationFile]
     }

@@ -280,8 +280,8 @@ public struct ModuleToUnmanagedOperation {
         let headerData = Data(hppContent.joined(separator: newLineCharacters).utf8)
         let implementationData = Data(cppContent.joined(separator: newLineCharacters).utf8)
 
-        let headerFile = GeneratedFile(name: "\(outputNamespace).hpp", contents: headerData)
-        let implementationFile = GeneratedFile(name: "\(outputNamespace).cpp", contents: implementationData)
+        let headerFile = GeneratedFile(kind: .header, name: "\(outputNamespace).hpp", contents: headerData)
+        let implementationFile = GeneratedFile(kind: .implementation, name: "\(outputNamespace).cpp", contents: implementationData)
 
         return [headerFile, implementationFile]
     }

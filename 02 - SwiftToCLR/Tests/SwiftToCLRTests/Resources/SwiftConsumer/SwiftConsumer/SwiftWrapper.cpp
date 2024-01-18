@@ -88,3 +88,4 @@ int SwiftWrapper::APIEnum::getRawValue() {
     swift::Int swiftResult = swiftObj->getRawValue();
     return (int)swiftResult;
 }
+

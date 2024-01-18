@@ -36,6 +36,12 @@ struct TypeMapping: Hashable {
 }
 
 public struct GeneratedFile {
+    public enum Kind {
+        case header
+        case implementation
+    }
+
+    public let kind: Kind
     public let name: String
     public let contents: Data
 }

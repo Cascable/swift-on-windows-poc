@@ -2,16 +2,16 @@ import Foundation
 import ArgumentParser
 import SwiftToCLRCodegen
 
-struct UnmanagedToManagedCommand: ParsableCommand {
+struct ModuleToUnmanagedCommand: ParsableCommand {
 
-    static var configuration = CommandConfiguration(commandName: "unmanaged-to-managed",
-                                                    abstract: "Wrap an 'unmanaged' C++ API into a 'managed' one, accessible by the .NET CLR.")
+    static var configuration = CommandConfiguration(commandName: "module-to-unmanaged",
+                                                    abstract: "Wrap a Swift module defined in C++ into an 'unmanaged' C++ API, accessible by compilers other than clang.")
 
     @Argument(help: "The to-be-wrapped input header file.")
     var inputHeader: String
 
-    @Option(name: .long, help: "The input namespace to target.")
-    var inputNamespace: String
+    @Option(name: .long, help: "The input module name to target.")
+    var inputModule: String
 
     @Option(name: .long, help: "The output namespace to contain the generated wrapper classes.")
     var outputNamespace: String
@@ -19,8 +19,11 @@ struct UnmanagedToManagedCommand: ParsableCommand {
     @Option(name: .long, help: "The platform SDK root, for finding system headers. If omitted, a basic auto-detection will be used.")
     var platformRoot: String?
 
+    @Option(name: .customLong("cxx-interop"), help: "The directory containing the Swift C++ interop headers. It should be named 'swiftToCxx'.")
+    var cxxInteropHeaderDirectory: String
+
     @Option(name: .customLong("wrapped-object-name"), help: "The variable name of the wrapped object.")
-    var wrappedObjectVariableName: String = "wrappedObj"
+    var wrappedObjectVariableName: String = "swiftObj"
 
     @Option(name: .shortAndLong, help: "The output directory. C++ implementation and header files will be emitted here, named after the output namespace.")
     var outputDirectory: String
@@ -40,14 +43,16 @@ struct UnmanagedToManagedCommand: ParsableCommand {
 
         print("Using clang version:", clangVersionString())
 
-        let generatedFiles: [GeneratedFile] = try UnmanagedToManagedOperation.execute(
+        let interopParent = URL(filePath: cxxInteropHeaderDirectory).deletingLastPathComponent().path
+
+        let generatedFiles: [GeneratedFile] = try ModuleToUnmanagedOperation.execute(
             inputHeaderPath: inputHeader,
-            inputNamespace: inputNamespace,
-            wrappedObjectVariableName: wrappedObjectVariableName,
+            inputModuleName: inputModule,
+            wrappedObjectVariableName: wrappedObjectVariableName, 
             outputNamespace: outputNamespace,
             platformRoot: platformRoot,
-            verbose: verbose
-        )
+            cxxInteropContainerPath: interopParent,
+            verbose: verbose)
 
         for file in generatedFiles {
             let outputPath = URL(fileURLWithPath: outputDirectory)

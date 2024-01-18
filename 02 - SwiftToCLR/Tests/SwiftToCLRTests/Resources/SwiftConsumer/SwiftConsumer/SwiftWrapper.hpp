@@ -23,7 +23,7 @@ namespace SwiftWrapper {
         APIStruct(std::shared_ptr<BasicTest::APIStruct> swiftObj);
         APIStruct(const SwiftWrapper::APIEnum & enumValue);
         ~APIStruct();
-
+    
         SwiftWrapper::APIEnum getEnumValue();
     };
 
@@ -34,7 +34,7 @@ namespace SwiftWrapper {
         APIClass(std::shared_ptr<BasicTest::APIClass> swiftObj);
         APIClass();
         ~APIClass();
-
+    
         std::string getText();
         std::string sayHello(const std::string & name);
         SwiftWrapper::APIStruct doWork(const SwiftWrapper::APIStruct & structValue);
@@ -46,12 +46,12 @@ namespace SwiftWrapper {
         std::shared_ptr<BasicTest::APIEnum> swiftObj;
         APIEnum(std::shared_ptr<BasicTest::APIEnum> swiftObj);
         ~APIEnum();
-
+    
         static APIEnum caseOne();
         static APIEnum caseTwo();
-
+    
         bool operator==(const SwiftWrapper::APIEnum &other) const;
-
+    
         bool isCaseOne();
         bool isCaseTwo();
         int getRawValue();
