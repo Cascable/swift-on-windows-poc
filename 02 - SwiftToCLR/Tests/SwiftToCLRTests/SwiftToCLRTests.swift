@@ -10,9 +10,9 @@ class CodeGenerationTests: XCTestCase {
         let cxxParent = try XCTUnwrap(testFile(named: "swiftToCxx", extension: nil)).deletingLastPathComponent()
 
         let resultFiles = try ModuleToUnmanagedOperation.execute(inputHeaderPath: inputFile.path,
-                                                                 inputNamespace: "BasicTest",
+                                                                 inputModuleName: "BasicTest",
                                                                  wrappedObjectVariableName: "swiftObj",
-                                                                 outputNamespace: "UnmanagedSwiftWrapper",
+                                                                 outputNamespace: "SwiftWrapper",
                                                                  platformRoot: nil,
                                                                  cxxInteropContainerPath: cxxParent.path,
                                                                  verbose: true)

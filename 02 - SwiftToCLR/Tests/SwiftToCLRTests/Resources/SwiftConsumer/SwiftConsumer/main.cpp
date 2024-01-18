@@ -8,12 +8,12 @@
 #include <iostream>
 #include "SwiftWrapper.hpp"
 
-using namespace UnmanagedSwiftWrapper;
+using namespace SwiftWrapper;
 
 int main(int argc, const char * argv[]) {
     // insert code here...
 
-
+/*
     APIEnum enumValue = APIEnum::caseOne();
     if (enumValue.isCaseOne()) {
         std::cout << "Case one!" << "\n";
@@ -30,10 +30,6 @@ int main(int argc, const char * argv[]) {
     std::cout << std::to_string(rawValue) << "\n";
     std::cout << std::to_string(APIEnum::caseTwo().getRawValue()) << "\n";
 
-    APIClass instance = APIClass();
-    std::cout << instance.getText() << "\n";
-    std::cout << instance.sayHello("Daniel") << "\n";
-
     APIStruct structValue = APIStruct(APIEnum::caseTwo());
     APIStruct returnedStructValue = instance.doWork(structValue);
     bool structsMatch = (structValue.getEnumValue() == returnedStructValue.getEnumValue());
@@ -41,6 +37,12 @@ int main(int argc, const char * argv[]) {
     if (structsMatch) {
         std::cout << "Match!" << "\n";
     }
+ */
+
+    APIClass instance = APIClass();
+    std::cout << instance.getText() << "\n";
+    std::cout << instance.sayHello("Daniel") << "\n";
+
 
     return 0;
 }
