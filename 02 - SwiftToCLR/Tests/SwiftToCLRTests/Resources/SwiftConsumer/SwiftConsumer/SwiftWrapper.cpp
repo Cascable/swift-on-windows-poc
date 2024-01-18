@@ -8,111 +8,87 @@
 #include "SwiftWrapper.hpp"
 #include <BasicTest-Swift.h>
 
-// NOTE: The internal classes need to go first.
-
-class UnmanagedSwiftWrapper::APIStruct::APIStruct_Internal {
-public:
-    BasicTest::APIStruct swiftObj;
-    APIStruct_Internal(BasicTest::APIStruct wrapped) : swiftObj(wrapped) {}
-    ~APIStruct_Internal() {}
-};
-
-class UnmanagedSwiftWrapper::APIEnum::APIEnum_Internal {
-public:
-    BasicTest::APIEnum swiftObj;
-    APIEnum_Internal(BasicTest::APIEnum wrapped) : swiftObj(wrapped) {}
-    ~APIEnum_Internal() {}
-};
-
-class UnmanagedSwiftWrapper::APIClass::APIClass_Internal {
-public:
-    BasicTest::APIClass swiftObj;
-    APIClass_Internal() : swiftObj(BasicTest::APIClass::init()) {}
-    APIClass_Internal(BasicTest::APIClass wrapped) : swiftObj(wrapped) {}
-    ~APIClass_Internal() {}
-};
-
 // UnmanagedSwiftWrapper::APIStruct Implementation
 
 UnmanagedSwiftWrapper::APIStruct::APIStruct(UnmanagedSwiftWrapper::APIEnum enumValue) {
-    BasicTest::APIEnum arg0 = enumValue.internal->swiftObj;
-    BasicTest::APIStruct value = BasicTest::APIStruct::init(arg0);
-    internal = std::make_shared<APIStruct_Internal>(value);
+    BasicTest::APIEnum *arg0 = enumValue.internal.get();
+    BasicTest::APIStruct value = BasicTest::APIStruct::init(*arg0);
+    internal = std::make_shared<BasicTest::APIStruct>(value);
 }
 
-UnmanagedSwiftWrapper::APIStruct::APIStruct(std::shared_ptr<APIStruct_Internal> wrapped) {
+UnmanagedSwiftWrapper::APIStruct::APIStruct(std::shared_ptr<BasicTest::APIStruct> wrapped) {
     internal = wrapped;
 }
 
 UnmanagedSwiftWrapper::APIStruct::~APIStruct() {}
 
 UnmanagedSwiftWrapper::APIEnum UnmanagedSwiftWrapper::APIStruct::getEnumValue() {
-    BasicTest::APIEnum result = internal->swiftObj.getEnumValue();
-    return APIEnum(std::make_shared<APIEnum::APIEnum_Internal>(result));
+    BasicTest::APIEnum result = internal->getEnumValue();
+    return APIEnum(std::make_shared<BasicTest::APIEnum>(result));
 }
 
 // UnmanagedSwiftWrapper::APIEnum Implementation
 
 bool UnmanagedSwiftWrapper::APIEnum::isCaseOne() {
-    return internal->swiftObj.isCaseOne();
+    return internal->isCaseOne();
 }
 
 bool UnmanagedSwiftWrapper::APIEnum::isCaseTwo() {
-    return internal->swiftObj.isCaseTwo();
+    return internal->isCaseTwo();
 }
 
 int UnmanagedSwiftWrapper::APIEnum::getRawValue() {
-    swift::Int val = internal->swiftObj.getRawValue();
+    swift::Int val = internal->getRawValue();
     return (int)val;
 }
 
-UnmanagedSwiftWrapper::APIEnum::APIEnum(std::shared_ptr<APIEnum_Internal> wrapped) {
+UnmanagedSwiftWrapper::APIEnum::APIEnum(std::shared_ptr<BasicTest::APIEnum> wrapped) {
     internal = wrapped;
 }
 
 UnmanagedSwiftWrapper::APIEnum::~APIEnum() {}
 
 bool UnmanagedSwiftWrapper::APIEnum::operator==(const UnmanagedSwiftWrapper::APIEnum &other) const {
-    return (internal->swiftObj == other.internal->swiftObj);
+    return (*internal.get() == *other.internal.get());
 }
 
 UnmanagedSwiftWrapper::APIEnum UnmanagedSwiftWrapper::APIEnum::caseOne() {
     BasicTest::APIEnum val = BasicTest::APIEnum::caseOne();
-    return APIEnum(std::make_shared<APIEnum_Internal>(val));
+    return APIEnum(std::make_shared<BasicTest::APIEnum>(val));
 }
 
 UnmanagedSwiftWrapper::APIEnum UnmanagedSwiftWrapper::APIEnum::caseTwo() {
     BasicTest::APIEnum val = BasicTest::APIEnum::caseTwo();
-    return APIEnum(std::make_shared<APIEnum_Internal>(val));
+    return APIEnum(std::make_shared<BasicTest::APIEnum>(val));
 }
 
 // UnmanagedSwiftWrapper::APIClass Implementation
 
 UnmanagedSwiftWrapper::APIClass::APIClass() {
-    internal = std::make_shared<APIClass_Internal>();
+    BasicTest::APIClass instance = BasicTest::APIClass::init();
+    internal = std::make_shared<BasicTest::APIClass>(instance);
 }
 
-UnmanagedSwiftWrapper::APIClass::APIClass(std::shared_ptr<APIClass_Internal> wrapped) {
+UnmanagedSwiftWrapper::APIClass::APIClass(std::shared_ptr<BasicTest::APIClass> wrapped) {
     internal = wrapped;
 }
 
 UnmanagedSwiftWrapper::APIClass::~APIClass() {}
 
 std::string UnmanagedSwiftWrapper::APIClass::getText() {
-    swift::String result = internal->swiftObj.getText();
+    swift::String result = internal->getText();
     return (std::string)result;
 }
 
 std::string UnmanagedSwiftWrapper::APIClass::sayHello(const std::string & name) {
     swift::String arg0 = (swift::String)name;
-    swift::String result = internal->swiftObj.sayHello(arg0);
+    swift::String result = internal->sayHello(arg0);
     return (std::string)result;
 }
 
 UnmanagedSwiftWrapper::APIStruct UnmanagedSwiftWrapper::APIClass::doWork(APIStruct structValue) {
-    // This seems to consume the original reference and crash us.
-    BasicTest::APIStruct arg0 = structValue.internal->swiftObj;
-    BasicTest::APIStruct result = internal->swiftObj.doWork(arg0);
-    return APIStruct(std::make_shared<APIStruct::APIStruct_Internal>(result));
+    BasicTest::APIStruct arg0 = *structValue.internal;
+    BasicTest::APIStruct result = internal->doWork(arg0);
+    return APIStruct(std::make_shared<BasicTest::APIStruct>(result));
 }
 

@@ -11,6 +11,12 @@
 #include <stdio.h>
 #include <string>
 
+namespace BasicTest {
+class APIClass;
+class APIStruct;
+class APIEnum;
+}
+
 namespace UnmanagedSwiftWrapper {
 
 class APIClass;
@@ -19,9 +25,8 @@ class APIEnum;
 
 class APIClass {
 public:
-    class APIClass_Internal;
-    std::shared_ptr<APIClass_Internal> internal;
-    APIClass(std::shared_ptr<APIClass_Internal> wrapped);
+    std::shared_ptr<BasicTest::APIClass> internal;
+    APIClass(std::shared_ptr<BasicTest::APIClass> wrapped);
     APIClass();
     ~APIClass();
     std::string getText();
@@ -31,9 +36,8 @@ public:
 
 class APIStruct {
 public:
-    class APIStruct_Internal;
-    APIStruct(std::shared_ptr<APIStruct_Internal> wrapped);
-    std::shared_ptr<APIStruct_Internal> internal;
+    APIStruct(std::shared_ptr<BasicTest::APIStruct> wrapped);
+    std::shared_ptr<BasicTest::APIStruct> internal;
     APIStruct(APIEnum);
     ~APIStruct();
 
@@ -42,9 +46,8 @@ public:
 
 class APIEnum {
 public:
-    class APIEnum_Internal;
-    APIEnum(std::shared_ptr<APIEnum_Internal> wrapped);
-    std::shared_ptr<APIEnum_Internal> internal;
+    APIEnum(std::shared_ptr<BasicTest::APIEnum> wrapped);
+    std::shared_ptr<BasicTest::APIEnum> internal;
     ~APIEnum();
 
     bool operator==(const APIEnum &other) const;

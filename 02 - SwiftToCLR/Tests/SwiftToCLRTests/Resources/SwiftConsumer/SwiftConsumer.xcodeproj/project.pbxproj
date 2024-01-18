@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5086E7C72B59197D0094A239 /* BasicTest.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 5086E7C62B59197D0094A239 /* BasicTest.o */; };
 		ABD512612B58072F00519D1F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABD512602B58072F00519D1F /* main.cpp */; };
 		ABD512692B58079000519D1F /* SwiftWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ABD512672B58079000519D1F /* SwiftWrapper.cpp */; };
-		ABD5126B2B5807BD00519D1F /* API.swift.o in Frameworks */ = {isa = PBXBuildFile; fileRef = ABD5126A2B5807BD00519D1F /* API.swift.o */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,11 +25,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5086E7C62B59197D0094A239 /* BasicTest.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = BasicTest.o; sourceTree = "<group>"; };
 		ABD5125D2B58072F00519D1F /* SwiftConsumer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SwiftConsumer; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABD512602B58072F00519D1F /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		ABD512672B58079000519D1F /* SwiftWrapper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SwiftWrapper.cpp; sourceTree = "<group>"; };
 		ABD512682B58079000519D1F /* SwiftWrapper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SwiftWrapper.hpp; sourceTree = "<group>"; };
-		ABD5126A2B5807BD00519D1F /* API.swift.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = API.swift.o; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,7 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ABD5126B2B5807BD00519D1F /* API.swift.o in Frameworks */,
+				5086E7C72B59197D0094A239 /* BasicTest.o in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,7 +66,7 @@
 				ABD512602B58072F00519D1F /* main.cpp */,
 				ABD512682B58079000519D1F /* SwiftWrapper.hpp */,
 				ABD512672B58079000519D1F /* SwiftWrapper.cpp */,
-				ABD5126A2B5807BD00519D1F /* API.swift.o */,
+				5086E7C62B59197D0094A239 /* BasicTest.o */,
 			);
 			path = SwiftConsumer;
 			sourceTree = "<group>";
