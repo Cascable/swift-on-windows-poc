@@ -11,7 +11,8 @@ import SwiftToCLRCodegen
 @main
 struct SwiftToCLR: ParsableCommand {
     static var configuration = CommandConfiguration(
-        abstract: "Code generation for calling Swift code from the .NET CLR.",
+        abstract: "Code generation for the wrappers needed to call Swift code from the .NET CLR.",
+        discussion: "This is a code generation tool to assist with calling Swift code from .NET CLR languages such as C# via Swift's C++ interop. Since the Microsoft compiler can't handle the clang-generated <Module-Swift.h> header, we actually need *two* wrappers - an 'unmanaged' C++ wrapper to expose the Swift API via a C++ dialect understandable by the Microsoft compiler, then a 'managed' C++ wrapper around *that* to get into the .NET CLR. From there, the code can be called from C#. This tool generates both wrappers.\n\nThe default command takes the <Module-Swift.h> file and outputs C++ code in files and namespaces named Unmanaged<Module> and Managed<Module>. To customise this behaviour, you can invoke the module-to-unmanaged and unmanaged-to-managed commands separately with additional options.",
         subcommands: [ModuleToUnmanagedCommand.self, UnmanagedToManagedCommand.self]
     )
 
