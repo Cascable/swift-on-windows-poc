@@ -9,6 +9,19 @@ public func clangVersionString() -> String {
     return clang_getClangVersion().consumeToString
 }
 
+extension CXTranslationUnit {
+    func printDiagnostics() {
+        let numberOfDiagnosticMessages = clang_getNumDiagnostics(self)
+        if numberOfDiagnosticMessages > 0 {
+            print("Warning: Got \(numberOfDiagnosticMessages) diagnostic messages from clang:")
+            for index in 0..<numberOfDiagnosticMessages {
+                let diagnostic = clang_getDiagnostic(self, index)
+                print(clang_formatDiagnostic(diagnostic, clang_defaultDiagnosticDisplayOptions()).consumeToString)
+            }
+        }
+    }
+}
+
 extension CXString: CustomStringConvertible, CustomDebugStringConvertible {
 
     public var description: String {

@@ -60,14 +60,7 @@ public struct ModuleToUnmanagedOperation {
             throw ClangError.initialization("Failed to initialise clang with the given input. Make sure it's a valid C++ header file.")
         }
 
-        let numberOfDiagnosticMessages = clang_getNumDiagnostics(unit)
-        if numberOfDiagnosticMessages > 0 {
-            print("Warning: Got \(numberOfDiagnosticMessages) diagnostic messages from clang:")
-            for index in 0..<numberOfDiagnosticMessages {
-                let diagnostic = clang_getDiagnostic(unit, index)
-                print(clang_formatDiagnostic(diagnostic, clang_defaultDiagnosticDisplayOptions()).consumeToString)
-            }
-        }
+        unit.printDiagnostics()
 
         // Logic
 
