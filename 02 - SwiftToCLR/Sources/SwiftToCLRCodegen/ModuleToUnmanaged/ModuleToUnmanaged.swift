@@ -207,8 +207,8 @@ public struct ModuleToUnmanagedOperation {
             if type.kind == CXType_FunctionProto && cursorKind == CXCursor_CXXMethod && parentKind == CXCursor_ClassDecl {
                 let className = clang_getCursorDisplayName(parent).consumeToString
                 if var wrapperClass = wrapperClasses[className], clang_getCXXAccessSpecifier(cursor) == CX_CXXPublic {
-                    if verbose { print("Got public method \(displayName) in class \(className) - adding to wrapper list.") }
-                    wrapperClass.generateWrappedMethodForSwiftMethod(at: cursor, internalTypeMappings: internalTypeMappings)
+                    let wasAdded = wrapperClass.generateWrappedMethodForSwiftMethod(at: cursor, internalTypeMappings: internalTypeMappings)
+                    if verbose, wasAdded { print("Got public method \(displayName) in class \(className) - adding to wrapper list.") }
                     wrapperClasses[className] = wrapperClass // CoW and all that
                 }
             }
@@ -392,7 +392,7 @@ struct UnmanagedManagedCPPWrapperClass {
         generatedEnumCaseImplementations.append(implementationLines)
     }
 
-    mutating func generateWrappedMethodForSwiftMethod(at cursor: CXCursor, internalTypeMappings: [String: TypeMapping]) {
+    mutating func generateWrappedMethodForSwiftMethod(at cursor: CXCursor, internalTypeMappings: [String: TypeMapping]) -> Bool {
         let cursorType: CXType = clang_getCursorType(cursor)
         let cursorKind: CXCursorKind = clang_getCursorKind(cursor)
         assert(cursorType.kind == CXType_FunctionProto, "Passed wrong cursor type")
@@ -408,7 +408,7 @@ struct UnmanagedManagedCPPWrapperClass {
         let isConstructor = (swiftMethodName == "init")
 
         let excludedMethods: [String] = ["operator="]
-        guard !excludedMethods.contains(swiftMethodName) else { return }
+        guard !excludedMethods.contains(swiftMethodName) else { return false }
 
         // …and the arguments.
         let argumentCount = UInt32(clang_Cursor_getNumArguments(cursor)) // Can return -1 if the wrong cursor type. We checked that above.
@@ -506,6 +506,8 @@ struct UnmanagedManagedCPPWrapperClass {
             methodLines.append("}")
             generatedMethodImplementations.append(methodLines)
         }
+
+        return true
     }
 
     func generateClassDefinition() -> [String] {
