@@ -220,6 +220,7 @@ public struct ModuleToUnmanagedOperation {
 
         var hppContent: [String] = [
             "// This is an auto-generated file. Do not modify.",
+            "",
             "#ifndef " + outputNamespace + "_hpp",
             "#define " + outputNamespace + "_hpp",
             "#include <memory>",
@@ -376,6 +377,8 @@ struct UnmanagedManagedCPPWrapperClass {
         assert(cursorKind == CXCursor_EnumConstantDecl, "Passed wrong cursor kind")
 
         let enumCaseName = clang_getCursorDisplayName(cursor).consumeToString
+        let scopedWrapperClassName = wrapperNamespace + "::" + wrapperClassName
+        let scopedSwiftClassName = swiftModuleName + "::" + swiftClassName
 
         //static APIEnum caseOne();
         generatedEnumCaseDefinitions.append("static " + wrapperClassName + " " + enumCaseName + "();")
@@ -385,9 +388,9 @@ struct UnmanagedManagedCPPWrapperClass {
         //    return APIEnum(std::make_shared<BasicTest::APIEnum>(val));
         //}
         var implementationLines: [String] = []
-        implementationLines.append(wrapperNamespace + "::" + wrapperClassName + " " + wrapperNamespace + "::" + wrapperClassName + "::" + enumCaseName + "() {")
-        implementationLines.append("    " + swiftModuleName + "::" + swiftClassName + " value = " + swiftModuleName + "::" + swiftClassName + "::" + enumCaseName + "();")
-        implementationLines.append("    return " + wrapperNamespace + "::" + wrapperClassName + "(std::make_shared<" + swiftModuleName + "::" + swiftClassName + ">(value));")
+        implementationLines.append(scopedWrapperClassName + " " + scopedWrapperClassName + "::" + enumCaseName + "() {")
+        implementationLines.append("    " + scopedSwiftClassName + " value = " + scopedSwiftClassName + "::" + enumCaseName + "();")
+        implementationLines.append("    return " + scopedWrapperClassName + "(std::make_shared<" + scopedSwiftClassName + ">(value));")
         implementationLines.append("}")
         generatedEnumCaseImplementations.append(implementationLines)
     }
@@ -444,10 +447,13 @@ struct UnmanagedManagedCPPWrapperClass {
             generatedMethodDefinitions.append(methodDefinition)
         }
 
+        let scopedSwiftClassName = swiftModuleName + "::" + swiftClassName
+        let scopedWrapperClassName = wrapperNamespace + "::" + wrapperClassName
+
         // Implementation
         if isConstructor {
-            
-            let openingLine: String = wrapperNamespace + "::" + wrapperClassName + "::" + wrapperClassName + "(" 
+
+            let openingLine: String = scopedWrapperClassName + "::" + wrapperClassName + "("
                 + unmanagedMethodArguments.joined(separator: ", ") + ") {"
             var constructorLines: [String] = [openingLine]
 
@@ -464,14 +470,14 @@ struct UnmanagedManagedCPPWrapperClass {
 
             let args: String = (0..<swiftArguments.count).map({ "arg\($0)" }).joined(separator: ", ")
 
-            constructorLines.append("    " + swiftModuleName + "::" + swiftClassName + " instance = " + swiftModuleName + "::" + swiftClassName + "::init(" + args + ");")
-            constructorLines.append("    " + swiftObjectName + " = std::make_shared<" + swiftModuleName + "::" + swiftClassName + ">(instance);")
+            constructorLines.append("    " + scopedSwiftClassName + " instance = " + scopedSwiftClassName + "::init(" + args + ");")
+            constructorLines.append("    " + swiftObjectName + " = std::make_shared<" + scopedSwiftClassName + ">(instance);")
             constructorLines.append("}")
             generatedConstructorImplementations.append(constructorLines)
 
         } else {
 
-            let openingLine: String = unmanagedReturnTypeName + " " + wrapperNamespace + "::" + wrapperClassName + "::" +
+            let openingLine: String = unmanagedReturnTypeName + " " + scopedWrapperClassName + "::" +
             swiftMethodName + "(" + unmanagedMethodArguments.joined(separator: ", ") + ") {"
 
             var methodLines: [String] = [openingLine]
@@ -546,7 +552,7 @@ struct UnmanagedManagedCPPWrapperClass {
         let scopedSwiftClassName: String = swiftModuleName + "::" + swiftClassName
         let scopedWrapperClassName: String = wrapperNamespace + "::" + wrapperClassName
 
-        lines.append(wrapperNamespace + "::" + wrapperClassName + "::" + wrapperClassName + "(std::shared_ptr<" + scopedSwiftClassName + "> " + swiftObjectName + ") {")
+        lines.append(scopedWrapperClassName + "::" + wrapperClassName + "(std::shared_ptr<" + scopedSwiftClassName + "> " + swiftObjectName + ") {")
         lines.append("    this->" + swiftObjectName + " = " + swiftObjectName + ";")
         lines.append("}")
         lines.append("")
@@ -556,7 +562,7 @@ struct UnmanagedManagedCPPWrapperClass {
             lines.append("")
         }
 
-        lines.append(wrapperNamespace + "::" + wrapperClassName + "::~" + wrapperClassName + "() {}")
+        lines.append(scopedWrapperClassName + "::~" + wrapperClassName + "() {}")
         lines.append("")
 
         if !generatedEnumCaseImplementations.isEmpty {

@@ -130,9 +130,9 @@ public struct UnmanagedToManagedOperation {
 
         // Generate content.
 
-        // TODO: Have these deal with multiple platforms properly.
         var hppContent: [String] = [
             "// This is an auto-generated file. Do not modify.",
+            "",
             "#pragma once",
             "#define WIN32_LEAN_AND_MEAN",
             "#include <windows.h>",
