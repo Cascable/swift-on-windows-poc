@@ -60,6 +60,20 @@ SwiftWrapper::APIEnum::APIEnum(std::shared_ptr<BasicTest::APIEnum> swiftObj) {
 
 SwiftWrapper::APIEnum::~APIEnum() {}
 
+SwiftWrapper::APIEnum SwiftWrapper::APIEnum::caseOne() {
+    BasicTest::APIEnum value = BasicTest::APIEnum::caseOne();
+    return SwiftWrapper::APIEnum(std::make_shared<BasicTest::APIEnum>(value));
+}
+
+SwiftWrapper::APIEnum SwiftWrapper::APIEnum::caseTwo() {
+    BasicTest::APIEnum value = BasicTest::APIEnum::caseTwo();
+    return SwiftWrapper::APIEnum(std::make_shared<BasicTest::APIEnum>(value));
+}
+
+bool SwiftWrapper::APIEnum::operator==(const SwiftWrapper::APIEnum &other) const {
+    return (*swiftObj.get() == *other.swiftObj.get());
+}
+
 bool SwiftWrapper::APIEnum::isCaseOne() {
     bool swiftResult = swiftObj->isCaseOne();
     return swiftResult;
@@ -74,13 +88,3 @@ int SwiftWrapper::APIEnum::getRawValue() {
     swift::Int swiftResult = swiftObj->getRawValue();
     return (int)swiftResult;
 }
-
-// Implementation of SwiftWrapper::APIProtocol
-
-/*
- SwiftWrapper::APIProtocol::APIProtocol(std::shared_ptr<BasicTest::APIProtocol> swiftObj) {
- this->swiftObj = swiftObj;
- }
-
- SwiftWrapper::APIProtocol::~APIProtocol() {}
- */

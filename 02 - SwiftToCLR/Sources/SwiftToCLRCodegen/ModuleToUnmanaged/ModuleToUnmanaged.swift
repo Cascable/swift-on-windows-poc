@@ -96,16 +96,88 @@ public struct ModuleToUnmanagedOperation {
             //let typeKindSpelling = clang_getTypeKindSpelling(type.kind).consumeToString
             //print("Display name: \(displayName), Kind: \(kindSpelling), Type: \(typeSpelling), Type Kind: \(typeKindSpelling), Parent: \(parent.briefName)")
 
+            if cursorKind == CXCursor_EnumConstantDecl && parentKind == CXCursor_EnumDecl && 
+                clang_getCursorKind(clang_getCursorLexicalParent(parent)) == CXCursor_ClassDecl {
+                
+                // We found what appears to be a Swift enum case declaration (an enum case with a parent enum with a
+                // parent class). I feel like this could be fragile, since we're relying on the fact that the C++ interop
+                // embeds the C++ enum declaration inside a class.
+                let parentParent: CXCursor = clang_getCursorLexicalParent(parent)
+                let parentParentName = clang_getCursorDisplayName(parentParent).consumeToString
+                
+                let className = parentParentName
+                let caseName = displayName
+                let caseType = clang_getTypeSpelling(type).consumeToString
+
+                if var wrapperClass = wrapperClasses[className], clang_getCXXAccessSpecifier(cursor) == CX_CXXPublic {
+                    if verbose { print("Got enum case \(caseName) of type \(caseType) in \(className) - adding to wrapper list") }
+                    wrapperClass.generateEnumCaseForSwiftEnumCase(at: cursor)
+                    wrapperClasses[className] = wrapperClass // CoW and all that
+                }
+            }
+
             if cursorKind == CXCursor_ClassDecl && parentKind == CXCursor_Namespace {
                 let className = displayName
                 let namespaceName = clang_getCursorDisplayName(parent).consumeToString
                 if namespaceName == inputModuleName {
                     if verbose { print("Got class \(className) in target namespace \(namespaceName) - adding to wrapper list.") }
-                    let wrapperClass = UnmanagedManagedCPPWrapperClass(swiftClassName: className,
+
+                    // Swift current declares protocols as unavailable, so try to find that attribute on the class
+                    // definition. This feels a little bit clunky to me.
+                    let classIsUnavailable: Bool = {
+                        let hasAttributes = clang_Cursor_hasAttrs(cursor)
+                        guard hasAttributes > 0 else { return false }
+                        var didEncounterUnavailableAttribute: Bool = false
+
+                        clang_visitChildrenWithBlock(cursor) { classChildCursor, _ in
+                            let kind: CXCursorKind = clang_getCursorKind(classChildCursor)
+                            guard className == "APIProtocol" else { return CXChildVisit_Continue }
+                            guard kind == CXCursor_FirstAttr else { return CXChildVisit_Continue }
+
+                            let range: CXSourceRange = clang_getCursorExtent(classChildCursor)
+
+                            var tokenCount: UInt32 = 0
+                            var tokens: UnsafeMutablePointer<CXToken>? = nil
+
+                            clang_tokenize(unit, range, &tokens, &tokenCount)
+                            guard let tokens else { return CXChildVisit_Continue }
+                            defer { clang_disposeTokens(unit, tokens, tokenCount) }
+                            guard tokenCount > 0 else { return CXChildVisit_Continue }
+
+                            // Maybe due to macros or defines, sometimes the declared types get a pile of "attributes"
+                            // tacked on to them. One type had tens of thousands? I've observed that the unavailable
+                            // attribute is the first one, so we're just checking that.
+                            let tokenValue = clang_getTokenSpelling(unit, tokens[0]).consumeToString
+                            if tokenValue == "unavailable" {
+                                if verbose { print("Class \(className) is marked as unavailable, removing from wrapper list.") }
+                                didEncounterUnavailableAttribute = true
+                                return CXChildVisit_Break
+                            } else {
+                                return CXChildVisit_Continue
+                            }
+                        }
+
+                        return didEncounterUnavailableAttribute
+                    }()
+
+                    let wrapperClass: UnmanagedManagedCPPWrapperClass = {
+                        if var existing = wrapperClasses[className] {
+                            if !existing.isUnavailable && classIsUnavailable {
+                                existing.isUnavailable = classIsUnavailable
+                                wrapperClasses[className] = existing
+                            }
+                            return existing
+                        }
+
+                        let newClass = UnmanagedManagedCPPWrapperClass(swiftClassName: className,
                                                                        swiftModuleName: namespaceName,
                                                                        swiftObjectName: wrappedObjectVariableName,
                                                                        wrapperClassName: className,
-                                                                       wrapperNamespace: outputNamespace)
+                                                                       wrapperNamespace: outputNamespace,
+                                                                       isUnavailable: classIsUnavailable)
+                        wrapperClasses[className] = newClass
+                        return newClass
+                    }()
 
                     // We also need to be able to adapt to/from it.
                     // As long the header we're wrapping forward-declares everything within the namespace, this works
@@ -127,7 +199,6 @@ public struct ModuleToUnmanagedOperation {
                         return "\(wrapperClass.wrapperNamespace)::\(wrapperClass.wrapperClassName)(std::make_shared<\(wrapperClass.swiftModuleName)::\(wrapperClass.swiftClassName)>(\($0)))"
                     })
 
-                    wrapperClasses[className] = wrapperClass
                     internalTypeMappings["const " + className + " &"] = constMapping // This seems fragile.
                     internalTypeMappings[className] = flatMapping // This seems fragile.
                 }
@@ -156,9 +227,11 @@ public struct ModuleToUnmanagedOperation {
             ""
         ]
 
+        let availableWrapperClasses = wrapperClasses.values.filter({ !$0.isUnavailable })
+
         // We need to forward-declare the Swift module types we're wrapping.
         hppContent.append("namespace " + inputModuleName + " {")
-        for wrapperClass in wrapperClasses.values {
+        for wrapperClass in availableWrapperClasses {
             hppContent.append("    class " + wrapperClass.swiftClassName + ";")
         }
         hppContent.append("}")
@@ -168,11 +241,11 @@ public struct ModuleToUnmanagedOperation {
         hppContent.append("")
 
         // We also need to forward-declare all of our wrapper classes in case they reference each other.
-        for wrapperClass in wrapperClasses.values {
+        for wrapperClass in availableWrapperClasses {
             hppContent.append("    " + "class " + wrapperClass.wrapperClassName + ";")
         }
 
-        for wrapperClass in wrapperClasses.values {
+        for wrapperClass in availableWrapperClasses {
             hppContent.append("")
             hppContent.append(contentsOf: wrapperClass.generateClassDefinition().map({ "    " + $0 }))
         }
@@ -190,7 +263,7 @@ public struct ModuleToUnmanagedOperation {
             ""
         ]
 
-        for wrapperClass in wrapperClasses.values {
+        for wrapperClass in availableWrapperClasses {
             cppContent.append("// Implementation of " + wrapperClass.wrapperNamespace + "::" + wrapperClass.wrapperClassName)
             cppContent.append("")
             cppContent.append(contentsOf: wrapperClass.generateClassImplementation())
@@ -270,21 +343,53 @@ struct UnmanagedManagedCPPWrapperClass {
     let wrapperClassName: String
     let wrapperNamespace: String
 
+    // True if the type is marked as unavailable in the source header.
+    var isUnavailable: Bool
+
     var generatedMethodDefinitions: [String] // For the header file
     var generatedConstructorDefinitions: [String] // For the header file
+    var generatedEnumCaseDefinitions: [String] // For the header file
     var generatedMethodImplementations: [[String]]  // For the implementation file.
-    var generatedConstructorImplementations: [[String]]  // For the implementation file.
+    var generatedConstructorImplementations: [[String]] // For the implementation file.
+    var generatedEnumCaseImplementations: [[String]] // For the implementation file.
 
-    init(swiftClassName: String, swiftModuleName: String, swiftObjectName: String, wrapperClassName: String, wrapperNamespace: String) {
+    init(swiftClassName: String, swiftModuleName: String, swiftObjectName: String, wrapperClassName: String,
+         wrapperNamespace: String, isUnavailable: Bool) {
         self.swiftClassName = swiftClassName
         self.swiftModuleName = swiftModuleName
         self.swiftObjectName = swiftObjectName
         self.wrapperClassName = wrapperClassName
         self.wrapperNamespace = wrapperNamespace
+        self.isUnavailable = isUnavailable
         self.generatedMethodDefinitions = []
         self.generatedConstructorDefinitions = []
+        self.generatedEnumCaseDefinitions = []
         self.generatedMethodImplementations = []
         self.generatedConstructorImplementations = []
+        self.generatedEnumCaseImplementations = []
+    }
+
+    mutating func generateEnumCaseForSwiftEnumCase(at cursor: CXCursor) {
+        let cursorType: CXType = clang_getCursorType(cursor)
+        let cursorKind: CXCursorKind = clang_getCursorKind(cursor)
+        assert(cursorType.kind == CXType_Enum, "Passed wrong cursor type")
+        assert(cursorKind == CXCursor_EnumConstantDecl, "Passed wrong cursor kind")
+
+        let enumCaseName = clang_getCursorDisplayName(cursor).consumeToString
+
+        //static APIEnum caseOne();
+        generatedEnumCaseDefinitions.append("static " + wrapperClassName + " " + enumCaseName + "();")
+
+        //UnmanagedSwiftWrapper::APIEnum UnmanagedSwiftWrapper::APIEnum::caseOne() {
+        //    BasicTest::APIEnum val = BasicTest::APIEnum::caseOne();
+        //    return APIEnum(std::make_shared<BasicTest::APIEnum>(val));
+        //}
+        var implementationLines: [String] = []
+        implementationLines.append(wrapperNamespace + "::" + wrapperClassName + " " + wrapperNamespace + "::" + wrapperClassName + "::" + enumCaseName + "() {")
+        implementationLines.append("    " + swiftModuleName + "::" + swiftClassName + " value = " + swiftModuleName + "::" + swiftClassName + "::" + enumCaseName + "();")
+        implementationLines.append("    return " + wrapperNamespace + "::" + wrapperClassName + "(std::make_shared<" + swiftModuleName + "::" + swiftClassName + ">(value));")
+        implementationLines.append("}")
+        generatedEnumCaseImplementations.append(implementationLines)
     }
 
     mutating func generateWrappedMethodForSwiftMethod(at cursor: CXCursor, internalTypeMappings: [String: TypeMapping]) {
@@ -407,6 +512,7 @@ struct UnmanagedManagedCPPWrapperClass {
         var lines: [String] = []
 
         let scopedSwiftClassName: String = swiftModuleName + "::" + swiftClassName
+        let scopedWrapperClassName: String = wrapperNamespace + "::" + wrapperClassName
 
         lines.append("class " + wrapperClassName + " {")
         lines.append("private:")
@@ -416,6 +522,13 @@ struct UnmanagedManagedCPPWrapperClass {
         lines.append(contentsOf: generatedConstructorDefinitions.map({ "    " + $0 }))
         lines.append("    ~" + wrapperClassName + "();")
         lines.append("")
+
+        if !generatedEnumCaseDefinitions.isEmpty {
+            lines.append(contentsOf: generatedEnumCaseDefinitions.map({ "    " + $0 }))
+            lines.append("")
+            lines.append("    bool operator==(const " + scopedWrapperClassName + " &other) const;")
+            lines.append("")
+        }
 
         for methodDefinition in generatedMethodDefinitions {
             lines.append("    "  + methodDefinition)
@@ -429,6 +542,8 @@ struct UnmanagedManagedCPPWrapperClass {
         var lines: [String] = []
 
         let scopedSwiftClassName: String = swiftModuleName + "::" + swiftClassName
+        let scopedWrapperClassName: String = wrapperNamespace + "::" + wrapperClassName
+
         lines.append(wrapperNamespace + "::" + wrapperClassName + "::" + wrapperClassName + "(std::shared_ptr<" + scopedSwiftClassName + "> " + swiftObjectName + ") {")
         lines.append("    this->" + swiftObjectName + " = " + swiftObjectName + ";")
         lines.append("}")
@@ -441,6 +556,24 @@ struct UnmanagedManagedCPPWrapperClass {
 
         lines.append(wrapperNamespace + "::" + wrapperClassName + "::~" + wrapperClassName + "() {}")
         lines.append("")
+
+        if !generatedEnumCaseImplementations.isEmpty {
+            for generatedEnumCaseImplementation in generatedEnumCaseImplementations {
+                lines.append(contentsOf: generatedEnumCaseImplementation)
+                lines.append("")
+            }
+
+            // bool UnmanagedSwiftWrapper::APIEnum::operator==(const UnmanagedSwiftWrapper::APIEnum &other) const {
+            //      return (*internal.get() == *other.internal.get());
+            // }
+            var comparator: [String] = []
+            comparator.append("bool " + scopedWrapperClassName + "::operator==(const " + scopedWrapperClassName + " &other) const {")
+            comparator.append("    return (*\(swiftObjectName).get() == *other.\(swiftObjectName).get());")
+            comparator.append("}")
+
+            lines.append(contentsOf: comparator)
+            lines.append("")
+        }
 
         for implementation in generatedMethodImplementations {
             lines.append(contentsOf: implementation)

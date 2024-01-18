@@ -8,7 +8,6 @@ namespace BasicTest {
     class APIStruct;
     class APIClass;
     class APIEnum;
-    class APIProtocol;
 }
 
 namespace SwiftWrapper {
@@ -16,7 +15,6 @@ namespace SwiftWrapper {
     class APIStruct;
     class APIClass;
     class APIEnum;
-    class APIProtocol;
 
     class APIStruct {
     private:
@@ -49,18 +47,14 @@ namespace SwiftWrapper {
         APIEnum(std::shared_ptr<BasicTest::APIEnum> swiftObj);
         ~APIEnum();
 
+        static APIEnum caseOne();
+        static APIEnum caseTwo();
+
+        bool operator==(const SwiftWrapper::APIEnum &other) const;
+
         bool isCaseOne();
         bool isCaseTwo();
         int getRawValue();
-    };
-
-    class APIProtocol {
-    private:
-    public:
-        std::shared_ptr<BasicTest::APIProtocol> swiftObj;
-        APIProtocol(std::shared_ptr<BasicTest::APIProtocol> swiftObj);
-        ~APIProtocol();
-
     };
 }
 
