@@ -46,7 +46,7 @@ struct SwiftToCLR: ParsableCommand {
 
         print("Using clang version:", clangVersionString())
 
-        let interopParent = URL(filePath: cxxInteropHeaderDirectory).deletingLastPathComponent().path
+        let interopParent = URL(fileURLWithPath: cxxInteropHeaderDirectory).deletingLastPathComponent().path
         let unmanagedWrapperNamespace: String = "Unmanaged" + inputModule
         let managedWrapperNamespace: String = "Managed" + inputModule
 

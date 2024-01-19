@@ -43,12 +43,12 @@ struct ModuleToUnmanagedCommand: ParsableCommand {
 
         print("Using clang version:", clangVersionString())
 
-        let interopParent = URL(filePath: cxxInteropHeaderDirectory).deletingLastPathComponent().path
+        let interopParent = URL(fileURLWithPath: cxxInteropHeaderDirectory).deletingLastPathComponent().path
 
         let generatedFiles: [GeneratedFile] = try ModuleToUnmanagedOperation.execute(
             inputHeaderPath: inputHeader,
             inputModuleName: inputModule,
-            wrappedObjectVariableName: wrappedObjectVariableName, 
+            wrappedObjectVariableName: wrappedObjectVariableName,
             outputNamespace: outputNamespace,
             platformRoot: platformRoot,
             cxxInteropContainerPath: interopParent,

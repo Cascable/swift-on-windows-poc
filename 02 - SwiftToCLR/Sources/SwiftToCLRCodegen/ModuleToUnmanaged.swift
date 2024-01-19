@@ -40,17 +40,17 @@ public struct ModuleToUnmanagedOperation {
         guard let index: CXIndex = clang_createIndex(0, 0) else { throw ClangError.initialization("Failed to initialise clang") }
         defer { clang_disposeIndex(index) }
 
-        let options: UInt32 = (CXTranslationUnit_SkipFunctionBodies.rawValue | 
-                               CXTranslationUnit_KeepGoing.rawValue |
-                               CXTranslationUnit_IncludeAttributedTypes.rawValue |
-                               CXTranslationUnit_VisitImplicitAttributes.rawValue |
-                               CXTranslationUnit_RetainExcludedConditionalBlocks.rawValue)
+        let options = (CXTranslationUnit_SkipFunctionBodies.rawValue |
+                       CXTranslationUnit_KeepGoing.rawValue |
+                       CXTranslationUnit_IncludeAttributedTypes.rawValue |
+                       CXTranslationUnit_VisitImplicitAttributes.rawValue |
+                       CXTranslationUnit_RetainExcludedConditionalBlocks.rawValue)
 
         argumentPointers.withUnsafeBufferPointer { ptr in
             let argumentsBasePtr = ptr.baseAddress!
             unit = clang_parseTranslationUnit(index, inputFilePath.path,
                                               argumentsBasePtr, Int32(argumentPointers.count),
-                                              nil, 0, options)
+                                              nil, 0, UInt32(options))
         }
 
         argumentPointers.forEach({ free(UnsafeMutablePointer(mutating: $0)) })
@@ -89,15 +89,15 @@ public struct ModuleToUnmanagedOperation {
             //let typeKindSpelling = clang_getTypeKindSpelling(type.kind).consumeToString
             //print("Display name: \(displayName), Kind: \(kindSpelling), Type: \(typeSpelling), Type Kind: \(typeKindSpelling), Parent: \(parent.briefName)")
 
-            if cursorKind == CXCursor_EnumConstantDecl && parentKind == CXCursor_EnumDecl && 
+            if cursorKind == CXCursor_EnumConstantDecl && parentKind == CXCursor_EnumDecl &&
                 clang_getCursorKind(clang_getCursorLexicalParent(parent)) == CXCursor_ClassDecl {
-                
+
                 // We found what appears to be a Swift enum case declaration (an enum case with a parent enum with a
                 // parent class). I feel like this could be fragile, since we're relying on the fact that the C++ interop
                 // embeds the C++ enum declaration inside a class.
                 let parentParent: CXCursor = clang_getCursorLexicalParent(parent)
                 let parentParentName = clang_getCursorDisplayName(parentParent).consumeToString
-                
+
                 let className = parentParentName
                 let caseName = displayName
                 let caseType = clang_getTypeSpelling(type).consumeToString
