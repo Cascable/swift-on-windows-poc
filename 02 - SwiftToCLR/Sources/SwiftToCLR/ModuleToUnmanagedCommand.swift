@@ -58,6 +58,7 @@ struct ModuleToUnmanagedCommand: ParsableCommand {
             let outputPath = URL(fileURLWithPath: outputDirectory)
                 .appendingPathComponent(file.name)
             try file.contents.write(to: outputPath)
+            print("Successfully wrote", file.name)
         }
     }
 }

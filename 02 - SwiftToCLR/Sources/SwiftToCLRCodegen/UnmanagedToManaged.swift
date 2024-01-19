@@ -48,7 +48,9 @@ public struct UnmanagedToManagedOperation {
             throw ClangError.initialization("Failed to initialise clang with the given input. Make sure it's a valid C++ header file.")
         }
 
-        unit.printDiagnostics()
+        if verbose {
+            unit.printDiagnostics()
+        }
 
         // Logic
 
