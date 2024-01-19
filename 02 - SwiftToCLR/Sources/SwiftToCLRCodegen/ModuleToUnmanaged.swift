@@ -22,6 +22,7 @@ public struct ModuleToUnmanagedOperation {
             "-std=c++17",
             "-isysroot", sdkRootPath,
             "-I\(cxxInteropContainerPath)",
+            "-D_ALLOW_KEYWORD_MACROS",
             "-Dinline=",
         ]
 
