@@ -92,16 +92,21 @@ public struct UnmanagedToManagedOperation {
                                                               managedClassName: className,
                                                               managedNamespace: outputNamespace)
 
+                    let scopedManagedTypeName = wrapperClass.managedNamespace + "::" + wrapperClass.managedClassName
+                    let scopedUnmanagedTypeName = wrapperClass.unmanagedNamespace + "::" + wrapperClass.unmanagedClassName
+
                     // We also need to be able to adapt to/from it.
                     // As long the header we're wrapping forward-declares everything within the namespace, this works
                     // alright. Without, we'd need to do two passes - one to collect all the types, then another to
                     // adapt the method calls.
-                    let mapping = TypeMapping(wrappedTypeName: wrapperClass.unmanagedNamespace + "::" + wrapperClass.unmanagedClassName + " *",
-                                              wrapperTypeName: wrapperClass.managedNamespace + "::" + wrapperClass.managedClassName + "^",
+                    let mapping = TypeMapping(wrappedTypeName: scopedUnmanagedTypeName,
+                                              wrapperTypeName: scopedManagedTypeName + "^",
                                               convertWrapperToWrapped: {
-                                                  return "\($0)->\(wrapperClass.unmanagedObjectName)"
+                                                  return "*\($0)->\(wrapperClass.unmanagedObjectName)->get()"
                                               }, convertWrappedToWrapper: {
-                                                  return "gcnew \(wrapperClass.managedNamespace)::\(wrapperClass.managedClassName)(\($0))"
+                                                  let copyOperation = "new " + scopedUnmanagedTypeName + "(" + $0 + ")"
+                                                  let ptrOperation = "new std::shared_ptr<" + scopedUnmanagedTypeName + ">(" + copyOperation + ")"
+                                                  return "gcnew \(wrapperClass.managedNamespace)::\(wrapperClass.managedClassName)(\(ptrOperation))"
                                               })
 
                     wrapperClasses[className] = wrapperClass
@@ -246,7 +251,8 @@ struct ManagedCPPWrapperClass {
     var generatedMethodDefinitions: [String] // For the header file
     var generatedConstructorDefinitions: [String] // For the header file
     var generatedStaticMethodDefinitions: [String] // For the header file
-    var generatedMethodImplementations: [[String]]  // For the implementation file.
+    var generatedMethodImplementations: [[String]]  // For the implementation file
+    var generatedConstructorImplementations: [[String]] // For the implementation file
 
     init(unmanagedClassName: String, unmanagedNamespace: String, unmanagedObjectName: String, managedClassName: String, managedNamespace: String) {
         self.unmanagedClassName = unmanagedClassName
@@ -258,6 +264,7 @@ struct ManagedCPPWrapperClass {
         self.generatedConstructorDefinitions = []
         self.generatedStaticMethodDefinitions = []
         self.generatedMethodImplementations = []
+        self.generatedConstructorImplementations = []
     }
 
     mutating func generateWrappedConstructorForUnmanagedConstructor(at cursor: CXCursor, internalTypeMappings: [String: TypeMapping]) -> Bool {
@@ -279,7 +286,7 @@ struct ManagedCPPWrapperClass {
 
         guard !unmanagedArguments.contains(where: { $0.typeName.contains("std::shared_ptr") }) else { return false }
 
-        // We have everything we need to wrap the method now!
+        // We have everything we need to wrap the constructor now!
 
         func wrapping(for unmanagedTypeName: String) -> TypeMapping {
             if let stdMapping = UnmanagedToManagedTypeMappings.managedMapping(from: unmanagedTypeName) { return stdMapping }
@@ -295,7 +302,32 @@ struct ManagedCPPWrapperClass {
         let constructorDefinition = managedClassName + "(" + managedMethodArguments.joined(separator: ", ") + ");"
         generatedConstructorDefinitions.append(constructorDefinition)
 
-        // TODO: Implementation.
+        // Implementation
+
+        let openingLine: String = managedNamespace + "::" + managedClassName + "::" + managedClassName
+            + "(" + managedMethodArguments.joined(separator: ", ") + ") {"
+
+        var methodLines: [String] = [openingLine]
+
+        let parameterName: String = "arg"
+
+        // Adapt the parameters
+        for (index, argument) in unmanagedArguments.enumerated() {
+            // We need to bridge each argument to the unmanaged type.
+            let unmanagedType = argument.typeName
+            let mapping = wrapping(for: unmanagedType)
+            let adaptedArgument: String = mapping.wrappedTypeName + " " + parameterName + "\(index) = " + mapping.convertWrapperToWrapped(argument.argumentName) + ";"
+            methodLines.append("    " + adaptedArgument)
+        }
+
+        let scopedUnmanagedTypeName = unmanagedNamespace + "::" + unmanagedClassName
+
+        let args: String = (0..<unmanagedArguments.count).map({ "arg\($0)" }).joined(separator: ", ")
+        methodLines.append("    " + scopedUnmanagedTypeName + " *newObject = new " + scopedUnmanagedTypeName + "(" + args + ");")
+        methodLines.append("    wrappedObj = new std::shared_ptr<" + scopedUnmanagedTypeName + ">(newObject);")
+
+        methodLines.append("}")
+        generatedConstructorImplementations.append(methodLines)
 
         return true
     }
@@ -341,6 +373,7 @@ struct ManagedCPPWrapperClass {
         })
 
         let scopedManagedClassName: String = managedNamespace + "::" + managedClassName
+        let scopedUnmanagedClassName: String = unmanagedNamespace + "::" + unmanagedClassName
 
         // Header definition.
         let methodDefinition = managedReturnTypeName + " " + unmanagedMethodName + "(" +
@@ -349,10 +382,21 @@ struct ManagedCPPWrapperClass {
         if methodIsStatic {
             generatedStaticMethodDefinitions.append("static " + methodDefinition)
         } else if methodIsEqualityOperator {
-            // TODO: Implementation of the == operator.
             generatedStaticMethodDefinitions.append("static bool operator==(" + scopedManagedClassName + "^ lhs, " + scopedManagedClassName + "^ rhs);")
         } else {
             generatedMethodDefinitions.append(methodDefinition)
+        }
+
+        guard !methodIsEqualityOperator else {
+            // This is special-cased a bit.
+            var methodLines: [String] = []
+
+            methodLines.append("bool " + scopedManagedClassName + "::operator==(" + scopedManagedClassName + "^ lhs, " + scopedManagedClassName + "^ rhs) {")
+            methodLines.append("    return (*lhs->" + unmanagedObjectName + "->get() == *rhs->" + unmanagedObjectName + "->get());")
+            methodLines.append("}")
+
+            generatedMethodImplementations.append(methodLines)
+            return
         }
 
         // Implementation
@@ -376,12 +420,24 @@ struct ManagedCPPWrapperClass {
         let args: String = (0..<unmanagedArguments.count).map({ "arg\($0)" }).joined(separator: ", ")
 
         if returnIsVoid {
-            let methodCall: String = unmanagedObjectName + "->" + unmanagedMethodName + "(" + args + ");"
+            let methodCall: String = {
+                if methodIsStatic {
+                    return scopedUnmanagedClassName + "::" + unmanagedMethodName + "(" + args + ");"
+                } else {
+                    return unmanagedObjectName + "->get()->" + unmanagedMethodName + "(" + args + ");"
+                }
+            }()
             methodLines.append("    " + methodCall)
         } else {
-            // Call the method!
-            let methodCall: String = returnTypeMapping.wrappedTypeName + " unmanagedResult = " + unmanagedObjectName
-                                        + "->" + unmanagedMethodName + "(" + args + ");"
+            let methodCall: String = {
+                if methodIsStatic {
+                    return returnTypeMapping.wrappedTypeName + " unmanagedResult = " + scopedUnmanagedClassName + "::"
+                                        + unmanagedMethodName + "(" + args + ");"
+                } else {
+                    return returnTypeMapping.wrappedTypeName + " unmanagedResult = " + unmanagedObjectName
+                                        + "->get()->" + unmanagedMethodName + "(" + args + ");"
+                }
+            }()
             methodLines.append("    " + methodCall)
 
             // Finally, translate back to the managed type and return it.
@@ -418,13 +474,29 @@ struct ManagedCPPWrapperClass {
 
     func generateClassImplementation() -> [String] {
 
-        // TODO:
-        // - Declared constructors.
-        // - Static methods.
-        // - Properly implement == for enums.
-        // - Type mapping is broken.
+        let scopedUnmanagedTypeName: String = unmanagedNamespace + "::" + unmanagedClassName
+        let scopedManagedTypeName: String = managedNamespace + "::" + managedClassName
 
         var lines: [String] = []
+
+        // Wrapper constructor
+        lines.append(scopedManagedTypeName + "::" + managedClassName + "(std::shared_ptr<" + scopedUnmanagedTypeName + ">* wrapped) {")
+        lines.append("    wrappedObj = wrapped;")
+        lines.append("}")
+        lines.append("")
+
+        // Wrapped constructor(s)
+        for implementation in generatedConstructorImplementations {
+            lines.append(contentsOf: implementation)
+            lines.append("")
+        }
+
+        // Destructor
+        lines.append(scopedManagedTypeName + "::~" + managedClassName + "() {")
+        lines.append("    delete wrappedObj;")
+        lines.append("}")
+        lines.append("")
+
         for implementation in generatedMethodImplementations {
             lines.append(contentsOf: implementation)
             lines.append("")

@@ -12,7 +12,8 @@ ManagedBasicTest::APIStruct::APIStruct(std::shared_ptr<UnmanagedBasicTest::APISt
 }
 
 ManagedBasicTest::APIStruct::APIStruct(ManagedBasicTest::APIEnum^ enumValue) {
-    UnmanagedBasicTest::APIStruct *newObject = new UnmanagedBasicTest::APIStruct(enumValue->wrappedObj->get()->swiftObj);
+    UnmanagedBasicTest::APIEnum arg0 = *enumValue->wrappedObj->get();
+    UnmanagedBasicTest::APIStruct* newObject = new UnmanagedBasicTest::APIStruct(arg0);
     wrappedObj = new std::shared_ptr<UnmanagedBasicTest::APIStruct>(newObject);
 }
 
@@ -22,8 +23,7 @@ ManagedBasicTest::APIStruct::~APIStruct() {
 
 ManagedBasicTest::APIEnum^ ManagedBasicTest::APIStruct::getEnumValue() {
     UnmanagedBasicTest::APIEnum unmanagedResult = wrappedObj->get()->getEnumValue();
-    UnmanagedBasicTest::APIEnum* copy = new UnmanagedBasicTest::APIEnum(unmanagedResult);
-    return gcnew ManagedBasicTest::APIEnum(new std::shared_ptr<UnmanagedBasicTest::APIEnum>(copy));
+    return gcnew ManagedBasicTest::APIEnum(new std::shared_ptr<UnmanagedBasicTest::APIEnum>(new UnmanagedBasicTest::APIEnum(unmanagedResult)));
 }
 
 // Implementation of ManagedBasicTest::APIClass
@@ -33,8 +33,8 @@ ManagedBasicTest::APIClass::APIClass(std::shared_ptr<UnmanagedBasicTest::APIClas
 }
 
 ManagedBasicTest::APIClass::APIClass() {
-    UnmanagedBasicTest::APIClass *newValue = new UnmanagedBasicTest::APIClass();
-    wrappedObj = new std::shared_ptr<UnmanagedBasicTest::APIClass>(newValue);
+    UnmanagedBasicTest::APIClass* newObject = new UnmanagedBasicTest::APIClass();
+    wrappedObj = new std::shared_ptr<UnmanagedBasicTest::APIClass>(newObject);
 }
 
 ManagedBasicTest::APIClass::~APIClass() {
@@ -47,16 +47,15 @@ System::String^ ManagedBasicTest::APIClass::getText() {
 }
 
 System::String^ ManagedBasicTest::APIClass::sayHello(System::String^ name) {
-    const std::string & arg0 = marshal_as<std::string>(name);
+    const std::string& arg0 = marshal_as<std::string>(name);
     std::string unmanagedResult = wrappedObj->get()->sayHello(arg0);
     return marshal_as<System::String^>(unmanagedResult);
 }
 
 ManagedBasicTest::APIStruct^ ManagedBasicTest::APIClass::doWork(ManagedBasicTest::APIStruct^ structValue) {
-    const UnmanagedBasicTest::APIStruct& arg0 = *structValue->wrappedObj->get();
+    UnmanagedBasicTest::APIStruct arg0 = *structValue->wrappedObj->get();
     UnmanagedBasicTest::APIStruct unmanagedResult = wrappedObj->get()->doWork(arg0);
-    UnmanagedBasicTest::APIStruct* copy = new UnmanagedBasicTest::APIStruct(unmanagedResult);
-    return gcnew ManagedBasicTest::APIStruct(new std::shared_ptr<UnmanagedBasicTest::APIStruct>(copy));
+    return gcnew ManagedBasicTest::APIStruct(new std::shared_ptr<UnmanagedBasicTest::APIStruct>(new UnmanagedBasicTest::APIStruct(unmanagedResult)));
 }
 
 // Implementation of ManagedBasicTest::APIEnum
@@ -71,14 +70,12 @@ ManagedBasicTest::APIEnum::~APIEnum() {
 
 ManagedBasicTest::APIEnum^ ManagedBasicTest::APIEnum::caseOne() {
     UnmanagedBasicTest::APIEnum unmanagedResult = UnmanagedBasicTest::APIEnum::caseOne();
-    UnmanagedBasicTest::APIEnum* copy = new UnmanagedBasicTest::APIEnum(unmanagedResult);
-    return gcnew ManagedBasicTest::APIEnum(new std::shared_ptr<UnmanagedBasicTest::APIEnum>(copy));
+    return gcnew ManagedBasicTest::APIEnum(new std::shared_ptr<UnmanagedBasicTest::APIEnum>(new UnmanagedBasicTest::APIEnum(unmanagedResult)));
 }
 
 ManagedBasicTest::APIEnum^ ManagedBasicTest::APIEnum::caseTwo() {
     UnmanagedBasicTest::APIEnum unmanagedResult = UnmanagedBasicTest::APIEnum::caseTwo();
-    UnmanagedBasicTest::APIEnum* copy = new UnmanagedBasicTest::APIEnum(unmanagedResult);
-    return gcnew ManagedBasicTest::APIEnum(new std::shared_ptr<UnmanagedBasicTest::APIEnum>(copy));
+    return gcnew ManagedBasicTest::APIEnum(new std::shared_ptr<UnmanagedBasicTest::APIEnum>(new UnmanagedBasicTest::APIEnum(unmanagedResult)));
 }
 
 bool ManagedBasicTest::APIEnum::operator==(ManagedBasicTest::APIEnum^ lhs, ManagedBasicTest::APIEnum^ rhs) {
@@ -99,4 +96,3 @@ int ManagedBasicTest::APIEnum::getRawValue() {
     int unmanagedResult = wrappedObj->get()->getRawValue();
     return unmanagedResult;
 }
-
