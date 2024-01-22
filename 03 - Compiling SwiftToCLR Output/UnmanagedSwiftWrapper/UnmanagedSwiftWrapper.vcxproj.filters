@@ -15,18 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UnmanagedSwiftWrapper.h">
+    <ClInclude Include="UnmanagedBasicTest.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UnmanagedSwiftWrapper.cpp">
+    <ClCompile Include="UnmanagedBasicTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
