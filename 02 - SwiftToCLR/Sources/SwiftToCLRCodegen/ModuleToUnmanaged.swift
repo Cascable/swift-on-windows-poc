@@ -377,7 +377,7 @@ struct UnmanagedManagedCPPWrapperClass {
         let scopedSwiftClassName = swiftModuleName + "::" + swiftClassName
 
         //static APIEnum caseOne();
-        generatedEnumCaseDefinitions.append("static " + wrapperClassName + " " + enumCaseName + "();")
+        generatedEnumCaseDefinitions.append("static " + scopedWrapperClassName + " " + enumCaseName + "();")
 
         //UnmanagedSwiftWrapper::APIEnum UnmanagedSwiftWrapper::APIEnum::caseOne() {
         //    BasicTest::APIEnum val = BasicTest::APIEnum::caseOne();

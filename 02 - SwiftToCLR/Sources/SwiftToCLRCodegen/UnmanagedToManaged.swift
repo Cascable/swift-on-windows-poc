@@ -106,6 +106,8 @@ public struct UnmanagedToManagedOperation {
 
                     wrapperClasses[className] = wrapperClass
                     internalTypeMappings[className + " *"] = mapping // This seems fragile.
+                    internalTypeMappings["const " + namespaceName + "::" + className + " &"] = mapping // This seems fragile.
+                    internalTypeMappings[namespaceName + "::" + className] = mapping // This seems fragile
                 }
             }
 
@@ -118,7 +120,18 @@ public struct UnmanagedToManagedOperation {
                 }
             }
 
-            // TODO: Constructor?
+            if cursorKind == CXCursor_Constructor && parentKind == CXCursor_ClassDecl {
+                let className = clang_getCursorDisplayName(parent).consumeToString
+                if var wrapperClass = wrapperClasses[className], clang_getCXXAccessSpecifier(cursor) == CX_CXXPublic {
+                    let wasIngested = wrapperClass.generateWrappedConstructorForUnmanagedConstructor(at: cursor, internalTypeMappings: internalTypeMappings)
+                    if wasIngested {
+                        if verbose { print("Got public constructor \(displayName) in class \(className) - adding to wrapper list.") }
+                        wrapperClasses[className] = wrapperClass // CoW and all that
+                    } else {
+                        if verbose { print("Public constructor \(displayName) in class \(className) was rejected for wrapping.") }
+                    }
+                }
+            }
 
             return CXChildVisit_Recurse
         }
@@ -231,6 +244,8 @@ struct ManagedCPPWrapperClass {
     let managedNamespace: String
 
     var generatedMethodDefinitions: [String] // For the header file
+    var generatedConstructorDefinitions: [String] // For the header file
+    var generatedStaticMethodDefinitions: [String] // For the header file
     var generatedMethodImplementations: [[String]]  // For the implementation file.
 
     init(unmanagedClassName: String, unmanagedNamespace: String, unmanagedObjectName: String, managedClassName: String, managedNamespace: String) {
@@ -240,7 +255,49 @@ struct ManagedCPPWrapperClass {
         self.managedClassName = managedClassName
         self.managedNamespace = managedNamespace
         self.generatedMethodDefinitions = []
+        self.generatedConstructorDefinitions = []
+        self.generatedStaticMethodDefinitions = []
         self.generatedMethodImplementations = []
+    }
+
+    mutating func generateWrappedConstructorForUnmanagedConstructor(at cursor: CXCursor, internalTypeMappings: [String: TypeMapping]) -> Bool {
+        let cursorType: CXType = clang_getCursorType(cursor)
+        let cursorKind: CXCursorKind = clang_getCursorKind(cursor)
+        assert(cursorType.kind == CXType_FunctionProto, "Passed wrong cursor type")
+        assert(cursorKind == CXCursor_Constructor, "Passed wrong cursor kind")
+
+        // We need to reject "wrapping" constructors and only take custom ones, since we generate our own wrapping
+        // constructor. These constructors take a std::shared_ptr<SwiftType>.
+
+        let argumentCount = UInt32(clang_Cursor_getNumArguments(cursor)) // Can return -1 if the wrong cursor type. We checked that above.
+        let unmanagedArguments: [MethodArgument] = (0..<argumentCount).map({ argumentIndex in
+            let argumentCursor: CXCursor = clang_Cursor_getArgument(cursor, argumentIndex)
+            let argumentName = clang_getCursorSpelling(argumentCursor).consumeToString
+            let argumentType = clang_getTypeSpelling(clang_getArgType(cursorType, argumentIndex)).consumeToString
+            return MethodArgument(typeName: argumentType, argumentName: argumentName)
+        })
+
+        guard !unmanagedArguments.contains(where: { $0.typeName.contains("std::shared_ptr") }) else { return false }
+
+        // We have everything we need to wrap the method now!
+
+        func wrapping(for unmanagedTypeName: String) -> TypeMapping {
+            if let stdMapping = UnmanagedToManagedTypeMappings.managedMapping(from: unmanagedTypeName) { return stdMapping }
+            if let internalMapping = internalTypeMappings[unmanagedTypeName] { return internalMapping }
+            return .direct(for: unmanagedTypeName)
+        }
+
+        let managedMethodArguments: [String] = unmanagedArguments.map({ argument in
+            return "\(wrapping(for: argument.typeName).wrapperTypeName) \(argument.argumentName)"
+        })
+
+        // Header definition.
+        let constructorDefinition = managedClassName + "(" + managedMethodArguments.joined(separator: ", ") + ");"
+        generatedConstructorDefinitions.append(constructorDefinition)
+
+        // TODO: Implementation.
+
+        return true
     }
 
     mutating func generateWrappedMethodForUnmanagedMethod(at cursor: CXCursor, internalTypeMappings: [String: TypeMapping]) {
@@ -256,6 +313,8 @@ struct ManagedCPPWrapperClass {
 
         // And the method name.
         let unmanagedMethodName = clang_getCursorSpelling(cursor).consumeToString
+        let methodIsEqualityOperator: Bool = (unmanagedMethodName == "operator==") // I'm sure there's a better way than this.
+        let methodIsStatic: Bool = (clang_CXXMethod_isStatic(cursor) > 0)
 
         // …and the arguments.
         let argumentCount = UInt32(clang_Cursor_getNumArguments(cursor)) // Can return -1 if the wrong cursor type. We checked that above.
@@ -281,14 +340,24 @@ struct ManagedCPPWrapperClass {
             return "\(wrapping(for: argument.typeName).wrapperTypeName) \(argument.argumentName)"
         })
 
+        let scopedManagedClassName: String = managedNamespace + "::" + managedClassName
+
         // Header definition.
         let methodDefinition = managedReturnTypeName + " " + unmanagedMethodName + "(" +
             managedMethodArguments.joined(separator: ", ") + ");"
-        generatedMethodDefinitions.append(methodDefinition)
+
+        if methodIsStatic {
+            generatedStaticMethodDefinitions.append("static " + methodDefinition)
+        } else if methodIsEqualityOperator {
+            // TODO: Implementation of the == operator.
+            generatedStaticMethodDefinitions.append("static bool operator==(" + scopedManagedClassName + "^ lhs, " + scopedManagedClassName + "^ rhs);")
+        } else {
+            generatedMethodDefinitions.append(methodDefinition)
+        }
 
         // Implementation
 
-        let openingLine: String = managedReturnTypeName + " " + managedNamespace + "::" + managedClassName + "::" +
+        let openingLine: String = managedReturnTypeName + " " + scopedManagedClassName + "::" +
             unmanagedMethodName + "(" + managedMethodArguments.joined(separator: ", ") + ") {"
 
         var methodLines: [String] = [openingLine]
@@ -331,23 +400,30 @@ struct ManagedCPPWrapperClass {
 
         lines.append("public ref class " + managedClassName + " {")
         lines.append("private:")
+        lines.append("internal:")
+        lines.append("    std::shared_ptr<" + scopedUnmanagedTypeName + "> *" + unmanagedObjectName + ";")
+        lines.append("    " + managedClassName + "(std::shared_ptr<" + scopedUnmanagedTypeName + "> *wrapped);")
         lines.append("public:")
-        lines.append("    " + scopedUnmanagedTypeName + " *" + unmanagedObjectName + ";")
-        lines.append("    " + managedClassName + "() : " + unmanagedObjectName + "(new " + scopedUnmanagedTypeName + "()) {}")
-        lines.append("    " + managedClassName + "(" + scopedUnmanagedTypeName + " * wrapped) : " + unmanagedObjectName + "(wrapped) {}")
-        // TODO: This might be bad when wrapping. We might want to use shared_ptr.
-        lines.append("    ~" + managedClassName + "() { delete " + unmanagedObjectName + "; }")
+        lines.append(contentsOf: generatedConstructorDefinitions.map({ "    " + $0 }))
+        lines.append("    ~" + managedClassName + "();")
         lines.append("")
 
-        for methodDefinition in generatedMethodDefinitions {
-            lines.append("    "  + methodDefinition)
-        }
+        lines.append(contentsOf: generatedStaticMethodDefinitions.map({ "    " + $0 }))
+        if !generatedStaticMethodDefinitions.isEmpty { lines.append("") }
+        lines.append(contentsOf: generatedMethodDefinitions.map({ "    " + $0 }))
 
         lines.append("};")
         return lines
     }
 
     func generateClassImplementation() -> [String] {
+
+        // TODO:
+        // - Declared constructors.
+        // - Static methods.
+        // - Properly implement == for enums.
+        // - Type mapping is broken.
+
         var lines: [String] = []
         for implementation in generatedMethodImplementations {
             lines.append(contentsOf: implementation)

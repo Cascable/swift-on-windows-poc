@@ -19,7 +19,7 @@ namespace ManagedBasicTest {
     public:
         APIStruct(ManagedBasicTest::APIEnum^ enumValue);
         ~APIStruct();
-    
+
         ManagedBasicTest::APIEnum^ getEnumValue();
     };
 
@@ -31,7 +31,7 @@ namespace ManagedBasicTest {
     public:
         APIClass();
         ~APIClass();
-    
+
         System::String^ getText();
         System::String^ sayHello(System::String^ name);
         ManagedBasicTest::APIStruct^ doWork(ManagedBasicTest::APIStruct^ structValue);
@@ -41,14 +41,14 @@ namespace ManagedBasicTest {
     private:
     internal:
         std::shared_ptr<UnmanagedBasicTest::APIEnum>* wrappedObj;
-        APIEnum(std::shared_ptr<UnmanagedBasicTest::APIEnum> *wrapped);
+        APIEnum(std::shared_ptr<UnmanagedBasicTest::APIEnum>* wrapped);
     public:
         ~APIEnum();
-    
+
         static ManagedBasicTest::APIEnum^ caseOne();
         static ManagedBasicTest::APIEnum^ caseTwo();
-
         static bool operator==(ManagedBasicTest::APIEnum^ lhs, ManagedBasicTest::APIEnum^ rhs);
+
         bool isCaseOne();
         bool isCaseTwo();
         int getRawValue();

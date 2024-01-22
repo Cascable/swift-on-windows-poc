@@ -12,7 +12,7 @@ class CodeGenerationTests: XCTestCase {
         let resultFiles = try ModuleToUnmanagedOperation.execute(inputHeaderPath: inputFile.path,
                                                                  inputModuleName: "BasicTest",
                                                                  wrappedObjectVariableName: "swiftObj",
-                                                                 outputNamespace: "SwiftWrapper",
+                                                                 outputNamespace: "UnmanagedBasicTest",
                                                                  platformRoot: nil,
                                                                  cxxInteropContainerPath: cxxParent.path,
                                                                  verbose: true)
@@ -24,13 +24,13 @@ class CodeGenerationTests: XCTestCase {
 
     func testUnmanagedToManaged() throws {
 
-        let inputFile = try XCTUnwrap(testFile(named: "UnmanagedSwiftWrapper", extension: "h"))
+        let inputFile = try XCTUnwrap(testFile(named: "UnmanagedBasicTest", extension: "hpp"))
 
         let resultFiles = try UnmanagedToManagedOperation.execute(
             inputHeaderPath: inputFile.path,
-            inputNamespace: "UnmanagedSwiftWrapper",
+            inputNamespace: "UnmanagedBasicTest",
             wrappedObjectVariableName: "wrappedObj",
-            outputNamespace: "ManagedWrapper",
+            outputNamespace: "ManagedBasicTest",
             platformRoot: nil,
             verbose: true)
 
