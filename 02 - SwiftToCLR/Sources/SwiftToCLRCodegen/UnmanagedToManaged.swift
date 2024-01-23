@@ -21,7 +21,6 @@ public struct UnmanagedToManagedOperation {
             "--language=c++",
             "-std=c++17",
             "-isysroot", sdkRootPath
-            //"-I/path/to/swift/cxx-interop-headers" // Parent folder of swiftToCxx - not needed here.
         ]
 
         var argumentPointers = clangArguments.map({
@@ -31,7 +30,6 @@ public struct UnmanagedToManagedOperation {
             return UnsafePointer<Int8>(strdup($0))
             #endif
         })
-        var unit: CXTranslationUnit? = nil
 
         let inputFilePath: URL = URL(fileURLWithPath: inputHeaderPath)
         let inputFileName: String = inputFilePath.lastPathComponent
@@ -39,6 +37,7 @@ public struct UnmanagedToManagedOperation {
         guard let index: CXIndex = clang_createIndex(0, 0) else { throw ClangError.initialization("Failed to initialise clang") }
         defer { clang_disposeIndex(index) }
 
+        var unit: CXTranslationUnit? = nil
         argumentPointers.withUnsafeBufferPointer { ptr in
             let argumentsBasePtr = ptr.baseAddress!
             unit = clang_parseTranslationUnit(index, inputFilePath.path,
@@ -121,13 +120,13 @@ public struct UnmanagedToManagedOperation {
                                                   } else {
                                                       ptrOperation = copyOperation
                                                   }
-                                                  return "gcnew \(wrapperClass.managedNamespace)::\(wrapperClass.managedClassName)(\(ptrOperation))"
+                                                  return "gcnew \(scopedManagedTypeName)(\(ptrOperation))"
                                               })
 
                     wrapperClasses[className] = wrapperClass
                     internalTypeMappings[className + " *"] = mapping // This seems fragile.
-                    internalTypeMappings["const " + namespaceName + "::" + className + " &"] = mapping // This seems fragile.
-                    internalTypeMappings[namespaceName + "::" + className] = mapping // This seems fragile
+                    internalTypeMappings["const " + scopedUnmanagedTypeName + " &"] = mapping // This seems fragile.
+                    internalTypeMappings[scopedUnmanagedTypeName] = mapping // This seems fragile
                 }
             }
 
@@ -147,8 +146,6 @@ public struct UnmanagedToManagedOperation {
                     if wasIngested {
                         if verbose { print("Got public constructor \(displayName) in class \(className) - adding to wrapper list.") }
                         wrapperClasses[className] = wrapperClass // CoW and all that
-                    } else {
-                        if verbose { print("Public constructor \(displayName) in class \(className) was rejected for wrapping.") }
                     }
                 }
             }
@@ -321,8 +318,10 @@ struct ManagedCPPWrapperClass {
         generatedConstructorDefinitions.append(constructorDefinition)
 
         // Implementation
+        let scopedUnmanagedTypeName = unmanagedNamespace + "::" + unmanagedClassName
+        let scopedManagedTypeName = managedNamespace + "::" + managedClassName
 
-        let openingLine: String = managedNamespace + "::" + managedClassName + "::" + managedClassName
+        let openingLine: String = scopedManagedTypeName + "::" + managedClassName
             + "(" + managedMethodArguments.joined(separator: ", ") + ") {"
 
         var methodLines: [String] = [openingLine]
@@ -338,14 +337,13 @@ struct ManagedCPPWrapperClass {
             methodLines.append("    " + adaptedArgument)
         }
 
-        let scopedUnmanagedTypeName = unmanagedNamespace + "::" + unmanagedClassName
 
         let args: String = (0..<unmanagedArguments.count).map({ "arg\($0)" }).joined(separator: ", ")
         methodLines.append("    " + scopedUnmanagedTypeName + " *newObject = new " + scopedUnmanagedTypeName + "(" + args + ");")
         if useSharedPtrs {
-            methodLines.append("    wrappedObj = new std::shared_ptr<" + scopedUnmanagedTypeName + ">(newObject);")
+            methodLines.append("    " + unmanagedObjectName + " = new std::shared_ptr<" + scopedUnmanagedTypeName + ">(newObject);")
         } else {
-            methodLines.append("    wrappedObj = newObject;")
+            methodLines.append("    " + unmanagedObjectName + " = newObject;")
         }
         methodLines.append("}")
         generatedConstructorImplementations.append(methodLines)
@@ -493,10 +491,10 @@ struct ManagedCPPWrapperClass {
         lines.append("internal:")
         if useSharedPtrs {
             lines.append("    std::shared_ptr<" + scopedUnmanagedTypeName + "> *" + unmanagedObjectName + ";")
-            lines.append("    " + managedClassName + "(std::shared_ptr<" + scopedUnmanagedTypeName + "> *wrapped);")
+            lines.append("    " + managedClassName + "(std::shared_ptr<" + scopedUnmanagedTypeName + "> *objectToTakeOwnershipOf);")
         } else {
             lines.append("    " + scopedUnmanagedTypeName + " *" + unmanagedObjectName + ";")
-            lines.append("    " + managedClassName + "(" + scopedUnmanagedTypeName + " *wrapped);")
+            lines.append("    " + managedClassName + "(" + scopedUnmanagedTypeName + " *objectToTakeOwnershipOf);")
         }
         lines.append("public:")
         lines.append(contentsOf: generatedConstructorDefinitions.map({ "    " + $0 }))
@@ -520,11 +518,11 @@ struct ManagedCPPWrapperClass {
 
         // Wrapper constructor
         if useSharedPtrs {
-            lines.append(scopedManagedTypeName + "::" + managedClassName + "(std::shared_ptr<" + scopedUnmanagedTypeName + ">* wrapped) {")
+            lines.append(scopedManagedTypeName + "::" + managedClassName + "(std::shared_ptr<" + scopedUnmanagedTypeName + "> *objectToTakeOwnershipOf) {")
         } else {
-            lines.append(scopedManagedTypeName + "::" + managedClassName + "(" + scopedUnmanagedTypeName + "* wrapped) {")
+            lines.append(scopedManagedTypeName + "::" + managedClassName + "(" + scopedUnmanagedTypeName + " *objectToTakeOwnershipOf) {")
         }
-        lines.append("    wrappedObj = wrapped;")
+        lines.append("    " + unmanagedObjectName + " = objectToTakeOwnershipOf;")
         lines.append("}")
         lines.append("")
 
@@ -536,7 +534,7 @@ struct ManagedCPPWrapperClass {
 
         // Destructor
         lines.append(scopedManagedTypeName + "::~" + managedClassName + "() {")
-        lines.append("    delete wrappedObj;")
+        lines.append("    delete " + unmanagedObjectName + ";")
         lines.append("}")
         lines.append("")
 

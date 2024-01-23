@@ -15,7 +15,7 @@ namespace ManagedBasicTest {
     private:
     internal:
         UnmanagedBasicTest::APIStruct* wrappedObj;
-        APIStruct(UnmanagedBasicTest::APIStruct* wrapped);
+        APIStruct(UnmanagedBasicTest::APIStruct* objectToTakeOwnershipOf);
     public:
         APIStruct(ManagedBasicTest::APIEnum^ enumValue);
         ~APIStruct();
@@ -27,7 +27,7 @@ namespace ManagedBasicTest {
     private:
     internal:
         UnmanagedBasicTest::APIClass* wrappedObj;
-        APIClass(UnmanagedBasicTest::APIClass* wrapped);
+        APIClass(UnmanagedBasicTest::APIClass* objectToTakeOwnershipOf);
     public:
         APIClass();
         ~APIClass();
@@ -41,7 +41,7 @@ namespace ManagedBasicTest {
     private:
     internal:
         UnmanagedBasicTest::APIEnum* wrappedObj;
-        APIEnum(UnmanagedBasicTest::APIEnum* wrapped);
+        APIEnum(UnmanagedBasicTest::APIEnum* objectToTakeOwnershipOf);
     public:
         ~APIEnum();
 

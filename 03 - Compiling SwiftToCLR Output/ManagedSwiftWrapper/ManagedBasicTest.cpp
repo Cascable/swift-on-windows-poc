@@ -7,8 +7,8 @@ using namespace msclr::interop;
 
 // Implementation of ManagedBasicTest::APIStruct
 
-ManagedBasicTest::APIStruct::APIStruct(UnmanagedBasicTest::APIStruct* wrapped) {
-    wrappedObj = wrapped;
+ManagedBasicTest::APIStruct::APIStruct(UnmanagedBasicTest::APIStruct* objectToTakeOwnershipOf) {
+    wrappedObj = objectToTakeOwnershipOf;
 }
 
 ManagedBasicTest::APIStruct::APIStruct(ManagedBasicTest::APIEnum^ enumValue) {
@@ -28,8 +28,8 @@ ManagedBasicTest::APIEnum^ ManagedBasicTest::APIStruct::getEnumValue() {
 
 // Implementation of ManagedBasicTest::APIClass
 
-ManagedBasicTest::APIClass::APIClass(UnmanagedBasicTest::APIClass* wrapped) {
-    wrappedObj = wrapped;
+ManagedBasicTest::APIClass::APIClass(UnmanagedBasicTest::APIClass* objectToTakeOwnershipOf) {
+    wrappedObj = objectToTakeOwnershipOf;
 }
 
 ManagedBasicTest::APIClass::APIClass() {
@@ -60,8 +60,8 @@ ManagedBasicTest::APIStruct^ ManagedBasicTest::APIClass::doWork(ManagedBasicTest
 
 // Implementation of ManagedBasicTest::APIEnum
 
-ManagedBasicTest::APIEnum::APIEnum(UnmanagedBasicTest::APIEnum* wrapped) {
-    wrappedObj = wrapped;
+ManagedBasicTest::APIEnum::APIEnum(UnmanagedBasicTest::APIEnum* objectToTakeOwnershipOf) {
+    wrappedObj = objectToTakeOwnershipOf;
 }
 
 ManagedBasicTest::APIEnum::~APIEnum() {
