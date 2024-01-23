@@ -14,8 +14,8 @@ namespace ManagedBasicTest {
     public ref class APIStruct {
     private:
     internal:
-        std::shared_ptr<UnmanagedBasicTest::APIStruct>* wrappedObj;
-        APIStruct(std::shared_ptr<UnmanagedBasicTest::APIStruct>* wrapped);
+        UnmanagedBasicTest::APIStruct* wrappedObj;
+        APIStruct(UnmanagedBasicTest::APIStruct* wrapped);
     public:
         APIStruct(ManagedBasicTest::APIEnum^ enumValue);
         ~APIStruct();
@@ -26,8 +26,8 @@ namespace ManagedBasicTest {
     public ref class APIClass {
     private:
     internal:
-        std::shared_ptr<UnmanagedBasicTest::APIClass>* wrappedObj;
-        APIClass(std::shared_ptr<UnmanagedBasicTest::APIClass>* wrapped);
+        UnmanagedBasicTest::APIClass* wrappedObj;
+        APIClass(UnmanagedBasicTest::APIClass* wrapped);
     public:
         APIClass();
         ~APIClass();
@@ -40,8 +40,8 @@ namespace ManagedBasicTest {
     public ref class APIEnum {
     private:
     internal:
-        std::shared_ptr<UnmanagedBasicTest::APIEnum>* wrappedObj;
-        APIEnum(std::shared_ptr<UnmanagedBasicTest::APIEnum>* wrapped);
+        UnmanagedBasicTest::APIEnum* wrappedObj;
+        APIEnum(UnmanagedBasicTest::APIEnum* wrapped);
     public:
         ~APIEnum();
 

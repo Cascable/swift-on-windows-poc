@@ -7,6 +7,11 @@ public struct UnmanagedToManagedOperation {
     public static func execute(inputHeaderPath: String, inputNamespace: String, wrappedObjectVariableName: String,
                  outputNamespace: String, platformRoot: String?, verbose: Bool) throws -> [GeneratedFile] {
 
+        // The initial implementation of this codegen used std::shared_ptr to store unmanaged objects inside the
+        // garbage-collected objects. Since we're currently being very aggressive with copying, this doesn't appear
+        // to be needed for now. However, my C++ memory management skills are rather rusty, so I'm keeping the option around.
+        let useSharedPtrs: Bool = false
+
         // Config & Setup
 
         let sdkRootPath: String = platformRoot ?? Platform.defaultSDKRoot
@@ -90,7 +95,8 @@ public struct UnmanagedToManagedOperation {
                                                               unmanagedNamespace: namespaceName,
                                                               unmanagedObjectName: wrappedObjectVariableName,
                                                               managedClassName: className,
-                                                              managedNamespace: outputNamespace)
+                                                              managedNamespace: outputNamespace,
+                                                              useSharedPtrs: useSharedPtrs)
 
                     let scopedManagedTypeName = wrapperClass.managedNamespace + "::" + wrapperClass.managedClassName
                     let scopedUnmanagedTypeName = wrapperClass.unmanagedNamespace + "::" + wrapperClass.unmanagedClassName
@@ -102,10 +108,19 @@ public struct UnmanagedToManagedOperation {
                     let mapping = TypeMapping(wrappedTypeName: scopedUnmanagedTypeName,
                                               wrapperTypeName: scopedManagedTypeName + "^",
                                               convertWrapperToWrapped: {
-                                                  return "*\($0)->\(wrapperClass.unmanagedObjectName)->get()"
+                                                  if useSharedPtrs {
+                                                      return "*\($0)->\(wrapperClass.unmanagedObjectName)->get()"
+                                                  } else {
+                                                      return "*\($0)->\(wrapperClass.unmanagedObjectName)"
+                                                  }
                                               }, convertWrappedToWrapper: {
                                                   let copyOperation = "new " + scopedUnmanagedTypeName + "(" + $0 + ")"
-                                                  let ptrOperation = "new std::shared_ptr<" + scopedUnmanagedTypeName + ">(" + copyOperation + ")"
+                                                  let ptrOperation: String
+                                                  if useSharedPtrs {
+                                                      ptrOperation = "new std::shared_ptr<" + scopedUnmanagedTypeName + ">(" + copyOperation + ")"
+                                                  } else {
+                                                      ptrOperation = copyOperation
+                                                  }
                                                   return "gcnew \(wrapperClass.managedNamespace)::\(wrapperClass.managedClassName)(\(ptrOperation))"
                                               })
 
@@ -248,18 +263,21 @@ struct ManagedCPPWrapperClass {
     let managedClassName: String
     let managedNamespace: String
 
+    let useSharedPtrs: Bool
+
     var generatedMethodDefinitions: [String] // For the header file
     var generatedConstructorDefinitions: [String] // For the header file
     var generatedStaticMethodDefinitions: [String] // For the header file
     var generatedMethodImplementations: [[String]]  // For the implementation file
     var generatedConstructorImplementations: [[String]] // For the implementation file
 
-    init(unmanagedClassName: String, unmanagedNamespace: String, unmanagedObjectName: String, managedClassName: String, managedNamespace: String) {
+    init(unmanagedClassName: String, unmanagedNamespace: String, unmanagedObjectName: String, managedClassName: String, managedNamespace: String, useSharedPtrs: Bool) {
         self.unmanagedClassName = unmanagedClassName
         self.unmanagedNamespace = unmanagedNamespace
         self.unmanagedObjectName = unmanagedObjectName
         self.managedClassName = managedClassName
         self.managedNamespace = managedNamespace
+        self.useSharedPtrs = useSharedPtrs
         self.generatedMethodDefinitions = []
         self.generatedConstructorDefinitions = []
         self.generatedStaticMethodDefinitions = []
@@ -324,8 +342,11 @@ struct ManagedCPPWrapperClass {
 
         let args: String = (0..<unmanagedArguments.count).map({ "arg\($0)" }).joined(separator: ", ")
         methodLines.append("    " + scopedUnmanagedTypeName + " *newObject = new " + scopedUnmanagedTypeName + "(" + args + ");")
-        methodLines.append("    wrappedObj = new std::shared_ptr<" + scopedUnmanagedTypeName + ">(newObject);")
-
+        if useSharedPtrs {
+            methodLines.append("    wrappedObj = new std::shared_ptr<" + scopedUnmanagedTypeName + ">(newObject);")
+        } else {
+            methodLines.append("    wrappedObj = newObject;")
+        }
         methodLines.append("}")
         generatedConstructorImplementations.append(methodLines)
 
@@ -392,7 +413,11 @@ struct ManagedCPPWrapperClass {
             var methodLines: [String] = []
 
             methodLines.append("bool " + scopedManagedClassName + "::operator==(" + scopedManagedClassName + "^ lhs, " + scopedManagedClassName + "^ rhs) {")
-            methodLines.append("    return (*lhs->" + unmanagedObjectName + "->get() == *rhs->" + unmanagedObjectName + "->get());")
+            if useSharedPtrs {
+                methodLines.append("    return (*lhs->" + unmanagedObjectName + "->get() == *rhs->" + unmanagedObjectName + "->get());")
+            } else {
+                methodLines.append("    return (*lhs->" + unmanagedObjectName + " == *rhs->" + unmanagedObjectName + ");")
+            }
             methodLines.append("}")
 
             generatedMethodImplementations.append(methodLines)
@@ -424,7 +449,11 @@ struct ManagedCPPWrapperClass {
                 if methodIsStatic {
                     return scopedUnmanagedClassName + "::" + unmanagedMethodName + "(" + args + ");"
                 } else {
-                    return unmanagedObjectName + "->get()->" + unmanagedMethodName + "(" + args + ");"
+                    if useSharedPtrs {
+                        return unmanagedObjectName + "->get()->" + unmanagedMethodName + "(" + args + ");"
+                    } else {
+                        return unmanagedObjectName + "->" + unmanagedMethodName + "(" + args + ");"
+                    }
                 }
             }()
             methodLines.append("    " + methodCall)
@@ -434,8 +463,13 @@ struct ManagedCPPWrapperClass {
                     return returnTypeMapping.wrappedTypeName + " unmanagedResult = " + scopedUnmanagedClassName + "::"
                                         + unmanagedMethodName + "(" + args + ");"
                 } else {
-                    return returnTypeMapping.wrappedTypeName + " unmanagedResult = " + unmanagedObjectName
-                                        + "->get()->" + unmanagedMethodName + "(" + args + ");"
+                    if useSharedPtrs {
+                        return returnTypeMapping.wrappedTypeName + " unmanagedResult = " + unmanagedObjectName
+                                            + "->get()->" + unmanagedMethodName + "(" + args + ");"
+                    } else {
+                        return returnTypeMapping.wrappedTypeName + " unmanagedResult = " + unmanagedObjectName
+                                            + "->" + unmanagedMethodName + "(" + args + ");"
+                    }
                 }
             }()
             methodLines.append("    " + methodCall)
@@ -457,8 +491,13 @@ struct ManagedCPPWrapperClass {
         lines.append("public ref class " + managedClassName + " {")
         lines.append("private:")
         lines.append("internal:")
-        lines.append("    std::shared_ptr<" + scopedUnmanagedTypeName + "> *" + unmanagedObjectName + ";")
-        lines.append("    " + managedClassName + "(std::shared_ptr<" + scopedUnmanagedTypeName + "> *wrapped);")
+        if useSharedPtrs {
+            lines.append("    std::shared_ptr<" + scopedUnmanagedTypeName + "> *" + unmanagedObjectName + ";")
+            lines.append("    " + managedClassName + "(std::shared_ptr<" + scopedUnmanagedTypeName + "> *wrapped);")
+        } else {
+            lines.append("    " + scopedUnmanagedTypeName + " *" + unmanagedObjectName + ";")
+            lines.append("    " + managedClassName + "(" + scopedUnmanagedTypeName + " *wrapped);")
+        }
         lines.append("public:")
         lines.append(contentsOf: generatedConstructorDefinitions.map({ "    " + $0 }))
         lines.append("    ~" + managedClassName + "();")
@@ -480,7 +519,11 @@ struct ManagedCPPWrapperClass {
         var lines: [String] = []
 
         // Wrapper constructor
-        lines.append(scopedManagedTypeName + "::" + managedClassName + "(std::shared_ptr<" + scopedUnmanagedTypeName + ">* wrapped) {")
+        if useSharedPtrs {
+            lines.append(scopedManagedTypeName + "::" + managedClassName + "(std::shared_ptr<" + scopedUnmanagedTypeName + ">* wrapped) {")
+        } else {
+            lines.append(scopedManagedTypeName + "::" + managedClassName + "(" + scopedUnmanagedTypeName + "* wrapped) {")
+        }
         lines.append("    wrappedObj = wrapped;")
         lines.append("}")
         lines.append("")
