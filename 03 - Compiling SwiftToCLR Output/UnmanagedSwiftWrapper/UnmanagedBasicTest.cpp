@@ -54,6 +54,18 @@ bool UnmanagedBasicTest::WorkType::isReturnNil() {
     return swiftResult;
 }
 
+std::optional<UnmanagedBasicTest::WorkType> UnmanagedBasicTest::WorkType::initWithRawValue(int rawValue) {
+    swift::Int arg0 = (swift::Int)rawValue;
+    swift::Optional<BasicTest::WorkType> swiftResult = BasicTest::WorkType::init(arg0);
+    if (swiftResult) {
+        BasicTest::WorkType unwrapped = swiftResult.get();
+        return std::optional<UnmanagedBasicTest::WorkType>(UnmanagedBasicTest::WorkType(std::make_shared<BasicTest::WorkType>(unwrapped)));
+    }
+    else {
+        return std::nullopt;
+    }
+}
+
 int UnmanagedBasicTest::WorkType::getRawValue() {
     swift::Int swiftResult = swiftObj->getRawValue();
     return (int)swiftResult;
@@ -93,7 +105,13 @@ std::optional<std::string> UnmanagedBasicTest::APIClass::doOptionalWork(const Un
     const BasicTest::WorkType& arg0 = *type.swiftObj.get();
     swift::Optional<swift::String>arg1 = (optionalString.has_value() ? swift::Optional<swift::String>::init((swift::String)optionalString.value()) : swift::Optional<swift::String>::none());
     swift::Optional<swift::String> swiftResult = swiftObj->doOptionalWork(arg0, arg1);
-    return swiftResult ? std::optional<swift::String>((std::string)swiftResult.get()) : std::nullopt;
+    if (swiftResult) {
+        swift::String unwrapped = swiftResult.get();
+        return std::optional<std::string>((std::string)unwrapped);
+    }
+    else {
+        return std::nullopt;
+    }
 }
 
 // Implementation of UnmanagedBasicTest::APIEnum
@@ -126,6 +144,18 @@ bool UnmanagedBasicTest::APIEnum::isCaseOne() {
 bool UnmanagedBasicTest::APIEnum::isCaseTwo() {
     bool swiftResult = swiftObj->isCaseTwo();
     return swiftResult;
+}
+
+std::optional<UnmanagedBasicTest::APIEnum> UnmanagedBasicTest::APIEnum::initWithRawValue(int rawValue) {
+    swift::Int arg0 = (swift::Int)rawValue;
+    swift::Optional<BasicTest::APIEnum> swiftResult = BasicTest::APIEnum::init(arg0);
+    if (swiftResult) {
+        BasicTest::APIEnum unwrapped = swiftResult.get();
+        return std::optional<UnmanagedBasicTest::APIEnum>(UnmanagedBasicTest::APIEnum(std::make_shared<BasicTest::APIEnum>(unwrapped)));
+    }
+    else {
+        return std::nullopt;
+    }
 }
 
 int UnmanagedBasicTest::APIEnum::getRawValue() {

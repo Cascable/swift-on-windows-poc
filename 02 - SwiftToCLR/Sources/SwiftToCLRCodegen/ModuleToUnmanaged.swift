@@ -347,6 +347,7 @@ struct UnmanagedManagedCPPWrapperClass {
     var generatedMethodDefinitions: [String] // For the header file
     var generatedConstructorDefinitions: [String] // For the header file
     var generatedEnumCaseDefinitions: [String] // For the header file
+    var generatedStaticMethodDefinitions: [String] // For the header file
     var generatedMethodImplementations: [[String]]  // For the implementation file.
     var generatedConstructorImplementations: [[String]] // For the implementation file.
     var generatedEnumCaseImplementations: [[String]] // For the implementation file.
@@ -362,6 +363,7 @@ struct UnmanagedManagedCPPWrapperClass {
         self.generatedMethodDefinitions = []
         self.generatedConstructorDefinitions = []
         self.generatedEnumCaseDefinitions = []
+        self.generatedStaticMethodDefinitions = []
         self.generatedMethodImplementations = []
         self.generatedConstructorImplementations = []
         self.generatedEnumCaseImplementations = []
@@ -453,11 +455,16 @@ struct UnmanagedManagedCPPWrapperClass {
             }
         })
 
-
         // Header definition.
         if isConstructor {
             if swiftReturnArgument.isOptionalType {
-                // TODO: Optional constructors!
+                // C++ doesn't have optional constructors, so make this a static method instead.
+                let mashedArgumentNames: String = swiftArguments.map({
+                    $0.argumentName.prefix(1).uppercased() + $0.argumentName.dropFirst()
+                }).joined(separator: "And")
+                let methodDefinition = "static std::optional<" + unmanagedReturnTypeName + "> initWith" + mashedArgumentNames + "(" +
+                    unmanagedMethodArguments.joined(separator: ", ") + ");"
+                generatedStaticMethodDefinitions.append(methodDefinition);
             } else {
                 let methodDefinition = swiftClassName + "(" + unmanagedMethodArguments.joined(separator: ", ") + ");"
                 generatedConstructorDefinitions.append(methodDefinition)
@@ -479,36 +486,40 @@ struct UnmanagedManagedCPPWrapperClass {
         let scopedWrapperClassName = wrapperNamespace + "::" + wrapperClassName
 
         // Implementation
-        if isConstructor {
-            if swiftReturnArgument.isOptionalType {
-                // TODO: Optional constructors!
-            } else {
-                let openingLine: String = scopedWrapperClassName + "::" + wrapperClassName + "("
-                    + unmanagedMethodArguments.joined(separator: ", ") + ") {"
-                var constructorLines: [String] = [openingLine]
+        if isConstructor && !swiftReturnArgument.isOptionalType {
+            let openingLine: String = scopedWrapperClassName + "::" + wrapperClassName + "("
+                + unmanagedMethodArguments.joined(separator: ", ") + ") {"
+            var constructorLines: [String] = [openingLine]
 
-                let parameterName: String = "arg"
+            let parameterName: String = "arg"
 
-                // Adapt the parameters
-                for (index, argument) in swiftArguments.enumerated() {
-                    // We need to bridge each argument to the Swift type.
-                    let swiftType = argument.typeName
-                    let mapping = wrapping(for: swiftType)
-                    let adaptedArgument: String = mapping.wrappedTypeName + " " + parameterName + "\(index) = " + mapping.convertWrapperToWrapped(argument.argumentName) + ";"
-                    constructorLines.append("    " + adaptedArgument)
-                }
-
-                let args: String = (0..<swiftArguments.count).map({ "arg\($0)" }).joined(separator: ", ")
-
-                constructorLines.append("    " + scopedSwiftClassName + " instance = " + scopedSwiftClassName + "::init(" + args + ");")
-                constructorLines.append("    " + swiftObjectName + " = std::make_shared<" + scopedSwiftClassName + ">(instance);")
-                constructorLines.append("}")
-                generatedConstructorImplementations.append(constructorLines)
+            // Adapt the parameters
+            for (index, argument) in swiftArguments.enumerated() {
+                // We need to bridge each argument to the Swift type.
+                let swiftType = argument.typeName
+                let mapping = wrapping(for: swiftType)
+                let adaptedArgument: String = mapping.wrappedTypeName + " " + parameterName + "\(index) = " + mapping.convertWrapperToWrapped(argument.argumentName) + ";"
+                constructorLines.append("    " + adaptedArgument)
             }
+
+            let args: String = (0..<swiftArguments.count).map({ "arg\($0)" }).joined(separator: ", ")
+
+            constructorLines.append("    " + scopedSwiftClassName + " instance = " + scopedSwiftClassName + "::init(" + args + ");")
+            constructorLines.append("    " + swiftObjectName + " = std::make_shared<" + scopedSwiftClassName + ">(instance);")
+            constructorLines.append("}")
+            generatedConstructorImplementations.append(constructorLines)
         } else {
 
             let openingLine: String = {
-                if swiftReturnArgument.isOptionalType {
+                if swiftReturnArgument.isOptionalType && isConstructor {
+                    // We transform failable inits into static methods.
+                    /// C++ doesn't have optional constructors, so make this a static method instead.
+                    let mashedArgumentNames: String = swiftArguments.map({
+                        $0.argumentName.prefix(1).uppercased() + $0.argumentName.dropFirst()
+                    }).joined(separator: "And")
+                    return "std::optional<" + unmanagedReturnTypeName + "> " + scopedWrapperClassName + "::" +
+                        "initWith" + mashedArgumentNames + "(" + unmanagedMethodArguments.joined(separator: ", ") + ") {"
+                } else if swiftReturnArgument.isOptionalType {
                     return "std::optional<" + unmanagedReturnTypeName + "> " + scopedWrapperClassName + "::" +
                         swiftMethodName + "(" + unmanagedMethodArguments.joined(separator: ", ") + ") {"
                 } else {
@@ -547,7 +558,11 @@ struct UnmanagedManagedCPPWrapperClass {
                 methodLines.append("    " + methodCall)
             } else {
                 // Call the method!
-                if swiftReturnArgument.isOptionalType {
+                if isConstructor {
+                    let methodCall: String = "swift::Optional<" + returnTypeMapping.wrappedTypeName + "> swiftResult = "
+                        + scopedSwiftClassName + "::" + swiftMethodName + "(" + args + ");"
+                    methodLines.append("    " + methodCall)
+                } else if swiftReturnArgument.isOptionalType {
                     let methodCall: String = "swift::Optional<" + returnTypeMapping.wrappedTypeName + "> swiftResult = " + swiftObjectName
                         + "->" + swiftMethodName + "(" + args + ");"
                     methodLines.append("    " + methodCall)
@@ -559,10 +574,17 @@ struct UnmanagedManagedCPPWrapperClass {
 
                 // Finally, translate back to the unmanaged type and return it.
                 if swiftReturnArgument.isOptionalType {
-                    // return swiftResult ? std::optional<std::string>((std::string)swiftResult.get()) : std::nullopt;
-                    let returnLine: String = "return swiftResult ? std::optional<" + returnTypeMapping.wrappedTypeName + ">(" +
-                        returnTypeMapping.convertWrappedToWrapper("swiftResult") + ".get()) : std::nullopt;"
-                    methodLines.append("    " + returnLine)
+                    // This needs to be multiline so we can make that explicit reference to the new value.
+                    // Passing an optional's get() result straight to the wrapper constructor can trigger
+                    // the Swift C++ interop's current non-support of C++ move semantics.
+                    var optionalConversionLines: [String] = ["if (swiftResult) {"]
+                    optionalConversionLines.append("    " + returnTypeMapping.wrappedTypeName + " unwrapped = swiftResult.get();")
+                    optionalConversionLines.append("    return std::optional<" + returnTypeMapping.wrapperTypeName + ">(" +
+                            returnTypeMapping.convertWrappedToWrapper("unwrapped") + ");")
+                    optionalConversionLines.append("} else {")
+                    optionalConversionLines.append("    return std::nullopt;")
+                    optionalConversionLines.append("}")
+                    methodLines.append(contentsOf: optionalConversionLines.map({ "    " + $0 }))
                 } else {
                     let returnLine = "return " + returnTypeMapping.convertWrappedToWrapper("swiftResult") + ";"
                     methodLines.append("    " + returnLine)
@@ -590,6 +612,11 @@ struct UnmanagedManagedCPPWrapperClass {
         lines.append(contentsOf: generatedConstructorDefinitions.map({ "    " + $0 }))
         lines.append("    ~" + wrapperClassName + "();")
         lines.append("")
+
+        if !generatedStaticMethodDefinitions.isEmpty {
+            lines.append(contentsOf: generatedStaticMethodDefinitions.map({ "    " + $0 }))
+            lines.append("")
+        }
 
         if !generatedEnumCaseDefinitions.isEmpty {
             lines.append(contentsOf: generatedEnumCaseDefinitions.map({ "    " + $0 }))

@@ -38,6 +38,8 @@ namespace UnmanagedBasicTest {
         WorkType(std::shared_ptr<BasicTest::WorkType> swiftObj);
         ~WorkType();
 
+        static std::optional<UnmanagedBasicTest::WorkType> initWithRawValue(int rawValue);
+
         static UnmanagedBasicTest::WorkType returnValue();
         static UnmanagedBasicTest::WorkType returnNil();
 
@@ -68,6 +70,8 @@ namespace UnmanagedBasicTest {
         std::shared_ptr<BasicTest::APIEnum> swiftObj;
         APIEnum(std::shared_ptr<BasicTest::APIEnum> swiftObj);
         ~APIEnum();
+
+        static std::optional<UnmanagedBasicTest::APIEnum> initWithRawValue(int rawValue);
 
         static UnmanagedBasicTest::APIEnum caseOne();
         static UnmanagedBasicTest::APIEnum caseTwo();
