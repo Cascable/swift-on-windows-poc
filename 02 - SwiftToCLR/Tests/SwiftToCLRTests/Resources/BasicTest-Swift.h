@@ -5103,6 +5103,31 @@ static SWIFT_C_INLINE_THUNK struct swift_interop_passStub_BasicTest_uint8_t_0_1 
 }
 
 SWIFT_EXTERN struct swift_interop_returnStub_BasicTest_uint8_t_0_1 $s9BasicTest8APIClassC6doWork4withAA9APIStructVAG_tF(struct swift_interop_passStub_BasicTest_uint8_t_0_1 structValue, SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // doWork(with:)
+// Stub struct to be used to pass/return values to/from Swift functions.
+struct swift_interop_returnStub_BasicTest_uint64_t_0_8_uint64_t_8_16 {
+  uint64_t _1;
+  uint64_t _2;
+};
+
+static SWIFT_C_INLINE_THUNK void swift_interop_returnDirect_BasicTest_uint64_t_0_8_uint64_t_8_16(char * _Nonnull result, struct swift_interop_returnStub_BasicTest_uint64_t_0_8_uint64_t_8_16 value) {
+  memcpy(result + 0, &value._1, 8);
+  memcpy(result + 8, &value._2, 8);
+}
+
+// Stub struct to be used to pass/return values to/from Swift functions.
+struct swift_interop_passStub_BasicTest_uint64_t_0_8_uint64_t_8_16 {
+  uint64_t _1;
+  uint64_t _2;
+};
+
+static SWIFT_C_INLINE_THUNK struct swift_interop_passStub_BasicTest_uint64_t_0_8_uint64_t_8_16 swift_interop_passDirect_BasicTest_uint64_t_0_8_uint64_t_8_16(const char * _Nonnull value) {
+  struct swift_interop_passStub_BasicTest_uint64_t_0_8_uint64_t_8_16 result;
+  memcpy(&result._1, value + 0, 8);
+  memcpy(&result._2, value + 8, 8);
+  return result;
+}
+
+SWIFT_EXTERN struct swift_interop_returnStub_BasicTest_uint64_t_0_8_uint64_t_8_16 $s9BasicTest8APIClassC14doOptionalWork2of14optionalStringSSSgAA0F4TypeO_AGtF(struct swift_interop_passStub_BasicTest_uint8_t_0_1 type, struct swift_interop_passStub_BasicTest_uint64_t_0_8_uint64_t_8_16 optionalString, SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // doOptionalWork(of:optionalString:)
 SWIFT_EXTERN struct swift_interop_returnStub_BasicTest_uint8_t_0_1 $s9BasicTest7APIEnumO8rawValueACSgSi_tcfC(ptrdiff_t rawValue) SWIFT_NOEXCEPT SWIFT_CALL; // init(rawValue:)
 SWIFT_EXTERN ptrdiff_t $s9BasicTest7APIEnumO8rawValueSivg(struct swift_interop_passStub_BasicTest_uint8_t_0_1 _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 struct BasicTest_APIEnum {
@@ -5112,6 +5137,12 @@ struct BasicTest_APIEnum {
 SWIFT_EXTERN struct swift_interop_returnStub_BasicTest_uint8_t_0_1 $s9BasicTest9APIStructV9enumValueAA7APIEnumOvg(struct swift_interop_passStub_BasicTest_uint8_t_0_1 _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 SWIFT_EXTERN struct swift_interop_returnStub_BasicTest_uint8_t_0_1 $s9BasicTest9APIStructV9enumValueAcA7APIEnumO_tcfC(struct swift_interop_passStub_BasicTest_uint8_t_0_1 enumValue) SWIFT_NOEXCEPT SWIFT_CALL; // init(enumValue:)
 struct BasicTest_APIStruct {
+  _Alignas(1) char _storage[1];
+};
+
+SWIFT_EXTERN struct swift_interop_returnStub_BasicTest_uint8_t_0_1 $s9BasicTest8WorkTypeO8rawValueACSgSi_tcfC(ptrdiff_t rawValue) SWIFT_NOEXCEPT SWIFT_CALL; // init(rawValue:)
+SWIFT_EXTERN ptrdiff_t $s9BasicTest8WorkTypeO8rawValueSivg(struct swift_interop_passStub_BasicTest_uint8_t_0_1 _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
+struct BasicTest_WorkType {
   _Alignas(1) char _storage[1];
 };
 
@@ -5130,6 +5161,18 @@ namespace swift SWIFT_PRIVATE_ATTR {
 #pragma clang diagnostic ignored "-Wc++17-extensions"
 template<>
 static inline const constexpr bool isUsableInGenericContext<BasicTest::APIStruct> = true;
+#pragma clang diagnostic pop
+} // namespace swift
+
+namespace BasicTest SWIFT_PRIVATE_ATTR SWIFT_SYMBOL_MODULE("BasicTest") {
+class SWIFT_SYMBOL("s:9BasicTest8WorkTypeO") WorkType;
+} // end namespace
+
+namespace swift SWIFT_PRIVATE_ATTR {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++17-extensions"
+template<>
+static inline const constexpr bool isUsableInGenericContext<BasicTest::WorkType> = true;
 #pragma clang diagnostic pop
 } // namespace swift
 
@@ -5164,6 +5207,7 @@ public:
   SWIFT_INLINE_THUNK swift::String getText() SWIFT_SYMBOL("s:9BasicTest8APIClassC4textSSvp");
   SWIFT_INLINE_THUNK swift::String sayHello(const swift::String& name) SWIFT_SYMBOL("s:9BasicTest8APIClassC8sayHello2toS2S_tF");
   SWIFT_INLINE_THUNK APIStruct doWork(const APIStruct& structValue) SWIFT_SYMBOL("s:9BasicTest8APIClassC6doWork4withAA9APIStructVAG_tF");
+  SWIFT_INLINE_THUNK swift::Optional<swift::String> doOptionalWork(const WorkType& type, const swift::Optional<swift::String>& optionalString) SWIFT_SYMBOL("s:9BasicTest8APIClassC14doOptionalWork2of14optionalStringSSSgAA0F4TypeO_AGtF");
 protected:
   SWIFT_INLINE_THUNK APIClass(void * _Nonnull ptr) noexcept : RefCountedClass(ptr) {}
 private:
@@ -5520,6 +5564,190 @@ struct implClassFor<BasicTest::APIStruct> { using type = BasicTest::_impl::_impl
 
 namespace BasicTest SWIFT_PRIVATE_ATTR SWIFT_SYMBOL_MODULE("BasicTest") {
 
+namespace _impl {
+
+class _impl_WorkType;
+
+// Type metadata accessor for WorkType
+SWIFT_EXTERN swift::_impl::MetadataResponseTy $s9BasicTest8WorkTypeOMa(swift::_impl::MetadataRequestTy) SWIFT_NOEXCEPT SWIFT_CALL;
+
+
+} // namespace _impl
+
+class SWIFT_SYMBOL("s:9BasicTest8WorkTypeO") WorkType final {
+public:
+  SWIFT_INLINE_THUNK ~WorkType() noexcept {
+    auto metadata = _impl::$s9BasicTest8WorkTypeOMa(0);
+    auto *vwTableAddr = reinterpret_cast<swift::_impl::ValueWitnessTable **>(metadata._0) - 1;
+#ifdef __arm64e__
+    auto *vwTable = reinterpret_cast<swift::_impl::ValueWitnessTable *>(ptrauth_auth_data(reinterpret_cast<void *>(*vwTableAddr), ptrauth_key_process_independent_data, ptrauth_blend_discriminator(vwTableAddr, 11839)));
+#else
+    auto *vwTable = *vwTableAddr;
+#endif
+    vwTable->destroy(_getOpaquePointer(), metadata._0);
+  }
+  SWIFT_INLINE_THUNK WorkType(const WorkType &other) noexcept {
+    auto metadata = _impl::$s9BasicTest8WorkTypeOMa(0);
+    auto *vwTableAddr = reinterpret_cast<swift::_impl::ValueWitnessTable **>(metadata._0) - 1;
+#ifdef __arm64e__
+    auto *vwTable = reinterpret_cast<swift::_impl::ValueWitnessTable *>(ptrauth_auth_data(reinterpret_cast<void *>(*vwTableAddr), ptrauth_key_process_independent_data, ptrauth_blend_discriminator(vwTableAddr, 11839)));
+#else
+    auto *vwTable = *vwTableAddr;
+#endif
+    vwTable->initializeWithCopy(_getOpaquePointer(), const_cast<char *>(other._getOpaquePointer()), metadata._0);
+  }
+  SWIFT_INLINE_THUNK WorkType &operator =(const WorkType &other) noexcept {
+    auto metadata = _impl::$s9BasicTest8WorkTypeOMa(0);
+    auto *vwTableAddr = reinterpret_cast<swift::_impl::ValueWitnessTable **>(metadata._0) - 1;
+#ifdef __arm64e__
+    auto *vwTable = reinterpret_cast<swift::_impl::ValueWitnessTable *>(ptrauth_auth_data(reinterpret_cast<void *>(*vwTableAddr), ptrauth_key_process_independent_data, ptrauth_blend_discriminator(vwTableAddr, 11839)));
+#else
+    auto *vwTable = *vwTableAddr;
+#endif
+    vwTable->assignWithCopy(_getOpaquePointer(), const_cast<char *>(other._getOpaquePointer()), metadata._0);
+  return *this;
+  }
+  SWIFT_INLINE_THUNK WorkType &operator =(WorkType &&other) = delete;
+  [[noreturn]] SWIFT_INLINE_PRIVATE_HELPER WorkType(WorkType &&) noexcept {
+  swift::_impl::_fatalError_Cxx_move_of_Swift_value_type_not_supported_yet();
+  swift::_impl::_swift_stdlib_reportFatalError("swift", 5, "C++ does not support moving a Swift value yet", 45, 0);
+  abort();
+  }
+
+  enum class cases {
+    returnValue SWIFT_SYMBOL("s:9BasicTest8WorkTypeO11returnValueyA2CmF"),
+    returnNil SWIFT_SYMBOL("s:9BasicTest8WorkTypeO9returnNilyA2CmF")
+  };
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++17-extensions"  // allow use of inline static data member
+  inline const static struct _impl_returnValue {  // impl struct for case returnValue
+    SWIFT_INLINE_THUNK constexpr operator cases() const {
+      return cases::returnValue;
+    }
+    SWIFT_INLINE_THUNK WorkType operator()() const;
+  } returnValue SWIFT_SYMBOL("s:9BasicTest8WorkTypeO11returnValueyA2CmF");
+  SWIFT_INLINE_THUNK bool isReturnValue() const;
+
+  inline const static struct _impl_returnNil {  // impl struct for case returnNil
+    SWIFT_INLINE_THUNK constexpr operator cases() const {
+      return cases::returnNil;
+    }
+    SWIFT_INLINE_THUNK WorkType operator()() const;
+  } returnNil SWIFT_SYMBOL("s:9BasicTest8WorkTypeO9returnNilyA2CmF");
+  SWIFT_INLINE_THUNK bool isReturnNil() const;
+
+#pragma clang diagnostic pop
+  SWIFT_INLINE_THUNK operator cases() const {
+    switch (_getEnumTag()) {
+      case 0: return cases::returnValue;
+      case 1: return cases::returnNil;
+      default: abort();
+    }
+  }
+
+  static SWIFT_INLINE_THUNK swift::Optional<WorkType> init(swift::Int rawValue) SWIFT_SYMBOL("s:9BasicTest8WorkTypeO8rawValueACSgSi_tcfc");
+  SWIFT_INLINE_THUNK swift::Int getRawValue() const SWIFT_SYMBOL("s:9BasicTest8WorkTypeO8rawValueSivp");
+private:
+  SWIFT_INLINE_THUNK WorkType() noexcept {}
+  static SWIFT_INLINE_THUNK WorkType _make() noexcept { return WorkType(); }
+  SWIFT_INLINE_THUNK const char * _Nonnull _getOpaquePointer() const noexcept { return _storage; }
+  SWIFT_INLINE_THUNK char * _Nonnull _getOpaquePointer() noexcept { return _storage; }
+
+  SWIFT_INLINE_THUNK char * _Nonnull _destructiveProjectEnumData() noexcept {
+    auto metadata = _impl::$s9BasicTest8WorkTypeOMa(0);
+    auto *vwTableAddr = reinterpret_cast<swift::_impl::ValueWitnessTable **>(metadata._0) - 1;
+#ifdef __arm64e__
+    auto *vwTable = reinterpret_cast<swift::_impl::ValueWitnessTable *>(ptrauth_auth_data(reinterpret_cast<void *>(*vwTableAddr), ptrauth_key_process_independent_data, ptrauth_blend_discriminator(vwTableAddr, 11839)));
+#else
+    auto *vwTable = *vwTableAddr;
+#endif
+    const auto *enumVWTable = reinterpret_cast<swift::_impl::EnumValueWitnessTable *>(vwTable);
+    enumVWTable->destructiveProjectEnumData(_getOpaquePointer(), metadata._0);
+    return _getOpaquePointer();
+  }
+  SWIFT_INLINE_THUNK void _destructiveInjectEnumTag(unsigned tag) noexcept {
+    auto metadata = _impl::$s9BasicTest8WorkTypeOMa(0);
+    auto *vwTableAddr = reinterpret_cast<swift::_impl::ValueWitnessTable **>(metadata._0) - 1;
+#ifdef __arm64e__
+    auto *vwTable = reinterpret_cast<swift::_impl::ValueWitnessTable *>(ptrauth_auth_data(reinterpret_cast<void *>(*vwTableAddr), ptrauth_key_process_independent_data, ptrauth_blend_discriminator(vwTableAddr, 11839)));
+#else
+    auto *vwTable = *vwTableAddr;
+#endif
+    const auto *enumVWTable = reinterpret_cast<swift::_impl::EnumValueWitnessTable *>(vwTable);
+    enumVWTable->destructiveInjectEnumTag(_getOpaquePointer(), tag, metadata._0);
+  }
+  SWIFT_INLINE_THUNK unsigned _getEnumTag() const noexcept {
+    auto metadata = _impl::$s9BasicTest8WorkTypeOMa(0);
+    auto *vwTableAddr = reinterpret_cast<swift::_impl::ValueWitnessTable **>(metadata._0) - 1;
+#ifdef __arm64e__
+    auto *vwTable = reinterpret_cast<swift::_impl::ValueWitnessTable *>(ptrauth_auth_data(reinterpret_cast<void *>(*vwTableAddr), ptrauth_key_process_independent_data, ptrauth_blend_discriminator(vwTableAddr, 11839)));
+#else
+    auto *vwTable = *vwTableAddr;
+#endif
+    const auto *enumVWTable = reinterpret_cast<swift::_impl::EnumValueWitnessTable *>(vwTable);
+    return enumVWTable->getEnumTag(_getOpaquePointer(), metadata._0);
+  }
+  alignas(1) char _storage[1];
+  friend class _impl::_impl_WorkType;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++17-extensions"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+  typedef char $s9BasicTest8WorkTypeOD;
+  static inline constexpr $s9BasicTest8WorkTypeOD __swift_mangled_name = 0;
+#pragma clang diagnostic pop
+#pragma clang diagnostic pop
+};
+
+namespace _impl {
+
+class _impl_WorkType {
+public:
+  static SWIFT_INLINE_THUNK char * _Nonnull getOpaquePointer(WorkType &object) { return object._getOpaquePointer(); }
+  static SWIFT_INLINE_THUNK const char * _Nonnull getOpaquePointer(const WorkType &object) { return object._getOpaquePointer(); }
+  template<class T>
+  static SWIFT_INLINE_PRIVATE_HELPER WorkType returnNewValue(T callable) {
+    auto result = WorkType::_make();
+    callable(result._getOpaquePointer());
+    return result;
+  }
+  static SWIFT_INLINE_THUNK void initializeWithTake(char * _Nonnull destStorage, char * _Nonnull srcStorage) {
+    auto metadata = _impl::$s9BasicTest8WorkTypeOMa(0);
+    auto *vwTableAddr = reinterpret_cast<swift::_impl::ValueWitnessTable **>(metadata._0) - 1;
+#ifdef __arm64e__
+    auto *vwTable = reinterpret_cast<swift::_impl::ValueWitnessTable *>(ptrauth_auth_data(reinterpret_cast<void *>(*vwTableAddr), ptrauth_key_process_independent_data, ptrauth_blend_discriminator(vwTableAddr, 11839)));
+#else
+    auto *vwTable = *vwTableAddr;
+#endif
+    vwTable->initializeWithTake(destStorage, srcStorage, metadata._0);
+  }
+};
+
+} // namespace _impl
+
+} // end namespace
+
+namespace swift SWIFT_PRIVATE_ATTR {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++17-extensions"
+template<>
+struct TypeMetadataTrait<BasicTest::WorkType> {
+  static SWIFT_INLINE_PRIVATE_HELPER void * _Nonnull getTypeMetadata() {
+    return BasicTest::_impl::$s9BasicTest8WorkTypeOMa(0)._0;
+  }
+};
+namespace _impl{
+template<>
+static inline const constexpr bool isValueType<BasicTest::WorkType> = true;
+template<>
+struct implClassFor<BasicTest::WorkType> { using type = BasicTest::_impl::_impl_WorkType; };
+} // namespace
+#pragma clang diagnostic pop
+} // namespace swift
+
+namespace BasicTest SWIFT_PRIVATE_ATTR SWIFT_SYMBOL_MODULE("BasicTest") {
+
   SWIFT_INLINE_THUNK APIClass APIClass::init() {
   return _impl::_impl_APIClass::makeRetained(_impl::$s9BasicTest8APIClassCACycfC(swift::TypeMetadataTrait<APIClass>::getTypeMetadata()));
   }
@@ -5568,6 +5796,21 @@ FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 80 / sizeof(
     _impl::swift_interop_returnDirect_BasicTest_uint8_t_0_1(result, (* fptrptr_->func)(_impl::swift_interop_passDirect_BasicTest_uint8_t_0_1(_impl::_impl_APIStruct::getOpaquePointer(structValue)), ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
   });
   }
+  SWIFT_INLINE_THUNK swift::Optional<swift::String> APIClass::doOptionalWork(const WorkType& type, const swift::Optional<swift::String>& optionalString) {
+void ***selfPtr_ = reinterpret_cast<void ***>( ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+#ifdef __arm64e__
+void **vtable_ = ptrauth_auth_data(*selfPtr_, ptrauth_key_process_independent_data, ptrauth_blend_discriminator(selfPtr_,27361));
+#else
+void **vtable_ = *selfPtr_;
+#endif
+struct FTypeAddress {
+decltype(_impl::$s9BasicTest8APIClassC14doOptionalWork2of14optionalStringSSSgAA0F4TypeO_AGtF) * func;
+};
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 88 / sizeof(void *));
+  return swift::_impl::_impl_Optional<swift::String>::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
+    _impl::swift_interop_returnDirect_BasicTest_uint64_t_0_8_uint64_t_8_16(result, (* fptrptr_->func)(_impl::swift_interop_passDirect_BasicTest_uint8_t_0_1(_impl::_impl_WorkType::getOpaquePointer(type)), _impl::swift_interop_passDirect_BasicTest_uint64_t_0_8_uint64_t_8_16(swift::_impl::_impl_Optional<swift::String>::getOpaquePointer(optionalString)), ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
+  });
+  }
   SWIFT_INLINE_THUNK APIEnum APIEnum::_impl_caseOne::operator()() const {
     auto result = APIEnum::_make();
     result._destructiveInjectEnumTag(0);
@@ -5601,6 +5844,30 @@ FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 80 / sizeof(
   return _impl::_impl_APIStruct::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
     _impl::swift_interop_returnDirect_BasicTest_uint8_t_0_1(result, _impl::$s9BasicTest9APIStructV9enumValueAcA7APIEnumO_tcfC(_impl::swift_interop_passDirect_BasicTest_uint8_t_0_1(_impl::_impl_APIEnum::getOpaquePointer(enumValue))));
   });
+  }
+  SWIFT_INLINE_THUNK WorkType WorkType::_impl_returnValue::operator()() const {
+    auto result = WorkType::_make();
+    result._destructiveInjectEnumTag(0);
+    return result;
+  }
+  SWIFT_INLINE_THUNK  bool WorkType::isReturnValue() const {
+    return *this == WorkType::returnValue;
+  }
+  SWIFT_INLINE_THUNK WorkType WorkType::_impl_returnNil::operator()() const {
+    auto result = WorkType::_make();
+    result._destructiveInjectEnumTag(1);
+    return result;
+  }
+  SWIFT_INLINE_THUNK  bool WorkType::isReturnNil() const {
+    return *this == WorkType::returnNil;
+  }
+  SWIFT_INLINE_THUNK swift::Optional<WorkType> WorkType::init(swift::Int rawValue) {
+  return swift::_impl::_impl_Optional<WorkType>::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
+    _impl::swift_interop_returnDirect_BasicTest_uint8_t_0_1(result, _impl::$s9BasicTest8WorkTypeO8rawValueACSgSi_tcfC(rawValue));
+  });
+  }
+  SWIFT_INLINE_THUNK swift::Int WorkType::getRawValue() const {
+  return _impl::$s9BasicTest8WorkTypeO8rawValueSivg(_impl::swift_interop_passDirect_BasicTest_uint8_t_0_1(_getOpaquePointer()));
   }
 
 class APIProtocol { } SWIFT_UNAVAILABLE_MSG("protocol 'APIProtocol' can not yet be represented in C++");

@@ -17,6 +17,11 @@ public protocol APIProtocol {
     func sayHello(to name: String) -> String
 }
 
+public enum WorkType: Int {
+    case returnValue
+    case returnNil
+}
+
 public class APIClass: APIProtocol {
 
     public init() {}
@@ -32,5 +37,12 @@ public class APIClass: APIProtocol {
     public func doWork(with structValue: APIStruct) -> APIStruct {
         print("structValue is", structValue)
         return APIStruct(enumValue: structValue.enumValue)
+    }
+
+    public func doOptionalWork(of type: WorkType, optionalString: String?) -> String? {
+        switch type {
+            case .returnNil: return nil
+            case .returnValue: return "I did some work"
+        }
     }
 }

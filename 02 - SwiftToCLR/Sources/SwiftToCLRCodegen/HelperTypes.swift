@@ -4,6 +4,30 @@ import Foundation
 struct MethodArgument: Hashable {
     let typeName: String
     let argumentName: String
+    let isOptionalType: Bool
+    let isVoidType: Bool
+
+    init(typeName: String, argumentName: String, isOptionalType: Bool, isVoidType: Bool) {
+        self.typeName = typeName
+        self.argumentName = argumentName
+        self.isOptionalType = isOptionalType
+        self.isVoidType = isVoidType
+    }
+
+    init?(extractingFirstOptionalTypeFromCondensedTokenization argumentSpelling: String, argumentName: String) {
+        // RED FLAG: This is definitely not the best way to do this. However, clang seems to trip up and report
+        // swift::Optional<T> types as just "int", which is what it seems to do if it can't find the definition
+        // of a type. I can't immediately figure out why this is, so here's a stopgap solution in the meantime.
+        let optionalContainerStart: String = "swift::Optional<"
+        let optionalContainerEnd: String = ">"
+        guard let containerStartRange = argumentSpelling.range(of: optionalContainerStart),
+            let containerEndRange = argumentSpelling.range(of: optionalContainerEnd, range: containerStartRange.upperBound..<argumentSpelling.endIndex) else { return nil }
+        let containedType: String = String(argumentSpelling[containerStartRange.upperBound..<containerEndRange.lowerBound])
+        self.typeName = containedType
+        self.argumentName = argumentName
+        self.isOptionalType = true
+        self.isVoidType = false
+    }
 }
 
 /// A representation of a mapping between two related types (such as `swift::string` and `std::string`).

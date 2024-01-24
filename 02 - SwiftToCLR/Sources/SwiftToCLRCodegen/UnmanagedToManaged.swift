@@ -296,7 +296,7 @@ struct ManagedCPPWrapperClass {
             let argumentCursor: CXCursor = clang_Cursor_getArgument(cursor, argumentIndex)
             let argumentName = clang_getCursorSpelling(argumentCursor).consumeToString
             let argumentType = clang_getTypeSpelling(clang_getArgType(cursorType, argumentIndex)).consumeToString
-            return MethodArgument(typeName: argumentType, argumentName: argumentName)
+            return MethodArgument(typeName: argumentType, argumentName: argumentName, isOptionalType: false, isVoidType: false)
         })
 
         guard !unmanagedArguments.contains(where: { $0.typeName.contains("std::shared_ptr") }) else { return false }
@@ -373,7 +373,7 @@ struct ManagedCPPWrapperClass {
             let argumentCursor: CXCursor = clang_Cursor_getArgument(cursor, argumentIndex)
             let argumentName = clang_getCursorSpelling(argumentCursor).consumeToString
             let argumentType = clang_getTypeSpelling(clang_getArgType(cursorType, argumentIndex)).consumeToString
-            return MethodArgument(typeName: argumentType, argumentName: argumentName)
+            return MethodArgument(typeName: argumentType, argumentName: argumentName, isOptionalType: false, isVoidType: false)
         })
 
         // We have everything we need to wrap the method now!

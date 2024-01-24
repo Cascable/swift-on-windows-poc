@@ -51,5 +51,18 @@ extension CXCursor {
         defer { clang_disposeString(kindSpelling) }
         return kindSpelling.asString
     }
+
+    func condensedTokenization(in unit: CXTranslationUnit) -> String? {
+        let range: CXSourceRange = clang_getCursorExtent(self)
+
+        var tokenCount: UInt32 = 0
+        var tokens: UnsafeMutablePointer<CXToken>? = nil
+        clang_tokenize(unit, range, &tokens, &tokenCount)
+
+        guard let tokens else { return nil }
+        defer { clang_disposeTokens(unit, tokens, tokenCount) }
+        guard tokenCount > 0 else { return "" }
+        return (0..<tokenCount).map({ clang_getTokenSpelling(unit, tokens[Int($0)]).consumeToString }).joined()
+    }
 }
 
