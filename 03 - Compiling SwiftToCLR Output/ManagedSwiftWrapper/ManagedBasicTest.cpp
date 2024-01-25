@@ -26,6 +26,53 @@ ManagedBasicTest::APIEnum^ ManagedBasicTest::APIStruct::getEnumValue() {
     return gcnew ManagedBasicTest::APIEnum(new UnmanagedBasicTest::APIEnum(unmanagedResult));
 }
 
+// Implementation of ManagedBasicTest::WorkType
+
+ManagedBasicTest::WorkType::WorkType(UnmanagedBasicTest::WorkType* objectToTakeOwnershipOf) {
+    wrappedObj = objectToTakeOwnershipOf;
+}
+
+ManagedBasicTest::WorkType::~WorkType() {
+    delete wrappedObj;
+}
+
+ManagedBasicTest::WorkType^ ManagedBasicTest::WorkType::initWithRawValue(int rawValue) {
+    int arg0 = rawValue;
+    std::optional<UnmanagedBasicTest::WorkType> unmanagedResult = UnmanagedBasicTest::WorkType::initWithRawValue(arg0);
+    return (unmanagedResult.has_value() ? gcnew ManagedBasicTest::WorkType(new UnmanagedBasicTest::WorkType(unmanagedResult.value())) : nullptr);
+}
+
+ManagedBasicTest::WorkType^ ManagedBasicTest::WorkType::returnValue() {
+    UnmanagedBasicTest::WorkType unmanagedResult = UnmanagedBasicTest::WorkType::returnValue();
+    return gcnew ManagedBasicTest::WorkType(new UnmanagedBasicTest::WorkType(unmanagedResult));
+}
+
+ManagedBasicTest::WorkType^ ManagedBasicTest::WorkType::returnNil() {
+    UnmanagedBasicTest::WorkType unmanagedResult = UnmanagedBasicTest::WorkType::returnNil();
+    return gcnew ManagedBasicTest::WorkType(new UnmanagedBasicTest::WorkType(unmanagedResult));
+}
+
+bool ManagedBasicTest::WorkType::operator==(ManagedBasicTest::WorkType^ lhs, ManagedBasicTest::WorkType^ rhs) {
+    if (Object::ReferenceEquals(lhs, nullptr) && Object::ReferenceEquals(rhs, nullptr)) { return true; }
+    if (Object::ReferenceEquals(lhs, nullptr) || Object::ReferenceEquals(rhs, nullptr)) { return false; }
+    return (*lhs->wrappedObj == *rhs->wrappedObj);
+}
+
+bool ManagedBasicTest::WorkType::isReturnValue() {
+    bool unmanagedResult = wrappedObj->isReturnValue();
+    return unmanagedResult;
+}
+
+bool ManagedBasicTest::WorkType::isReturnNil() {
+    bool unmanagedResult = wrappedObj->isReturnNil();
+    return unmanagedResult;
+}
+
+int ManagedBasicTest::WorkType::getRawValue() {
+    int unmanagedResult = wrappedObj->getRawValue();
+    return unmanagedResult;
+}
+
 // Implementation of ManagedBasicTest::APIClass
 
 ManagedBasicTest::APIClass::APIClass(UnmanagedBasicTest::APIClass* objectToTakeOwnershipOf) {
@@ -58,6 +105,13 @@ ManagedBasicTest::APIStruct^ ManagedBasicTest::APIClass::doWork(ManagedBasicTest
     return gcnew ManagedBasicTest::APIStruct(new UnmanagedBasicTest::APIStruct(unmanagedResult));
 }
 
+System::String^ ManagedBasicTest::APIClass::doOptionalWork(ManagedBasicTest::WorkType^ type, System::String^ optionalString) {
+    UnmanagedBasicTest::WorkType arg0 = *type->wrappedObj;
+    std::optional<std::string> arg1 = (optionalString == nullptr ? std::nullopt : std::optional<std::string>(marshal_as<std::string>(optionalString)));
+    std::optional<std::string> unmanagedResult = wrappedObj->doOptionalWork(arg0, arg1);
+    return (unmanagedResult.has_value() ? marshal_as<System::String^>(unmanagedResult.value()) : nullptr);
+}
+
 // Implementation of ManagedBasicTest::APIEnum
 
 ManagedBasicTest::APIEnum::APIEnum(UnmanagedBasicTest::APIEnum* objectToTakeOwnershipOf) {
@@ -66,6 +120,12 @@ ManagedBasicTest::APIEnum::APIEnum(UnmanagedBasicTest::APIEnum* objectToTakeOwne
 
 ManagedBasicTest::APIEnum::~APIEnum() {
     delete wrappedObj;
+}
+
+ManagedBasicTest::APIEnum^ ManagedBasicTest::APIEnum::initWithRawValue(int rawValue) {
+    int arg0 = rawValue;
+    std::optional<UnmanagedBasicTest::APIEnum> unmanagedResult = UnmanagedBasicTest::APIEnum::initWithRawValue(arg0);
+    return (unmanagedResult.has_value() ? gcnew ManagedBasicTest::APIEnum(new UnmanagedBasicTest::APIEnum(unmanagedResult.value())) : nullptr);
 }
 
 ManagedBasicTest::APIEnum^ ManagedBasicTest::APIEnum::caseOne() {
@@ -79,6 +139,8 @@ ManagedBasicTest::APIEnum^ ManagedBasicTest::APIEnum::caseTwo() {
 }
 
 bool ManagedBasicTest::APIEnum::operator==(ManagedBasicTest::APIEnum^ lhs, ManagedBasicTest::APIEnum^ rhs) {
+    if (Object::ReferenceEquals(lhs, nullptr) && Object::ReferenceEquals(rhs, nullptr)) { return true; }
+    if (Object::ReferenceEquals(lhs, nullptr) || Object::ReferenceEquals(rhs, nullptr)) { return false; }
     return (*lhs->wrappedObj == *rhs->wrappedObj);
 }
 

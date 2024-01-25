@@ -28,6 +28,26 @@ struct MethodArgument: Hashable {
         self.isOptionalType = true
         self.isVoidType = false
     }
+
+    init(extractingOptionalOfType optionalType: String, from typeName: String, argumentName: String, isVoidType: Bool) {
+        // We'll be given a string like std::optional<std::string> etc. `optionalType` should be given without the <>.
+        let optionalContainerStart: String = optionalType + "<"
+        let optionalContainerEnd: String = ">"
+
+        if let containerStartRange = typeName.range(of: optionalContainerStart),
+            let containerEndRange = typeName.range(of: optionalContainerEnd, range: containerStartRange.upperBound..<typeName.endIndex) {
+            let containedType: String = String(typeName[containerStartRange.upperBound..<containerEndRange.lowerBound])
+            self.typeName = containedType
+            self.argumentName = argumentName
+            self.isOptionalType = true
+            self.isVoidType = isVoidType
+        } else {
+            self.typeName = typeName
+            self.argumentName = argumentName
+            self.isOptionalType = false
+            self.isVoidType = isVoidType
+        }
+    }
 }
 
 /// A representation of a mapping between two related types (such as `swift::string` and `std::string`).

@@ -8,6 +8,7 @@
 namespace ManagedBasicTest {
 
     ref class APIStruct;
+    ref class WorkType;
     ref class APIClass;
     ref class APIEnum;
 
@@ -23,6 +24,24 @@ namespace ManagedBasicTest {
         ManagedBasicTest::APIEnum^ getEnumValue();
     };
 
+    public ref class WorkType {
+    private:
+    internal:
+        UnmanagedBasicTest::WorkType* wrappedObj;
+        WorkType(UnmanagedBasicTest::WorkType* objectToTakeOwnershipOf);
+    public:
+        ~WorkType();
+
+        static ManagedBasicTest::WorkType^ initWithRawValue(int rawValue);
+        static ManagedBasicTest::WorkType^ returnValue();
+        static ManagedBasicTest::WorkType^ returnNil();
+        static bool operator==(ManagedBasicTest::WorkType^ lhs, ManagedBasicTest::WorkType^ rhs);
+
+        bool isReturnValue();
+        bool isReturnNil();
+        int getRawValue();
+    };
+
     public ref class APIClass {
     private:
     internal:
@@ -35,6 +54,7 @@ namespace ManagedBasicTest {
         System::String^ getText();
         System::String^ sayHello(System::String^ name);
         ManagedBasicTest::APIStruct^ doWork(ManagedBasicTest::APIStruct^ structValue);
+        System::String^ doOptionalWork(ManagedBasicTest::WorkType^ type, System::String^ optionalString);
     };
 
     public ref class APIEnum {
@@ -45,6 +65,7 @@ namespace ManagedBasicTest {
     public:
         ~APIEnum();
 
+        static ManagedBasicTest::APIEnum^ initWithRawValue(int rawValue);
         static ManagedBasicTest::APIEnum^ caseOne();
         static ManagedBasicTest::APIEnum^ caseTwo();
         static bool operator==(ManagedBasicTest::APIEnum^ lhs, ManagedBasicTest::APIEnum^ rhs);

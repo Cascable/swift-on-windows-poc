@@ -359,8 +359,9 @@ struct ManagedCPPWrapperClass {
 
         // We need to get the return type.
         let unmanagedReturnType: CXType = clang_getResultType(cursorType)
-        let unmanagedReturnTypeName = clang_getTypeSpelling(unmanagedReturnType).consumeToString
-        let returnIsVoid = (unmanagedReturnType.kind == CXType_Void)
+        let unmanagedReturnArgument = MethodArgument(extractingOptionalOfType: "std::optional",
+                                                     from: clang_getTypeSpelling(unmanagedReturnType).consumeToString,
+                                                     argumentName: "", isVoidType: (unmanagedReturnType.kind == CXType_Void))
 
         // And the method name.
         let unmanagedMethodName = clang_getCursorSpelling(cursor).consumeToString
@@ -373,7 +374,7 @@ struct ManagedCPPWrapperClass {
             let argumentCursor: CXCursor = clang_Cursor_getArgument(cursor, argumentIndex)
             let argumentName = clang_getCursorSpelling(argumentCursor).consumeToString
             let argumentType = clang_getTypeSpelling(clang_getArgType(cursorType, argumentIndex)).consumeToString
-            return MethodArgument(typeName: argumentType, argumentName: argumentName, isOptionalType: false, isVoidType: false)
+            return MethodArgument(extractingOptionalOfType: "std::optional", from: argumentType, argumentName: argumentName, isVoidType: false)
         })
 
         // We have everything we need to wrap the method now!
@@ -384,7 +385,7 @@ struct ManagedCPPWrapperClass {
             return .direct(for: unmanagedTypeName)
         }
 
-        let returnTypeMapping = wrapping(for: unmanagedReturnTypeName)
+        let returnTypeMapping = wrapping(for: unmanagedReturnArgument.typeName)
         let managedReturnTypeName = returnTypeMapping.wrapperTypeName
 
         let managedMethodArguments: [String] = unmanagedArguments.map({ argument in
@@ -411,6 +412,8 @@ struct ManagedCPPWrapperClass {
             var methodLines: [String] = []
 
             methodLines.append("bool " + scopedManagedClassName + "::operator==(" + scopedManagedClassName + "^ lhs, " + scopedManagedClassName + "^ rhs) {")
+            methodLines.append("    if (Object::ReferenceEquals(lhs, nullptr) && Object::ReferenceEquals(rhs, nullptr)) { return true; }");
+            methodLines.append("    if (Object::ReferenceEquals(lhs, nullptr) || Object::ReferenceEquals(rhs, nullptr)) { return false; }");
             if useSharedPtrs {
                 methodLines.append("    return (*lhs->" + unmanagedObjectName + "->get() == *rhs->" + unmanagedObjectName + "->get());")
             } else {
@@ -436,13 +439,21 @@ struct ManagedCPPWrapperClass {
             // We need to bridge each argument to the unmanaged type.
             let unmanagedType = argument.typeName
             let mapping = wrapping(for: unmanagedType)
-            let adaptedArgument: String = mapping.wrappedTypeName + " " + parameterName + "\(index) = " + mapping.convertWrapperToWrapped(argument.argumentName) + ";"
-            methodLines.append("    " + adaptedArgument)
+            if argument.isOptionalType {
+                let adaptedArgument: String = "std::optional<" + mapping.wrappedTypeName + "> " + parameterName + "\(index) = (" +
+                    argument.argumentName + " == nullptr ? std::nullopt : std::optional<" + mapping.wrappedTypeName +
+                        ">(" + mapping.convertWrapperToWrapped(argument.argumentName) + "));"
+                methodLines.append("    " + adaptedArgument)
+            } else {
+                let adaptedArgument: String = mapping.wrappedTypeName + " " + parameterName + "\(index) = " +
+                    mapping.convertWrapperToWrapped(argument.argumentName) + ";"
+                methodLines.append("    " + adaptedArgument)
+            }
         }
 
         let args: String = (0..<unmanagedArguments.count).map({ "arg\($0)" }).joined(separator: ", ")
 
-        if returnIsVoid {
+        if unmanagedReturnArgument.isVoidType {
             let methodCall: String = {
                 if methodIsStatic {
                     return scopedUnmanagedClassName + "::" + unmanagedMethodName + "(" + args + ");"
@@ -457,15 +468,22 @@ struct ManagedCPPWrapperClass {
             methodLines.append("    " + methodCall)
         } else {
             let methodCall: String = {
+                let resultTypeName: String = {
+                    if unmanagedReturnArgument.isOptionalType {
+                        return "std::optional<" + returnTypeMapping.wrappedTypeName + ">"
+                    } else {
+                        return returnTypeMapping.wrappedTypeName
+                    }
+                }()
                 if methodIsStatic {
-                    return returnTypeMapping.wrappedTypeName + " unmanagedResult = " + scopedUnmanagedClassName + "::"
+                    return resultTypeName + " unmanagedResult = " + scopedUnmanagedClassName + "::"
                                         + unmanagedMethodName + "(" + args + ");"
                 } else {
                     if useSharedPtrs {
-                        return returnTypeMapping.wrappedTypeName + " unmanagedResult = " + unmanagedObjectName
+                        return resultTypeName + " unmanagedResult = " + unmanagedObjectName
                                             + "->get()->" + unmanagedMethodName + "(" + args + ");"
                     } else {
-                        return returnTypeMapping.wrappedTypeName + " unmanagedResult = " + unmanagedObjectName
+                        return resultTypeName + " unmanagedResult = " + unmanagedObjectName
                                             + "->" + unmanagedMethodName + "(" + args + ");"
                     }
                 }
@@ -473,8 +491,14 @@ struct ManagedCPPWrapperClass {
             methodLines.append("    " + methodCall)
 
             // Finally, translate back to the managed type and return it.
-            let returnLine = "return " + returnTypeMapping.convertWrappedToWrapper("unmanagedResult") + ";"
-            methodLines.append("    " + returnLine)
+            if unmanagedReturnArgument.isOptionalType {
+                let returnLine = "return (unmanagedResult.has_value() ? " +
+                    returnTypeMapping.convertWrappedToWrapper("unmanagedResult.value()") + " : nullptr);"
+                methodLines.append("    " + returnLine)
+            } else {
+                let returnLine = "return " + returnTypeMapping.convertWrappedToWrapper("unmanagedResult") + ";"
+                methodLines.append("    " + returnLine)
+            }
         }
 
         methodLines.append("}")
