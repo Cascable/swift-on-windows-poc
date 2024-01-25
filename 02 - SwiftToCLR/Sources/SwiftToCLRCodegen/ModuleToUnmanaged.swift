@@ -400,10 +400,18 @@ struct UnmanagedManagedCPPWrapperClass {
         assert(cursorType.kind == CXType_FunctionProto, "Passed wrong cursor type")
         assert(cursorKind == CXCursor_CXXMethod, "Passed wrong cursor kind")
 
-        // We need to get the return type.
+        // We need to get the method name…
+        let swiftMethodName = clang_getCursorSpelling(cursor).consumeToString
+        let isConstructor = (swiftMethodName == "init")
+
+        let excludedMethods: [String] = ["operator="]
+        guard !excludedMethods.contains(swiftMethodName) else { return false }
+
+        // …and the return type…
         let swiftReturnArgument: MethodArgument = {
             if let tokenization = cursor.condensedTokenization(in: unit),
-                let optionalArgument = MethodArgument(extractingFirstOptionalTypeFromCondensedTokenization: tokenization, argumentName: "") {
+                let optionalArgument = MethodArgument(extractingOptionalReturnTypeFromCondensedMethodTokenization: tokenization,
+                                                      of: swiftMethodName) {
                     return optionalArgument
             } else {
                 let swiftReturnType: CXType = clang_getResultType(cursorType)
@@ -412,13 +420,6 @@ struct UnmanagedManagedCPPWrapperClass {
                 return MethodArgument(typeName: swiftReturnTypeName, argumentName: "", isOptionalType: false, isVoidType: returnIsVoid)
             }
         }()
-
-        // And the method name.
-        let swiftMethodName = clang_getCursorSpelling(cursor).consumeToString
-        let isConstructor = (swiftMethodName == "init")
-
-        let excludedMethods: [String] = ["operator="]
-        guard !excludedMethods.contains(swiftMethodName) else { return false }
 
         // …and the arguments.
         let argumentCount = UInt32(clang_Cursor_getNumArguments(cursor)) // Can return -1 if the wrong cursor type. We checked that above.
@@ -429,7 +430,7 @@ struct UnmanagedManagedCPPWrapperClass {
             let argumentTypeName = clang_getTypeSpelling(argumentType).consumeToString
 
             if let argumentSpelling = argumentCursor.condensedTokenization(in: unit),
-                let argument = MethodArgument(extractingFirstOptionalTypeFromCondensedTokenization: argumentSpelling, argumentName: argumentName) {
+                let argument = MethodArgument(extractingOptionalTypeFromCondensedArgumentTokenization: argumentSpelling, argumentName: argumentName) {
                 return argument
             } else {
                 return MethodArgument(typeName: argumentTypeName, argumentName: argumentName, isOptionalType: false, isVoidType: false)

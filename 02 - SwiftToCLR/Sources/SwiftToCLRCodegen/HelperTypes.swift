@@ -14,7 +14,7 @@ struct MethodArgument: Hashable {
         self.isVoidType = isVoidType
     }
 
-    init?(extractingFirstOptionalTypeFromCondensedTokenization argumentSpelling: String, argumentName: String) {
+    init?(extractingOptionalTypeFromCondensedArgumentTokenization argumentSpelling: String, argumentName: String) {
         // RED FLAG: This is definitely not the best way to do this. However, clang seems to trip up and report
         // swift::Optional<T> types as just "int", which is what it seems to do if it can't find the definition
         // of a type. I can't immediately figure out why this is, so here's a stopgap solution in the meantime.
@@ -25,6 +25,24 @@ struct MethodArgument: Hashable {
         let containedType: String = String(argumentSpelling[containerStartRange.upperBound..<containerEndRange.lowerBound])
         self.typeName = containedType
         self.argumentName = argumentName
+        self.isOptionalType = true
+        self.isVoidType = false
+    }
+
+    init?(extractingOptionalReturnTypeFromCondensedMethodTokenization methodSpelling: String, of methodName: String) {
+        // RED FLAG: This is definitely not the best way to do this. However, clang seems to trip up and report
+        // swift::Optional<T> types as just "int", which is what it seems to do if it can't find the definition
+        // of a type. I can't immediately figure out why this is, so here's a stopgap solution in the meantime.
+        guard let rangeOfMethodName = methodSpelling.range(of: methodName) else { return nil }
+        let returnTypeHaystack = methodSpelling[methodSpelling.startIndex..<rangeOfMethodName.lowerBound];
+
+        let optionalContainerStart: String = "swift::Optional<"
+        let optionalContainerEnd: String = ">"
+        guard let containerStartRange = returnTypeHaystack.range(of: optionalContainerStart),
+            let containerEndRange = returnTypeHaystack.range(of: optionalContainerEnd, range: containerStartRange.upperBound..<returnTypeHaystack.endIndex) else { return nil }
+        let containedType: String = String(returnTypeHaystack[containerStartRange.upperBound..<containerEndRange.lowerBound])
+        self.typeName = containedType
+        self.argumentName = ""
         self.isOptionalType = true
         self.isVoidType = false
     }
