@@ -7,3 +7,11 @@ extension Bundle {
         return Bundle.module
     }
 }
+
+#if !os(Windows)
+// Stub for this project - in reality, this is provided by CascableCore.
+internal class NetworkConfigurationHelper {
+    static func suggestedInterfaceForCameraCommunication() -> String? { return "en0 "}
+    static func ipAddress(ofInterface: String) -> String { return "127.0.0.1" }
+}
+#endif

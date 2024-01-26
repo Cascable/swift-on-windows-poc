@@ -9,6 +9,11 @@
 import Foundation
 import CascableCore
 
+#if canImport(CoreGraphics)
+import CoreGraphics
+import ImageIO
+#endif
+
 class SimulatedCameraStorage: NSObject, FileStorage {
 
     let rootUrl: URL
@@ -321,7 +326,7 @@ class SimulatedCameraFile: NSObject, FileSystemItem {
 
         if result {
             DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + configuration.connectionSpeed.mediumOperationDuration) {
-                #if os(Windows)
+                #if !canImport(CoreGraphics)
                 deliveryQueue.async {
                     // We don't have Core Graphics on Windows. TODO: Find an alternative.
                     delivery(self, NSError(cblErrorCode: .notAvailable), nil)
@@ -330,21 +335,19 @@ class SimulatedCameraFile: NSObject, FileSystemItem {
                 var metadata: [String: Any]? = nil
                 if let data = try? Data(contentsOf: self.url) {
                     if fileExtension.caseInsensitiveCompare("jpg") == .orderedSame || fileExtension.caseInsensitiveCompare("jpeg") == .orderedSame {
-                        metadata = RAWImageDescription.metadata(inJPEGHeader: data)
+                        // This should be using RAWImageDescription, but we don't have it here.
+                        if let source = CGImageSourceCreateWithData(data as CFData, nil),
+                           let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [String: Any] {
+                            metadata = properties
+                        }
 
                     } else if fileExtension.caseInsensitiveCompare("cr3") == .orderedSame {
-                        metadata = ImageMetadataHelperCR3.metadata(inCR3Data: data) as? [String: Any]
+                        // This should be using ImageMetadataHelperCR3, but we don't have it here.
+                        //metadata = ImageMetadataHelperCR3.metadata(inCR3Data: data) as? [String: Any]
 
                     } else {
                         // Probably another RAW.
-                        let descriptions = RAWImageDescription.imageDescriptions(inRAWHeaders: data) ?? []
-                        for description in descriptions {
-                            if metadata == nil && (description.isValidImage || description.isMetadataOnly) {
-                                if let descMetadata = description.additionalMetadata, descMetadata.count > 0 {
-                                    metadata = descMetadata as? [String: Any]
-                                }
-                            }
-                        }
+                        // This should be using RAWImageDescription, but we don't have it here.
                     }
                 }
                 deliveryQueue.async {

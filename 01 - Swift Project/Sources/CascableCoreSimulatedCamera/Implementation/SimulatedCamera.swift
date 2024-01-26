@@ -15,6 +15,7 @@ import UniformTypeIdentifiers
 #endif
 
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
+import AppKit
 internal extension NSImage {
     func jpegData(compressionQuality: CGFloat) -> Data? {
         guard let imageTiffData = tiffRepresentation, let imageRep = NSBitmapImageRep(data: imageTiffData) else {
