@@ -3,7 +3,7 @@ import CascableCore
 
 /// Implement the CBLCoreCameraDiscoveryProvider protocol in order to provide custom cameras and camera discovery
 /// to CascableCore. You can then register your camera provider with CascableCore in the plugin entrypoint.
-protocol CameraDiscoveryProvider: AnyObject {
+public protocol CameraDiscoveryProvider: AnyObject {
 
 /// Start the discovery process in the given mode. If the mode given doesn't apply to your situation (i.e., the mode
 /// is `CBLCameraDiscoveryModeUSBOnly` and you only support network comms), you shouldn't do anything.
@@ -33,7 +33,7 @@ var providerIdentifier: String { get }
 }
 
 /// Methods to deliver camera discovery changes to CascableCore.
-protocol CameraDiscoveryProviderDelegate: AnyObject {
+public protocol CameraDiscoveryProviderDelegate: AnyObject {
 
 /// Inform CascableCore that a new camera has been discovered.
 ///

@@ -9,24 +9,24 @@
 import Foundation
 import CascableCore
 
-internal class SimulatedCameraDiscovery: CameraDiscoveryProvider, SimulatedCameraDelegate {
+public class SimulatedCameraDiscovery: CameraDiscoveryProvider, SimulatedCameraDelegate {
 
-    static let shared = SimulatedCameraDiscovery()
+    public static let shared = SimulatedCameraDiscovery()
 
     // MARK: - Public API
 
-    weak var delegate: CameraDiscoveryProviderDelegate? = nil
+    public weak var delegate: CameraDiscoveryProviderDelegate? = nil
 
-    var providerIdentifier: String {
+    public var providerIdentifier: String {
         return SimulatedCameraPluginIdentifier
     }
 
-    var visibleCameras: [Camera] {
+    public var visibleCameras: [Camera] {
         if let camera = currentSimulatedCamera { return [camera] }
         return []
     }
 
-    func startDiscovery(in discoveryMode: CameraDiscoveryMode, clientName: String) {
+    public func startDiscovery(in discoveryMode: CameraDiscoveryMode, clientName: String) {
         isDiscovering = true
         let configuration = self.configuration
         DispatchQueue.main.asyncAfter(deadline: .now() + configuration.connectionSpeed.largeOperationDuration) {
@@ -57,7 +57,7 @@ internal class SimulatedCameraDiscovery: CameraDiscoveryProvider, SimulatedCamer
         }
     }
 
-    func stopDiscovery() {
+    public func stopDiscovery() {
         isDiscovering = false
         currentSimulatedCamera = nil
     }
