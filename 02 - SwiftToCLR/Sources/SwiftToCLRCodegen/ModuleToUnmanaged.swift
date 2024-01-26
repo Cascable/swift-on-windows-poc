@@ -403,6 +403,7 @@ struct UnmanagedManagedCPPWrapperClass {
         // We need to get the method name…
         let swiftMethodName = clang_getCursorSpelling(cursor).consumeToString
         let isConstructor = (swiftMethodName == "init")
+        let isStatic: Bool = (clang_CXXMethod_isStatic(cursor) > 0)
 
         let excludedMethods: [String] = ["operator="]
         guard !excludedMethods.contains(swiftMethodName) else { return false }
@@ -472,11 +473,12 @@ struct UnmanagedManagedCPPWrapperClass {
             }
         } else {
             let methodDefinition: String = {
+                let staticPrefix: String = (isStatic ? "static " : "")
                 if swiftReturnArgument.isOptionalType {
-                    return "std::optional<" + unmanagedReturnTypeName + "> " + swiftMethodName + "(" +
+                    return staticPrefix + "std::optional<" + unmanagedReturnTypeName + "> " + swiftMethodName + "(" +
                         unmanagedMethodArguments.joined(separator: ", ") + ");"
                 } else {
-                    return unmanagedReturnTypeName + " " + swiftMethodName + "(" +
+                    return staticPrefix + unmanagedReturnTypeName + " " + swiftMethodName + "(" +
                         unmanagedMethodArguments.joined(separator: ", ") + ");"
                 }
             }()
@@ -564,12 +566,14 @@ struct UnmanagedManagedCPPWrapperClass {
                         + scopedSwiftClassName + "::" + swiftMethodName + "(" + args + ");"
                     methodLines.append("    " + methodCall)
                 } else if swiftReturnArgument.isOptionalType {
-                    let methodCall: String = "swift::Optional<" + returnTypeMapping.wrappedTypeName + "> swiftResult = " + swiftObjectName
-                        + "->" + swiftMethodName + "(" + args + ");"
+                    let call: String = (isStatic ? scopedSwiftClassName + "::" : swiftObjectName + "->")
+                    let methodCall: String = "swift::Optional<" + returnTypeMapping.wrappedTypeName + "> swiftResult = " +
+                        call + swiftMethodName + "(" + args + ");"
                     methodLines.append("    " + methodCall)
                 } else {
-                    let methodCall: String = returnTypeMapping.wrappedTypeName + " swiftResult = " + swiftObjectName
-                        + "->" + swiftMethodName + "(" + args + ");"
+                    let call: String = (isStatic ? scopedSwiftClassName + "::" : swiftObjectName + "->")
+                    let methodCall: String = returnTypeMapping.wrappedTypeName + " swiftResult = " + call +
+                        swiftMethodName + "(" + args + ");"
                     methodLines.append("    " + methodCall)
                 }
 
