@@ -316,15 +316,26 @@ struct SwiftToUnmanagedTypeMappings {
             return "(int)\($0)"
         })
 
+    static let swiftUIntMapping: TypeMapping =
+        TypeMapping(wrappedTypeName: "swift::UInt",
+                    wrapperTypeName: "unsigned int",
+                    convertWrapperToWrapped: {
+            return "(swift::UInt)\($0)"
+        }, convertWrappedToWrapper: {
+            return "(unsigned int)\($0)"
+        })
+
     static let mappingsBySwiftType: [String: TypeMapping] = [
         swiftStringMapping.wrappedTypeName: swiftStringMapping,
         swiftStringConstStdStringMapping.wrappedTypeName: swiftStringConstStdStringMapping,
-        swiftIntMapping.wrappedTypeName: swiftIntMapping
+        swiftIntMapping.wrappedTypeName: swiftIntMapping,
+        swiftUIntMapping.wrappedTypeName: swiftUIntMapping
     ]
 
     static let mappingsByUnmanagedType: [String: TypeMapping] = [
         swiftStringMapping.wrapperTypeName: swiftStringMapping,
-        swiftIntMapping.wrapperTypeName: swiftIntMapping
+        swiftIntMapping.wrapperTypeName: swiftIntMapping,
+        swiftUIntMapping.wrapperTypeName: swiftUIntMapping
     ]
 
     static func unmanagedMapping(from swiftTypeName: String) -> TypeMapping? {
