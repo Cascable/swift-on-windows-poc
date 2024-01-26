@@ -9,7 +9,8 @@ let package = Package(
     products: [
         .library(name: "CascableCore", targets: ["CascableCore"]),
         .library(name: "StopKit", targets: ["StopKit"]),
-        .library(name: "CascableCore Simulated Camera", targets: ["CascableCoreSimulatedCamera"])
+        .library(name: "CascableCore Simulated Camera", targets: ["CascableCoreSimulatedCamera"]),
+        .library(name: "CascableCore Basic API", targets: ["CascableCoreBasicAPI"])
     ],
     targets: [
         .target(name: "CascableCore", // The public CascableCore API.
@@ -34,6 +35,13 @@ let package = Package(
                 ]),
         .testTarget(name: "CascableCore Simulated Camera Tests", // Simulated camera tests.
                     dependencies: ["CascableCoreSimulatedCamera"],
-                    swiftSettings: [.interoperabilityMode(.Cxx)])
+                    swiftSettings: [.interoperabilityMode(.Cxx)]),
+        .target(name: "CascableCoreBasicAPI", // A "basic" CascableCore API, working around the limitations of the C++ interop.
+                dependencies: ["CascableCoreSimulatedCamera"],
+                swiftSettings: [
+                    .interoperabilityMode(.Cxx),
+                    .unsafeFlags(["-emit-clang-header-path", ".build/CascableCoreBasicAPI-Swift.h"]),
+                    .unsafeFlags(["-Xfrontend", "-validate-tbd-against-ir=none"])
+                ])
     ]
 )
