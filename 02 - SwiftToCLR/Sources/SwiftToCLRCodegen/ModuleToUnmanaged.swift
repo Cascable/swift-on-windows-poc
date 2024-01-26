@@ -72,6 +72,7 @@ public struct ModuleToUnmanagedOperation {
 
         let translationCursor: CXCursor = clang_getTranslationUnitCursor(unit)
 
+        // We first need to find all our types to make mappings. This is effectively building up a forward-declaration list.
         clang_visitChildrenWithBlock(translationCursor) { (cursor, parent) -> CXChildVisitResult in
             let range: CXSourceRange = clang_getCursorExtent(cursor)
             let location: CXSourceLocation = clang_getRangeStart(range)
@@ -82,40 +83,15 @@ public struct ModuleToUnmanagedOperation {
                 return CXChildVisit_Continue
             }
 
-            let type: CXType = clang_getCursorType(cursor)
             let cursorKind: CXCursorKind = clang_getCursorKind(cursor)
             let parentKind: CXCursorKind = clang_getCursorKind(parent)
-
             let displayName = clang_getCursorDisplayName(cursor).consumeToString
-            //let kindSpelling = clang_getCursorKindSpelling(cursorKind).consumeToString
-            //let typeSpelling = clang_getTypeSpelling(type).consumeToString
-            //let typeKindSpelling = clang_getTypeKindSpelling(type.kind).consumeToString
-            //print("Display name: \(displayName), Kind: \(kindSpelling), Type: \(typeSpelling), Type Kind: \(typeKindSpelling), Parent: \(parent.briefName)")
-
-            if cursorKind == CXCursor_EnumConstantDecl && parentKind == CXCursor_EnumDecl &&
-                clang_getCursorKind(clang_getCursorLexicalParent(parent)) == CXCursor_ClassDecl {
-
-                // We found what appears to be a Swift enum case declaration (an enum case with a parent enum with a
-                // parent class). I feel like this could be fragile, since we're relying on the fact that the C++ interop
-                // embeds the C++ enum declaration inside a class.
-                let parentParent: CXCursor = clang_getCursorLexicalParent(parent)
-                let parentParentName = clang_getCursorDisplayName(parentParent).consumeToString
-
-                let className = parentParentName
-                let caseName = displayName
-                let caseType = clang_getTypeSpelling(type).consumeToString
-
-                if var wrapperClass = wrapperClasses[className], clang_getCXXAccessSpecifier(cursor) == CX_CXXPublic {
-                    if verbose { print("Got enum case \(caseName) of type \(caseType) in \(className) - adding to wrapper list") }
-                    wrapperClass.generateEnumCaseForSwiftEnumCase(at: cursor)
-                    wrapperClasses[className] = wrapperClass // CoW and all that
-                }
-            }
 
             if cursorKind == CXCursor_ClassDecl && parentKind == CXCursor_Namespace {
                 let className = displayName
                 let namespaceName = clang_getCursorDisplayName(parent).consumeToString
                 if namespaceName == inputModuleName {
+
                     if verbose { print("Got class \(className) in target namespace \(namespaceName) - adding to wrapper list.") }
 
                     // Swift current declares protocols as unavailable, so try to find that attribute on the class
@@ -127,7 +103,6 @@ public struct ModuleToUnmanagedOperation {
 
                         clang_visitChildrenWithBlock(cursor) { classChildCursor, _ in
                             let kind: CXCursorKind = clang_getCursorKind(classChildCursor)
-                            guard className == "APIProtocol" else { return CXChildVisit_Continue }
                             guard kind == CXCursor_FirstAttr else { return CXChildVisit_Continue }
 
                             let range: CXSourceRange = clang_getCursorExtent(classChildCursor)
@@ -175,28 +150,72 @@ public struct ModuleToUnmanagedOperation {
                         return newClass
                     }()
 
-                    // We also need to be able to adapt to/from it.
-                    // As long the header we're wrapping forward-declares everything within the namespace, this works
-                    // alright. Without, we'd need to do two passes - one to collect all the types, then another to
-                    // adapt the method calls.
                     let constMapping = TypeMapping(wrappedTypeName: "const " + wrapperClass.swiftModuleName + "::" + wrapperClass.swiftClassName + " &",
                                                    wrapperTypeName: "const " + wrapperClass.wrapperNamespace + "::" + wrapperClass.wrapperClassName + " &",
-                                                   convertWrapperToWrapped: {
-                        return "*\($0).\(wrapperClass.swiftObjectName).get()"
-                    }, convertWrappedToWrapper: {
-                        return "\(wrapperClass.wrapperNamespace)::\(wrapperClass.wrapperClassName)(std::make_shared<\(wrapperClass.swiftModuleName)::\(wrapperClass.swiftClassName)>(\($0)))"
+                                                   convertWrapperToWrapped: { name, _ in
+                        return "*\(name).\(wrapperClass.swiftObjectName).get()"
+                    }, convertWrappedToWrapper: { name, _ in
+                        return "\(wrapperClass.wrapperNamespace)::\(wrapperClass.wrapperClassName)(std::make_shared<\(wrapperClass.swiftModuleName)::\(wrapperClass.swiftClassName)>(\(name)))"
                     })
 
                     let flatMapping = TypeMapping(wrappedTypeName: wrapperClass.swiftModuleName + "::" + wrapperClass.swiftClassName,
-                                                   wrapperTypeName: wrapperClass.wrapperNamespace + "::" + wrapperClass.wrapperClassName,
-                                                   convertWrapperToWrapped: {
-                        return "\($0)->\(wrapperClass.swiftObjectName).get()"
-                    }, convertWrappedToWrapper: {
-                        return "\(wrapperClass.wrapperNamespace)::\(wrapperClass.wrapperClassName)(std::make_shared<\(wrapperClass.swiftModuleName)::\(wrapperClass.swiftClassName)>(\($0)))"
+                                                  wrapperTypeName: wrapperClass.wrapperNamespace + "::" + wrapperClass.wrapperClassName,
+                                                  convertWrapperToWrapped: { name, isConst in
+                        if isConst {
+                            return "*\(name).\(wrapperClass.swiftObjectName).get()"
+                        } else {
+                            return "\(name)->\(wrapperClass.swiftObjectName).get()"
+                        }
+                    }, convertWrappedToWrapper: { name, _ in
+                        return "\(wrapperClass.wrapperNamespace)::\(wrapperClass.wrapperClassName)(std::make_shared<\(wrapperClass.swiftModuleName)::\(wrapperClass.swiftClassName)>(\(name)))"
                     })
 
                     internalTypeMappings["const " + className + " &"] = constMapping // This seems fragile.
                     internalTypeMappings[className] = flatMapping // This seems fragile.
+                }
+            }
+
+            return CXChildVisit_Recurse
+        }
+
+        // Now we've collected all our types, we can start translating methods.
+        clang_visitChildrenWithBlock(translationCursor) { (cursor, parent) -> CXChildVisitResult in
+            let range: CXSourceRange = clang_getCursorExtent(cursor)
+            let location: CXSourceLocation = clang_getRangeStart(range)
+
+            // If the symbol isn't in our input file, skip it entirely - otherwise we'll be parsing a *ton* of stuff
+            // brought in by includes.
+            guard clang_Location_isFromMainFile(location) != 0 else {
+                return CXChildVisit_Continue
+            }
+
+            let type: CXType = clang_getCursorType(cursor)
+            let cursorKind: CXCursorKind = clang_getCursorKind(cursor)
+            let parentKind: CXCursorKind = clang_getCursorKind(parent)
+
+            let displayName = clang_getCursorDisplayName(cursor).consumeToString
+            //let kindSpelling = clang_getCursorKindSpelling(cursorKind).consumeToString
+            //let typeSpelling = clang_getTypeSpelling(type).consumeToString
+            //let typeKindSpelling = clang_getTypeKindSpelling(type.kind).consumeToString
+            //print("Display name: \(displayName), Kind: \(kindSpelling), Type: \(typeSpelling), Type Kind: \(typeKindSpelling), Parent: \(parent.briefName)")
+
+            if cursorKind == CXCursor_EnumConstantDecl && parentKind == CXCursor_EnumDecl &&
+                clang_getCursorKind(clang_getCursorLexicalParent(parent)) == CXCursor_ClassDecl {
+
+                // We found what appears to be a Swift enum case declaration (an enum case with a parent enum with a
+                // parent class). I feel like this could be fragile, since we're relying on the fact that the C++ interop
+                // embeds the C++ enum declaration inside a class.
+                let parentParent: CXCursor = clang_getCursorLexicalParent(parent)
+                let parentParentName = clang_getCursorDisplayName(parentParent).consumeToString
+
+                let className = parentParentName
+                let caseName = displayName
+                let caseType = clang_getTypeSpelling(type).consumeToString
+
+                if var wrapperClass = wrapperClasses[className], clang_getCXXAccessSpecifier(cursor) == CX_CXXPublic {
+                    if verbose { print("Got enum case \(caseName) of type \(caseType) in \(className) - adding to wrapper list") }
+                    wrapperClass.generateEnumCaseForSwiftEnumCase(at: cursor)
+                    wrapperClasses[className] = wrapperClass // CoW and all that
                 }
             }
 
@@ -222,6 +241,7 @@ public struct ModuleToUnmanagedOperation {
             "#include <memory>",
             "#include <string>",
             "#include <optional>",
+            "#include <vector>",
             ""
         ]
 
@@ -292,37 +312,37 @@ struct SwiftToUnmanagedTypeMappings {
     static let swiftStringMapping: TypeMapping =
         TypeMapping(wrappedTypeName: "swift::String",
                     wrapperTypeName: "std::string",
-                    convertWrapperToWrapped: {
-            return "(swift::String)\($0)"
-        }, convertWrappedToWrapper: {
-            return "(std::string)\($0)"
+                    convertWrapperToWrapped: { name, _ in
+            return "(swift::String)\(name)"
+        }, convertWrappedToWrapper: { name, _ in
+            return "(std::string)\(name)"
         })
 
     static let swiftStringConstStdStringMapping: TypeMapping =
         TypeMapping(wrappedTypeName: "const swift::String &",
                     wrapperTypeName: "const std::string &",
-                    convertWrapperToWrapped: {
-            return "(swift::String)\($0)"
-        }, convertWrappedToWrapper: {
-            return "(std::string)\($0)"
+                    convertWrapperToWrapped: { name, _ in
+            return "(swift::String)\(name)"
+        }, convertWrappedToWrapper: { name, _ in
+            return "(std::string)\(name)"
         })
 
     static let swiftIntMapping: TypeMapping =
         TypeMapping(wrappedTypeName: "swift::Int",
                     wrapperTypeName: "int",
-                    convertWrapperToWrapped: {
-            return "(swift::Int)\($0)"
-        }, convertWrappedToWrapper: {
-            return "(int)\($0)"
+                    convertWrapperToWrapped: { name, _ in
+            return "(swift::Int)\(name)"
+        }, convertWrappedToWrapper: { name, _ in
+            return "(int)\(name)"
         })
 
     static let swiftUIntMapping: TypeMapping =
         TypeMapping(wrappedTypeName: "swift::UInt",
                     wrapperTypeName: "unsigned int",
-                    convertWrapperToWrapped: {
-            return "(swift::UInt)\($0)"
-        }, convertWrappedToWrapper: {
-            return "(unsigned int)\($0)"
+                    convertWrapperToWrapped: { name, _ in
+            return "(swift::UInt)\(name)"
+        }, convertWrappedToWrapper: { name, _ in
+            return "(unsigned int)\(name)"
         })
 
     static let mappingsBySwiftType: [String: TypeMapping] = [
@@ -421,15 +441,15 @@ struct UnmanagedManagedCPPWrapperClass {
 
         // …and the return type…
         let swiftReturnArgument: MethodArgument = {
-            if let tokenization = cursor.condensedTokenization(in: unit),
-                let optionalArgument = MethodArgument(extractingOptionalReturnTypeFromCondensedMethodTokenization: tokenization,
-                                                      of: swiftMethodName) {
-                    return optionalArgument
+            let swiftReturnType: CXType = clang_getResultType(cursorType)
+            let returnIsVoid = (swiftReturnType.kind == CXType_Void)
+
+            if !returnIsVoid, let tokenization = cursor.condensedTokenization(in: unit),
+                let argument = MethodArgument(extractingOptionalReturnTypeFromCondensedMethodTokenization: tokenization, of: swiftMethodName) {
+                return argument
             } else {
-                let swiftReturnType: CXType = clang_getResultType(cursorType)
-                let swiftReturnTypeName = clang_getTypeSpelling(swiftReturnType).consumeToString
-                let returnIsVoid = (swiftReturnType.kind == CXType_Void)
-                return MethodArgument(typeName: swiftReturnTypeName, argumentName: "", isOptionalType: false, isVoidType: returnIsVoid)
+                return MethodArgument(typeName: clang_getTypeSpelling(swiftReturnType).consumeToString, argumentName: "",
+                                      isOptionalType: false, isArrayType: false, isVoidType: returnIsVoid)
             }
         }()
 
@@ -441,11 +461,11 @@ struct UnmanagedManagedCPPWrapperClass {
             let argumentType: CXType = clang_getArgType(cursorType, argumentIndex)
             let argumentTypeName = clang_getTypeSpelling(argumentType).consumeToString
 
-            if let argumentSpelling = argumentCursor.condensedTokenization(in: unit),
-                let argument = MethodArgument(extractingOptionalTypeFromCondensedArgumentTokenization: argumentSpelling, argumentName: argumentName) {
-                return argument
+            if let argumentSpelling = argumentCursor.condensedTokenization(in: unit) {
+                print(argumentSpelling)
+                return MethodArgument(extractingOptionalTypeFromCondensedArgumentTokenization: argumentSpelling, argumentName: argumentName)
             } else {
-                return MethodArgument(typeName: argumentTypeName, argumentName: argumentName, isOptionalType: false, isVoidType: false)
+                return MethodArgument(typeName: argumentTypeName, argumentName: argumentName, isOptionalType: false, isArrayType: false, isVoidType: false)
             }
         })
 
@@ -461,10 +481,12 @@ struct UnmanagedManagedCPPWrapperClass {
         let unmanagedReturnTypeName = returnTypeMapping.wrapperTypeName
 
         let unmanagedMethodArguments: [String] = swiftArguments.map({ argument in
+            let coreType: String = wrapping(for: argument.typeName).wrapperTypeName
+            let arrayedType: String = (argument.isArrayType ? "std::vector<\(coreType)>" : coreType)
             if argument.isOptionalType {
-                return "const std::optional<\(wrapping(for: argument.typeName).wrapperTypeName)> & \(argument.argumentName)"
+                return "const std::optional<\(arrayedType)> & \(argument.argumentName)"
             } else {
-                return "\(wrapping(for: argument.typeName).wrapperTypeName) \(argument.argumentName)"
+                return "\(arrayedType) \(argument.argumentName)"
             }
         })
 
@@ -485,11 +507,12 @@ struct UnmanagedManagedCPPWrapperClass {
         } else {
             let methodDefinition: String = {
                 let staticPrefix: String = (isStatic ? "static " : "")
+                let arrayedType: String = (swiftReturnArgument.isArrayType ? "std::vector<\(unmanagedReturnTypeName)>" : unmanagedReturnTypeName)
                 if swiftReturnArgument.isOptionalType {
-                    return staticPrefix + "std::optional<" + unmanagedReturnTypeName + "> " + swiftMethodName + "(" +
+                    return staticPrefix + "std::optional<" + arrayedType + "> " + swiftMethodName + "(" +
                         unmanagedMethodArguments.joined(separator: ", ") + ");"
                 } else {
-                    return staticPrefix + unmanagedReturnTypeName + " " + swiftMethodName + "(" +
+                    return staticPrefix + arrayedType + " " + swiftMethodName + "(" +
                         unmanagedMethodArguments.joined(separator: ", ") + ");"
                 }
             }()
@@ -512,7 +535,12 @@ struct UnmanagedManagedCPPWrapperClass {
                 // We need to bridge each argument to the Swift type.
                 let swiftType = argument.typeName
                 let mapping = wrapping(for: swiftType)
-                let adaptedArgument: String = mapping.wrappedTypeName + " " + parameterName + "\(index) = " + mapping.convertWrapperToWrapped(argument.argumentName) + ";"
+
+                var wrappedTypeName: String = mapping.wrappedTypeName
+                if argument.isArrayType { wrappedTypeName = "std::vector<\(wrappedTypeName)>" }
+                if argument.isOptionalType { wrappedTypeName = "std::optional<\(wrappedTypeName)>" }
+                // TODO: Adapt from optional/array
+                let adaptedArgument: String = wrappedTypeName + " " + parameterName + "\(index) = " + mapping.convertWrapperToWrapped(argument.argumentName, false) + ";"
                 constructorLines.append("    " + adaptedArgument)
             }
 
@@ -525,19 +553,19 @@ struct UnmanagedManagedCPPWrapperClass {
         } else {
 
             let openingLine: String = {
+                var wrappedReturnTypeName: String = unmanagedReturnTypeName
+                if swiftReturnArgument.isArrayType { wrappedReturnTypeName = "std::vector<\(wrappedReturnTypeName)>" }
+                if swiftReturnArgument.isOptionalType { wrappedReturnTypeName = "std::optional<\(wrappedReturnTypeName)>" }
                 if swiftReturnArgument.isOptionalType && isConstructor {
                     // We transform failable inits into static methods.
                     /// C++ doesn't have optional constructors, so make this a static method instead.
                     let mashedArgumentNames: String = swiftArguments.map({
                         $0.argumentName.prefix(1).uppercased() + $0.argumentName.dropFirst()
                     }).joined(separator: "And")
-                    return "std::optional<" + unmanagedReturnTypeName + "> " + scopedWrapperClassName + "::" +
+                    return wrappedReturnTypeName + " " + scopedWrapperClassName + "::" +
                         "initWith" + mashedArgumentNames + "(" + unmanagedMethodArguments.joined(separator: ", ") + ") {"
-                } else if swiftReturnArgument.isOptionalType {
-                    return "std::optional<" + unmanagedReturnTypeName + "> " + scopedWrapperClassName + "::" +
-                        swiftMethodName + "(" + unmanagedMethodArguments.joined(separator: ", ") + ") {"
                 } else {
-                    return unmanagedReturnTypeName + " " + scopedWrapperClassName + "::" +
+                    return wrappedReturnTypeName + " " + scopedWrapperClassName + "::" +
                         swiftMethodName + "(" + unmanagedMethodArguments.joined(separator: ", ") + ") {"
                 }
             }()
@@ -546,6 +574,15 @@ struct UnmanagedManagedCPPWrapperClass {
 
             let parameterName: String = "arg"
 
+            func adaptArray(fromStdVectorNamed sourceName: String, toSwiftArrayNamed destName: String, containing destType: String, mapping: TypeMapping) -> [String] {
+                var lines: [String] = []
+                lines.append("swift::Array<" + destType + "> " + destName + " = swift::Array<" + destType + ">::init();");
+                lines.append("for (auto element: " + sourceName + ") {")
+                lines.append("    " + destName + ".append(" + mapping.convertWrapperToWrapped("element", true) + ");")
+                lines.append("}")
+                return lines
+            }
+
             // Adapt the parameters
             for (index, argument) in swiftArguments.enumerated() {
                 // We need to bridge each argument to the Swift type.
@@ -553,39 +590,63 @@ struct UnmanagedManagedCPPWrapperClass {
                 let mapping = wrapping(for: swiftType)
                 if argument.isOptionalType {
                     // This is a bit clunky. Maybe we should rebuild the wrapping class to do this.
-                    let swiftOptionalType: String = "swift::Optional<" + mapping.wrappedTypeName + ">"
+                    let wrappedTypeName: String = (argument.isArrayType ? "swift::Optional<swift::Array<" + mapping.wrappedTypeName + ">>" : "swift::Optional<" + mapping.wrappedTypeName + ">")
                     // swift::Optional<swift::String> arg1 = (optionalString.has_value() ? swift::Optional<swift::String>::init((swift::String)optionalString.value()) : swift::Optional<swift::String>::none());
-                    let adaptedArgument: String = swiftOptionalType + parameterName + "\(index) = (" + argument.argumentName + ".has_value() ? " +
-                        swiftOptionalType + "::init(" + mapping.convertWrapperToWrapped(argument.argumentName) + ".value()) : " +
-                        swiftOptionalType + "::none());"
+                    let adaptedArgument: String = wrappedTypeName + " " + parameterName + "\(index) = (" + argument.argumentName + ".has_value() ? " +
+                        wrappedTypeName + "::init(*" + mapping.convertWrapperToWrapped(argument.argumentName, false) + ") : " +
+                        wrappedTypeName + "::none());"
                     methodLines.append("    " + adaptedArgument)
+                    if argument.isArrayType {
+                        methodLines.append(contentsOf: adaptArray(fromStdVectorNamed: parameterName + "\(index)", toSwiftArrayNamed: parameterName + "\(index)Array",
+                                            containing: mapping.wrappedTypeName, mapping: mapping).map({ "    " + $0 }))
+                    }
+                } else if argument.isArrayType {
+                    methodLines.append(contentsOf: adaptArray(fromStdVectorNamed: argument.argumentName, toSwiftArrayNamed: parameterName + "\(index)Array",
+                                       containing: mapping.wrappedTypeName, mapping: mapping).map({ "    " + $0 }))
                 } else {
-                    let adaptedArgument: String = mapping.wrappedTypeName + " " + parameterName + "\(index) = " + mapping.convertWrapperToWrapped(argument.argumentName) + ";"
+                    let adaptedArgument: String = mapping.wrappedTypeName + " " + parameterName + "\(index) = " + mapping.convertWrapperToWrapped(argument.argumentName, false) + ";"
                     methodLines.append("    " + adaptedArgument)
                 }
             }
 
-            let args: String = (0..<swiftArguments.count).map({ "arg\($0)" }).joined(separator: ", ")
+            let args: String = swiftArguments.enumerated().map({ index, argument in
+                return argument.isArrayType ? "arg\(index)Array" : "arg\(index)"
+            }).joined(separator: ", ")
 
             if swiftReturnArgument.isVoidType {
                 let methodCall: String = swiftObjectName + "->" + swiftMethodName + "(" + args + ");"
                 methodLines.append("    " + methodCall)
             } else {
                 // Call the method!
+                var returnType: String = returnTypeMapping.wrappedTypeName
+                if swiftReturnArgument.isArrayType { returnType = "swift::Array<" + returnType + ">" }
+                if swiftReturnArgument.isOptionalType { returnType = "swift::Optional<" + returnType + ">" }
                 if isConstructor {
-                    let methodCall: String = "swift::Optional<" + returnTypeMapping.wrappedTypeName + "> swiftResult = "
-                        + scopedSwiftClassName + "::" + swiftMethodName + "(" + args + ");"
-                    methodLines.append("    " + methodCall)
-                } else if swiftReturnArgument.isOptionalType {
-                    let call: String = (isStatic ? scopedSwiftClassName + "::" : swiftObjectName + "->")
-                    let methodCall: String = "swift::Optional<" + returnTypeMapping.wrappedTypeName + "> swiftResult = " +
-                        call + swiftMethodName + "(" + args + ");"
+                    let methodCall: String = returnType + " swiftResult = " + scopedSwiftClassName + "::" + swiftMethodName + "(" + args + ");"
                     methodLines.append("    " + methodCall)
                 } else {
                     let call: String = (isStatic ? scopedSwiftClassName + "::" : swiftObjectName + "->")
-                    let methodCall: String = returnTypeMapping.wrappedTypeName + " swiftResult = " + call +
-                        swiftMethodName + "(" + args + ");"
+                    let methodCall: String = returnType + " swiftResult = " + call + swiftMethodName + "(" + args + ");"
                     methodLines.append("    " + methodCall)
+                }
+
+                /*
+                std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> arrayResult;
+                arrayResult.reserve(swiftResult.getCount());
+                for (auto element : swiftResult) {
+                    arrayResult.push_back(UnmanagedCascableCoreBasicAPI::BasicPropertyValue(std::make_shared<CascableCoreBasicAPI::BasicPropertyValue>(element)));
+                }
+                return arrayResult;
+                */
+
+                func adaptArray(toStdVectorNamed vectorName: String, fromSwiftArrayNamed sourceName: String, using mapping: TypeMapping) -> [String] {
+                    var lines: [String] = []
+                    lines.append("std::vector<" + mapping.wrapperTypeName + "> " + vectorName + ";")
+                    lines.append(vectorName + ".reserve(" + sourceName + ".getCount());")
+                    lines.append("for (auto element : " + sourceName + ") {")
+                    lines.append("    " + vectorName + ".push_back(" + mapping.convertWrappedToWrapper("element", true) + ");")
+                    lines.append("}")
+                    return lines
                 }
 
                 // Finally, translate back to the unmanaged type and return it.
@@ -594,15 +655,26 @@ struct UnmanagedManagedCPPWrapperClass {
                     // Passing an optional's get() result straight to the wrapper constructor can trigger
                     // the Swift C++ interop's current non-support of C++ move semantics.
                     var optionalConversionLines: [String] = ["if (swiftResult) {"]
-                    optionalConversionLines.append("    " + returnTypeMapping.wrappedTypeName + " unwrapped = swiftResult.get();")
-                    optionalConversionLines.append("    return std::optional<" + returnTypeMapping.wrapperTypeName + ">(" +
-                            returnTypeMapping.convertWrappedToWrapper("unwrapped") + ");")
+                    if swiftReturnArgument.isArrayType {
+                        optionalConversionLines.append("    swift::Array<" + returnTypeMapping.wrappedTypeName + "> unwrapped = swiftResult.get();")
+                        let arrayLines = adaptArray(toStdVectorNamed: "unwrappedArray", fromSwiftArrayNamed: "unwrapped", using: returnTypeMapping)
+                        optionalConversionLines.append(contentsOf: arrayLines.map({ "    " + $0 }))
+                        optionalConversionLines.append("    return std::optional<std::vector<" + returnTypeMapping.wrapperTypeName + ">>(unwrappedArray);")
+                    } else {
+                        optionalConversionLines.append("    " + returnTypeMapping.wrappedTypeName + " unwrapped = swiftResult.get();")
+                        optionalConversionLines.append("    return std::optional<" + returnTypeMapping.wrapperTypeName + ">(" +
+                                returnTypeMapping.convertWrappedToWrapper("unwrapped", false) + ");")
+                    }
                     optionalConversionLines.append("} else {")
                     optionalConversionLines.append("    return std::nullopt;")
                     optionalConversionLines.append("}")
                     methodLines.append(contentsOf: optionalConversionLines.map({ "    " + $0 }))
+                } else if swiftReturnArgument.isArrayType {
+                   methodLines.append(contentsOf: adaptArray(toStdVectorNamed: "resultArray", fromSwiftArrayNamed: "swiftResult",
+                        using: returnTypeMapping).map({ "    " + $0 }))
+                    methodLines.append("    return resultArray;")
                 } else {
-                    let returnLine = "return " + returnTypeMapping.convertWrappedToWrapper("swiftResult") + ";"
+                    let returnLine = "return " + returnTypeMapping.convertWrappedToWrapper("swiftResult", false) + ";"
                     methodLines.append("    " + returnLine)
                 }
             }

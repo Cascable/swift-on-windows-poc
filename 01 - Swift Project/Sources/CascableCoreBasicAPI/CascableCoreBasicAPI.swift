@@ -287,7 +287,7 @@ public class BasicCameraProperty {
         if let settable = wrappedProperty.validSettableValues {
             validSettableValues = settable.map({ BasicPropertyValue(wrapping: $0) })
         } else {
-            validSettableValues = nil
+            validSettableValues = []
         }
     }
 
@@ -313,7 +313,7 @@ public class BasicCameraProperty {
 
     /// The values that are considered valid for this property. Only valid if the
     /// property's `valueSetType` is `CBLPropertyValueSetTypeEnumeration`.
-    public private(set) var validSettableValues: [BasicPropertyValue]? = nil
+    public private(set) var validSettableValues: [BasicPropertyValue] = []
 
     /// Attempt to set a new value for the property. The value must be in the `validSettableValues` property. As such,
     /// this method is only useable if the property's `valueSetType` contains `CBLPropertyValueSetTypeEnumeration`.

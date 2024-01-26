@@ -106,14 +106,14 @@ public struct UnmanagedToManagedOperation {
                     // adapt the method calls.
                     let mapping = TypeMapping(wrappedTypeName: scopedUnmanagedTypeName,
                                               wrapperTypeName: scopedManagedTypeName + "^",
-                                              convertWrapperToWrapped: {
+                                              convertWrapperToWrapped: { name, _ in
                                                   if useSharedPtrs {
-                                                      return "*\($0)->\(wrapperClass.unmanagedObjectName)->get()"
+                                                      return "*\(name)->\(wrapperClass.unmanagedObjectName)->get()"
                                                   } else {
-                                                      return "*\($0)->\(wrapperClass.unmanagedObjectName)"
+                                                      return "*\(name)->\(wrapperClass.unmanagedObjectName)"
                                                   }
-                                              }, convertWrappedToWrapper: {
-                                                  let copyOperation = "new " + scopedUnmanagedTypeName + "(" + $0 + ")"
+                                              }, convertWrappedToWrapper: { name, _ in
+                                                  let copyOperation = "new " + scopedUnmanagedTypeName + "(" + name + ")"
                                                   let ptrOperation: String
                                                   if useSharedPtrs {
                                                       ptrOperation = "new std::shared_ptr<" + scopedUnmanagedTypeName + ">(" + copyOperation + ")"
@@ -222,19 +222,19 @@ struct UnmanagedToManagedTypeMappings {
     static let stdStringMapping: TypeMapping =
         TypeMapping(wrappedTypeName: "std::string",
                     wrapperTypeName: "System::String^",
-                    convertWrapperToWrapped: {
-            return "marshal_as<std::string>(\($0))"
-        }, convertWrappedToWrapper: {
-            return "marshal_as<System::String^>(\($0))"
+                    convertWrapperToWrapped: { name, _ in
+            return "marshal_as<std::string>(\(name))"
+        }, convertWrappedToWrapper: { name, _ in
+            return "marshal_as<System::String^>(\(name))"
         })
 
     static let constStdStringMapping: TypeMapping =
         TypeMapping(wrappedTypeName: "const std::string &",
                     wrapperTypeName: "System::String^",
-                    convertWrapperToWrapped: {
-            return "marshal_as<std::string>(\($0))"
-        }, convertWrappedToWrapper: {
-            return "marshal_as<System::String^>(\($0))"
+                    convertWrapperToWrapped: { name, _ in
+            return "marshal_as<std::string>(\(name))"
+        }, convertWrappedToWrapper: { name, _ in
+            return "marshal_as<System::String^>(\(name))"
         })
 
     static let mappingsByUnManagedType: [String: TypeMapping] = [
@@ -296,7 +296,7 @@ struct ManagedCPPWrapperClass {
             let argumentCursor: CXCursor = clang_Cursor_getArgument(cursor, argumentIndex)
             let argumentName = clang_getCursorSpelling(argumentCursor).consumeToString
             let argumentType = clang_getTypeSpelling(clang_getArgType(cursorType, argumentIndex)).consumeToString
-            return MethodArgument(typeName: argumentType, argumentName: argumentName, isOptionalType: false, isVoidType: false)
+            return MethodArgument(typeName: argumentType, argumentName: argumentName, isOptionalType: false, isArrayType: false, isVoidType: false)
         })
 
         guard !unmanagedArguments.contains(where: { $0.typeName.contains("std::shared_ptr") }) else { return false }
@@ -333,7 +333,7 @@ struct ManagedCPPWrapperClass {
             // We need to bridge each argument to the unmanaged type.
             let unmanagedType = argument.typeName
             let mapping = wrapping(for: unmanagedType)
-            let adaptedArgument: String = mapping.wrappedTypeName + " " + parameterName + "\(index) = " + mapping.convertWrapperToWrapped(argument.argumentName) + ";"
+            let adaptedArgument: String = mapping.wrappedTypeName + " " + parameterName + "\(index) = " + mapping.convertWrapperToWrapped(argument.argumentName, false) + ";"
             methodLines.append("    " + adaptedArgument)
         }
 
@@ -360,6 +360,7 @@ struct ManagedCPPWrapperClass {
         // We need to get the return type.
         let unmanagedReturnType: CXType = clang_getResultType(cursorType)
         let unmanagedReturnArgument = MethodArgument(extractingOptionalOfType: "std::optional",
+                                                     arrayOfType: "std::vector",
                                                      from: clang_getTypeSpelling(unmanagedReturnType).consumeToString,
                                                      argumentName: "", isVoidType: (unmanagedReturnType.kind == CXType_Void))
 
@@ -374,7 +375,7 @@ struct ManagedCPPWrapperClass {
             let argumentCursor: CXCursor = clang_Cursor_getArgument(cursor, argumentIndex)
             let argumentName = clang_getCursorSpelling(argumentCursor).consumeToString
             let argumentType = clang_getTypeSpelling(clang_getArgType(cursorType, argumentIndex)).consumeToString
-            return MethodArgument(extractingOptionalOfType: "std::optional", from: argumentType, argumentName: argumentName, isVoidType: false)
+            return MethodArgument(extractingOptionalOfType: "std::optional", arrayOfType: "std::vector", from: argumentType, argumentName: argumentName, isVoidType: false)
         })
 
         // We have everything we need to wrap the method now!
@@ -442,11 +443,11 @@ struct ManagedCPPWrapperClass {
             if argument.isOptionalType {
                 let adaptedArgument: String = "std::optional<" + mapping.wrappedTypeName + "> " + parameterName + "\(index) = (" +
                     argument.argumentName + " == nullptr ? std::nullopt : std::optional<" + mapping.wrappedTypeName +
-                        ">(" + mapping.convertWrapperToWrapped(argument.argumentName) + "));"
+                        ">(" + mapping.convertWrapperToWrapped(argument.argumentName, false) + "));"
                 methodLines.append("    " + adaptedArgument)
             } else {
                 let adaptedArgument: String = mapping.wrappedTypeName + " " + parameterName + "\(index) = " +
-                    mapping.convertWrapperToWrapped(argument.argumentName) + ";"
+                    mapping.convertWrapperToWrapped(argument.argumentName, false) + ";"
                 methodLines.append("    " + adaptedArgument)
             }
         }
@@ -493,10 +494,10 @@ struct ManagedCPPWrapperClass {
             // Finally, translate back to the managed type and return it.
             if unmanagedReturnArgument.isOptionalType {
                 let returnLine = "return (unmanagedResult.has_value() ? " +
-                    returnTypeMapping.convertWrappedToWrapper("unmanagedResult.value()") + " : nullptr);"
+                    returnTypeMapping.convertWrappedToWrapper("unmanagedResult.value()", false) + " : nullptr);"
                 methodLines.append("    " + returnLine)
             } else {
-                let returnLine = "return " + returnTypeMapping.convertWrappedToWrapper("unmanagedResult") + ";"
+                let returnLine = "return " + returnTypeMapping.convertWrappedToWrapper("unmanagedResult", false) + ";"
                 methodLines.append("    " + returnLine)
             }
         }
