@@ -45,8 +45,11 @@ struct MethodArgument: Hashable {
         // RED FLAG: This is definitely not the best way to do this. However, clang seems to trip up and report
         // swift::Optional<T> types as just "int", which is what it seems to do if it can't find the definition
         // of a type. I can't immediately figure out why this is, so here's a stopgap solution in the meantime.
-        guard let rangeOfMethodName = methodSpelling.range(of: methodName) else { return nil }
-        let returnTypeHaystack = String(methodSpelling[methodSpelling.startIndex..<rangeOfMethodName.lowerBound]);
+        // DOUBLE RED FLAG: Static functions end up in here with a 'staticSWIFT_INLINE_THUNK' prefix. We should
+        // only try to use this method for swift::Optional and swift::Array types.
+        let manuallyFixedStaticDecl = methodSpelling.replacingOccurrences(of: "staticSWIFT_INLINE_THUNK", with: "")
+        guard let rangeOfMethodName = manuallyFixedStaticDecl.range(of: methodName) else { return nil }
+        let returnTypeHaystack = String(manuallyFixedStaticDecl[manuallyFixedStaticDecl.startIndex..<rangeOfMethodName.lowerBound]);
         self.init(extractingOptionalOfType: "swift::Optional", arrayOfType: "swift::Array", from: returnTypeHaystack,
                   argumentName: "", isVoidType: false)
     }

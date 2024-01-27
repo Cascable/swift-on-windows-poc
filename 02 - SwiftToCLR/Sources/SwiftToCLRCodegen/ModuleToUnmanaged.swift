@@ -462,7 +462,6 @@ struct UnmanagedManagedCPPWrapperClass {
             let argumentTypeName = clang_getTypeSpelling(argumentType).consumeToString
 
             if let argumentSpelling = argumentCursor.condensedTokenization(in: unit) {
-                print(argumentSpelling)
                 return MethodArgument(extractingOptionalTypeFromCondensedArgumentTokenization: argumentSpelling, argumentName: argumentName)
             } else {
                 return MethodArgument(typeName: argumentTypeName, argumentName: argumentName, isOptionalType: false, isArrayType: false, isVoidType: false)

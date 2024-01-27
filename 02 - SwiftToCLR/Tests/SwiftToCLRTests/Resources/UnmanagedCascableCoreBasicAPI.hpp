@@ -128,6 +128,7 @@ namespace UnmanagedCascableCoreBasicAPI {
         BasicCameraDiscovery(std::shared_ptr<CascableCoreBasicAPI::BasicCameraDiscovery> swiftObj);
         ~BasicCameraDiscovery();
     
+        static UnmanagedCascableCoreBasicAPI::BasicCameraDiscovery sharedInstance();
         bool getDiscoveryRunning();
         void setDiscoveryRunning(bool value);
         std::vector<UnmanagedCascableCoreBasicAPI::BasicCamera> getVisibleCameras();
@@ -185,6 +186,7 @@ namespace UnmanagedCascableCoreBasicAPI {
         BasicSimulatedCameraConfiguration(std::shared_ptr<CascableCoreBasicAPI::BasicSimulatedCameraConfiguration> swiftObj);
         ~BasicSimulatedCameraConfiguration();
     
+        static UnmanagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration defaultConfiguration();
         std::string getManufacturer();
         void setManufacturer(const std::string & value);
         std::string getModel();

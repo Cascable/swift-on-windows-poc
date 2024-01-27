@@ -6,13 +6,13 @@ class CodeGenerationTests: XCTestCase {
 
     func testModuleToUnmanaged() throws {
 
-        let inputFile = try XCTUnwrap(testFile(named: "BasicTest-Swift", extension: "h"))
+        let inputFile = try XCTUnwrap(testFile(named: "CascableCoreBasicAPI-Swift", extension: "h"))
         let cxxParent = try XCTUnwrap(testFile(named: "swiftToCxx", extension: nil)).deletingLastPathComponent()
 
         let resultFiles = try ModuleToUnmanagedOperation.execute(inputHeaderPath: inputFile.path,
-                                                                 inputModuleName: "BasicTest",
+                                                                 inputModuleName: "CascableCoreBasicAPI",
                                                                  wrappedObjectVariableName: "swiftObj",
-                                                                 outputNamespace: "UnmanagedBasicTest",
+                                                                 outputNamespace: "UnmanagedCascableCoreBasicAPI",
                                                                  platformRoot: nil,
                                                                  cxxInteropContainerPath: cxxParent.path,
                                                                  verbose: true)
