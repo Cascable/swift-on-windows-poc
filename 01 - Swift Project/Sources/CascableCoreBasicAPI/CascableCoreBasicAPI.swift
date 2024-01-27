@@ -7,6 +7,8 @@ import Foundation
 
  - Protocols aren't exposed to C++.
 
+ - Static let properties aren't exposed to C++.
+
  - Enum cases with more than one associated value disallow that enum to be exposed to C++.
 
  - Closures/callbacks aren't exposed to C++. This is particulary troublesome since we use this pattern a lot for
@@ -29,6 +31,16 @@ import CascableCoreSimulatedCamera
 
 /// Configuration values for simulated cameras.
 public struct BasicSimulatedCameraConfiguration {
+
+    /// Create a default configuration object.
+    public static func defaultConfiguration() -> BasicSimulatedCameraConfiguration {
+        let wrappedDefault = SimulatedCameraConfiguration.default
+        return BasicSimulatedCameraConfiguration(
+            manufacturer: wrappedDefault.manufacturer,
+            model: wrappedDefault.model,
+            identifier: wrappedDefault.identifier
+        )
+    }
 
     /// The simulated camera's manufacturer name. The default value is `Cascable`.
     public var manufacturer: String
@@ -56,8 +68,13 @@ public struct BasicSimulatedCameraConfiguration {
 /// Discovering cameras.
 public class BasicCameraDiscovery {
 
+    // static lets don't appear to be exposed via C++.
+    private static let _shared: BasicCameraDiscovery = BasicCameraDiscovery()
+
     /// The shared camera discovery instance.
-    public static let sharedInstance: BasicCameraDiscovery = BasicCameraDiscovery()
+    public static func sharedInstance() -> BasicCameraDiscovery {
+        return _shared
+    }
 
     /// Returns `true` if camera discovery is running, otherwise `false`.
     public private(set) var discoveryRunning: Bool = false
