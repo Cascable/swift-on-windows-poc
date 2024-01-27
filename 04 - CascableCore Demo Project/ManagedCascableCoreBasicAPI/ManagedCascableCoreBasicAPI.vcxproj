@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ManagedCascableCoreBasicAPI.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ManagedCascableCoreBasicAPI.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{2bcea18e-6c47-4815-9787-d3c2d24b680f}</ProjectGuid>
+    <RootNamespace>ManagedCascableCoreBasicAPI</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <TargetFrameworkVersion>6.0</TargetFrameworkVersion>
+    <WindowsTargetPlatformMinVersion>7.0</WindowsTargetPlatformMinVersion>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>NetCore</CLRSupport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>NetCore</CLRSupport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>NetCore</CLRSupport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>NetCore</CLRSupport>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;MANAGEDCASCABLECOREBASICAPI_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)UnmanagedCascableCoreBasicAPI</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)UnmanagedCascableCoreBasicAPI\$(Platform)\$(Configuration);$(SolutionDir)Compiled Swift Project\lib;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);UnmanagedCascableCoreBasicAPI.obj</AdditionalDependencies>
+      <AdditionalOptions>AEResult.swift.o
+Camera.swift.o
+CameraDiscovery.swift.o
+CameraDiscoveryService.swift.o
+CameraFocusTypes.swift.o
+CameraInitiatedTransfer.swift.o
+CameraPropertyAPI.swift.o
+CascableCore.o
+CascableCoreBasicAPI.o
+CascableCoreBasicAPI.swift.o
+CascableCoreSimulatedCamera.o
+DeviceInfo.swift.o
+FileStorage.swift.o
+FileSystemFolderItem.swift.o
+FileSystemItem.swift.o
+LiveViewFrame.swift.o
+NSError+Extensions.swift.o
+PluginDiscovery.swift.o
+resource_bundle_accessor.swift.o
+SimulatedCamera.swift.o
+SimulatedCamera+FileSystem.swift.o
+SimulatedCamera+Properties.swift.o
+SimulatedCamera+PropertyValues.swift.o
+SimulatedCameraConfiguration.swift.o
+SimulatedCameraDiscovery.swift.o
+SimulatedCameraEntryPoint.swift.o
+StopKit.o
+WindowsHelpers.swift.o
+UniversalPropertyValue.swift.o
+ApertureValue.swift.o
+ExposureCompensationValue.swift.o
+ExposureStops.swift.o
+Helpers.swift.o
+ISOValue.swift.o
+ShutterSpeedValue.swift.o
+stopkit_resource_bundle_accessor.swift.o </AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;MANAGEDCASCABLECOREBASICAPI_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)UnmanagedCascableCoreBasicAPI</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)UnmanagedCascableCoreBasicAPI\$(Platform)\$(Configuration);$(SolutionDir)Compiled Swift Project\lib;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);UnmanagedCascableCoreBasicAPI.obj</AdditionalDependencies>
+      <AdditionalOptions>AEResult.swift.o
+Camera.swift.o
+CameraDiscovery.swift.o
+CameraDiscoveryService.swift.o
+CameraFocusTypes.swift.o
+CameraInitiatedTransfer.swift.o
+CameraPropertyAPI.swift.o
+CascableCore.o
+CascableCoreBasicAPI.o
+CascableCoreBasicAPI.swift.o
+CascableCoreSimulatedCamera.o
+DeviceInfo.swift.o
+FileStorage.swift.o
+FileSystemFolderItem.swift.o
+FileSystemItem.swift.o
+LiveViewFrame.swift.o
+NSError+Extensions.swift.o
+PluginDiscovery.swift.o
+resource_bundle_accessor.swift.o
+SimulatedCamera.swift.o
+SimulatedCamera+FileSystem.swift.o
+SimulatedCamera+Properties.swift.o
+SimulatedCamera+PropertyValues.swift.o
+SimulatedCameraConfiguration.swift.o
+SimulatedCameraDiscovery.swift.o
+SimulatedCameraEntryPoint.swift.o
+StopKit.o
+WindowsHelpers.swift.o
+UniversalPropertyValue.swift.o
+ApertureValue.swift.o
+ExposureCompensationValue.swift.o
+ExposureStops.swift.o
+Helpers.swift.o
+ISOValue.swift.o
+ShutterSpeedValue.swift.o
+stopkit_resource_bundle_accessor.swift.o </AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;MANAGEDCASCABLECOREBASICAPI_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(SolutionDir)UnmanagedCascableCoreBasicAPI</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)UnmanagedCascableCoreBasicAPI\$(Platform)\$(Configuration);$(SolutionDir)Compiled Swift Project\lib;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);UnmanagedCascableCoreBasicAPI.obj</AdditionalDependencies>
+      <AdditionalOptions>AEResult.swift.o
+Camera.swift.o
+CameraDiscovery.swift.o
+CameraDiscoveryService.swift.o
+CameraFocusTypes.swift.o
+CameraInitiatedTransfer.swift.o
+CameraPropertyAPI.swift.o
+CascableCore.o
+CascableCoreBasicAPI.o
+CascableCoreBasicAPI.swift.o
+CascableCoreSimulatedCamera.o
+DeviceInfo.swift.o
+FileStorage.swift.o
+FileSystemFolderItem.swift.o
+FileSystemItem.swift.o
+LiveViewFrame.swift.o
+NSError+Extensions.swift.o
+PluginDiscovery.swift.o
+resource_bundle_accessor.swift.o
+SimulatedCamera.swift.o
+SimulatedCamera+FileSystem.swift.o
+SimulatedCamera+Properties.swift.o
+SimulatedCamera+PropertyValues.swift.o
+SimulatedCameraConfiguration.swift.o
+SimulatedCameraDiscovery.swift.o
+SimulatedCameraEntryPoint.swift.o
+StopKit.o
+WindowsHelpers.swift.o
+UniversalPropertyValue.swift.o
+ApertureValue.swift.o
+ExposureCompensationValue.swift.o
+ExposureStops.swift.o
+Helpers.swift.o
+ISOValue.swift.o
+ShutterSpeedValue.swift.o
+stopkit_resource_bundle_accessor.swift.o </AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;MANAGEDCASCABLECOREBASICAPI_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)UnmanagedCascableCoreBasicAPI</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)UnmanagedCascableCoreBasicAPI\$(Platform)\$(Configuration);$(SolutionDir)Compiled Swift Project\lib;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);UnmanagedCascableCoreBasicAPI.obj</AdditionalDependencies>
+      <AdditionalOptions>AEResult.swift.o
+Camera.swift.o
+CameraDiscovery.swift.o
+CameraDiscoveryService.swift.o
+CameraFocusTypes.swift.o
+CameraInitiatedTransfer.swift.o
+CameraPropertyAPI.swift.o
+CascableCore.o
+CascableCoreBasicAPI.o
+CascableCoreBasicAPI.swift.o
+CascableCoreSimulatedCamera.o
+DeviceInfo.swift.o
+FileStorage.swift.o
+FileSystemFolderItem.swift.o
+FileSystemItem.swift.o
+LiveViewFrame.swift.o
+NSError+Extensions.swift.o
+PluginDiscovery.swift.o
+resource_bundle_accessor.swift.o
+SimulatedCamera.swift.o
+SimulatedCamera+FileSystem.swift.o
+SimulatedCamera+Properties.swift.o
+SimulatedCamera+PropertyValues.swift.o
+SimulatedCameraConfiguration.swift.o
+SimulatedCameraDiscovery.swift.o
+SimulatedCameraEntryPoint.swift.o
+StopKit.o
+WindowsHelpers.swift.o
+UniversalPropertyValue.swift.o
+ApertureValue.swift.o
+ExposureCompensationValue.swift.o
+ExposureStops.swift.o
+Helpers.swift.o
+ISOValue.swift.o
+ShutterSpeedValue.swift.o
+stopkit_resource_bundle_accessor.swift.o </AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

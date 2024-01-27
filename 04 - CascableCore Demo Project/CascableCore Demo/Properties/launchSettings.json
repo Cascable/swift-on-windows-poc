@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "CascableCore Demo (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "CascableCore Demo (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
