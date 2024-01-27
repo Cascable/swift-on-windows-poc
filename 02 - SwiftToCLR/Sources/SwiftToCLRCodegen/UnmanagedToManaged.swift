@@ -161,7 +161,10 @@ public struct UnmanagedToManagedOperation {
             "#pragma once",
             "#define WIN32_LEAN_AND_MEAN",
             "#include <windows.h>",
+            "#include <cliext/list> // This header requires \"Conformance Mode\" is disabled (/permissive)",
             "#include <" + inputFileName + ">",
+            "",
+            "using namespace cliext;",
             ""
         ]
 
@@ -188,6 +191,7 @@ public struct UnmanagedToManagedOperation {
             "#include <msclr/marshal_cppstd.h>",
             "",
             "using namespace msclr::interop;",
+            "using namespace cliext;",
             ""
         ]
 
@@ -387,10 +391,20 @@ struct ManagedCPPWrapperClass {
         }
 
         let returnTypeMapping = wrapping(for: unmanagedReturnArgument.typeName)
-        let managedReturnTypeName = returnTypeMapping.wrapperTypeName
+        let managedReturnTypeName: String = {
+            if unmanagedReturnArgument.isArrayType {
+                return "list <" + returnTypeMapping.wrapperTypeName + ">^"
+            } else {
+                return returnTypeMapping.wrapperTypeName
+            }
+        }();
 
         let managedMethodArguments: [String] = unmanagedArguments.map({ argument in
-            return "\(wrapping(for: argument.typeName).wrapperTypeName) \(argument.argumentName)"
+            if argument.isArrayType {
+                return "list<\(wrapping(for: argument.typeName).wrapperTypeName)>^ \(argument.argumentName)"
+            } else {
+                return "\(wrapping(for: argument.typeName).wrapperTypeName) \(argument.argumentName)"
+            }
         })
 
         let scopedManagedClassName: String = managedNamespace + "::" + managedClassName
@@ -435,16 +449,43 @@ struct ManagedCPPWrapperClass {
 
         let parameterName: String = "arg"
 
+        func adaptArray(fromListNamed sourceName: String, toStdVectorNamed destName: String, using mapping: TypeMapping) -> [String] {
+            var lines: [String] = []
+            lines.append("std::vector<" + mapping.wrappedTypeName + "> \(destName);")
+            lines.append(destName + ".reserve(" + sourceName + "->size());")
+            lines.append("for each(auto element in " + sourceName + ") {")
+            lines.append("    " + destName + ".push_back(" + mapping.convertWrapperToWrapped("element", false) + ");")
+            lines.append("}")
+            return lines
+        }
+
         // Adapt the parameters
         for (index, argument) in unmanagedArguments.enumerated() {
             // We need to bridge each argument to the unmanaged type.
             let unmanagedType = argument.typeName
             let mapping = wrapping(for: unmanagedType)
+            let arrayName: String = "\(parameterName)\(index)Array"
             if argument.isOptionalType {
-                let adaptedArgument: String = "std::optional<" + mapping.wrappedTypeName + "> " + parameterName + "\(index) = (" +
-                    argument.argumentName + " == nullptr ? std::nullopt : std::optional<" + mapping.wrappedTypeName +
-                        ">(" + mapping.convertWrapperToWrapped(argument.argumentName, false) + "));"
-                methodLines.append("    " + adaptedArgument)
+                if argument.isArrayType {
+                    var lines: [String] = []
+                    lines.append("std::optional<std::vector<" + mapping.wrappedTypeName + ">> " + arrayName + ";");
+                    lines.append("if (" + argument.argumentName + " == nullptr) {")
+                    lines.append("    " + arrayName + " = std::nullopt;")
+                    lines.append("} else {")
+                    lines.append(contentsOf: adaptArray(fromListNamed: argument.argumentName, toStdVectorNamed: arrayName + "Unwrapped",
+                                                using: mapping).map({ "    " + $0 }))
+                    lines.append("    " + arrayName + " = std::optional<std::vector<" + mapping.wrappedTypeName + ">>(" + arrayName + "Unwrapped);")
+                    lines.append("}")
+                    methodLines.append(contentsOf: lines.map({ "    " + $0 }))
+                } else {
+                    let adaptedArgument: String = "std::optional<" + mapping.wrappedTypeName + "> " + parameterName + "\(index) = (" +
+                        argument.argumentName + " == nullptr ? std::nullopt : std::optional<" + mapping.wrappedTypeName +
+                            ">(" + mapping.convertWrapperToWrapped(argument.argumentName, false) + "));"
+                    methodLines.append("    " + adaptedArgument)
+                }
+            } else if argument.isArrayType {
+                methodLines.append(contentsOf: adaptArray(fromListNamed: argument.argumentName, toStdVectorNamed: arrayName,
+                    using: mapping).map({ "    " + $0 }))
             } else {
                 let adaptedArgument: String = mapping.wrappedTypeName + " " + parameterName + "\(index) = " +
                     mapping.convertWrapperToWrapped(argument.argumentName, false) + ";"
@@ -452,7 +493,13 @@ struct ManagedCPPWrapperClass {
             }
         }
 
-        let args: String = (0..<unmanagedArguments.count).map({ "arg\($0)" }).joined(separator: ", ")
+        let args: String = unmanagedArguments.enumerated().map({ index, argument in
+            if argument.isArrayType {
+                return parameterName + "\(index)Array"
+            } else {
+                return parameterName + "\(index)"
+            }
+        }).joined(separator: ", ")
 
         if unmanagedReturnArgument.isVoidType {
             let methodCall: String = {
@@ -469,13 +516,10 @@ struct ManagedCPPWrapperClass {
             methodLines.append("    " + methodCall)
         } else {
             let methodCall: String = {
-                let resultTypeName: String = {
-                    if unmanagedReturnArgument.isOptionalType {
-                        return "std::optional<" + returnTypeMapping.wrappedTypeName + ">"
-                    } else {
-                        return returnTypeMapping.wrappedTypeName
-                    }
-                }()
+                var resultTypeName: String = returnTypeMapping.wrappedTypeName
+                if unmanagedReturnArgument.isArrayType { resultTypeName = "std::vector<" + resultTypeName + ">" }
+                if unmanagedReturnArgument.isOptionalType { resultTypeName = "std::optional<" + resultTypeName + ">" }
+
                 if methodIsStatic {
                     return resultTypeName + " unmanagedResult = " + scopedUnmanagedClassName + "::"
                                         + unmanagedMethodName + "(" + args + ");"
@@ -491,11 +535,37 @@ struct ManagedCPPWrapperClass {
             }()
             methodLines.append("    " + methodCall)
 
+            func adaptArray(fromStdVectorNamed sourceName: String, toListNamed destName: String, using mapping: TypeMapping) -> [String] {
+                var lines: [String] = []
+                lines.append("list<" + mapping.wrapperTypeName + ">^ " + destName + " = gcnew list<" + mapping.wrapperTypeName + ">();")
+                lines.append("for (auto element : " + sourceName + ") {")
+                lines.append("    auto managedElement = " + mapping.convertWrappedToWrapper("element", false) + ";")
+                lines.append("    " + destName + "->push_back(managedElement);")
+                lines.append("}")
+                return lines
+            }
+
             // Finally, translate back to the managed type and return it.
             if unmanagedReturnArgument.isOptionalType {
-                let returnLine = "return (unmanagedResult.has_value() ? " +
-                    returnTypeMapping.convertWrappedToWrapper("unmanagedResult.value()", false) + " : nullptr);"
-                methodLines.append("    " + returnLine)
+                if unmanagedReturnArgument.isArrayType {
+                    methodLines.append("    if (unmanagedResult.has_value()) {")
+                    methodLines.append("        std::vector<" + returnTypeMapping.wrappedTypeName + "> unwrappedResult = unmanagedResult.value();")
+                    let conversion = adaptArray(fromStdVectorNamed: "unwrappedResult", toListNamed: "managedResult", using: returnTypeMapping)
+                    methodLines.append(contentsOf: conversion.map({ "        " + $0 }))
+                    methodLines.append("        return managedResult;")
+                    methodLines.append("    } else {")
+                    methodLines.append("        return nullptr;")
+                    methodLines.append("    }")
+
+                } else {
+                    let returnLine = "return (unmanagedResult.has_value() ? " +
+                        returnTypeMapping.convertWrappedToWrapper("unmanagedResult.value()", false) + " : nullptr);"
+                    methodLines.append("    " + returnLine)
+                }
+            } else if unmanagedReturnArgument.isArrayType {
+                methodLines.append(contentsOf: adaptArray(fromStdVectorNamed: "unmanagedResult", toListNamed: "managedResult",
+                    using: returnTypeMapping).map{( "    " + $0 )})
+                methodLines.append("    return managedResult;")
             } else {
                 let returnLine = "return " + returnTypeMapping.convertWrappedToWrapper("unmanagedResult", false) + ";"
                 methodLines.append("    " + returnLine)

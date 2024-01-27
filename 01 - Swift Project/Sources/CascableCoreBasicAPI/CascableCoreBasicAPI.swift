@@ -247,7 +247,7 @@ public enum BasicPropertyIdentifier: UInt {
     case videoRecordingFormat
     /// The camera's live view zoom level.
     case liveViewZoomLevel
-    case max
+    case maxValue // Can't call it 'max' since that's a reserved keyword
 
     // This needs to be NSNotFound, or UInt.max
     case unknown = 18446744073709551615

@@ -24,13 +24,13 @@ class CodeGenerationTests: XCTestCase {
 
     func testUnmanagedToManaged() throws {
 
-        let inputFile = try XCTUnwrap(testFile(named: "UnmanagedBasicTest", extension: "hpp"))
+        let inputFile = try XCTUnwrap(testFile(named: "UnmanagedCascableCoreBasicAPI", extension: "hpp"))
 
         let resultFiles = try UnmanagedToManagedOperation.execute(
             inputHeaderPath: inputFile.path,
-            inputNamespace: "UnmanagedBasicTest",
+            inputNamespace: "UnmanagedCascableCoreBasicAPI",
             wrappedObjectVariableName: "wrappedObj",
-            outputNamespace: "ManagedBasicTest",
+            outputNamespace: "ManagedCascableCoreBasicAPI",
             platformRoot: nil,
             verbose: true)
 
