@@ -161,10 +161,9 @@ public struct UnmanagedToManagedOperation {
             "#pragma once",
             "#define WIN32_LEAN_AND_MEAN",
             "#include <windows.h>",
-            "#include <cliext/list> // This header requires \"Conformance Mode\" is disabled (/permissive)",
             "#include <" + inputFileName + ">",
             "",
-            "using namespace cliext;",
+            "using namespace System::Collections::Generic;",
             ""
         ]
 
@@ -191,7 +190,7 @@ public struct UnmanagedToManagedOperation {
             "#include <msclr/marshal_cppstd.h>",
             "",
             "using namespace msclr::interop;",
-            "using namespace cliext;",
+            "using namespace System::Collections::Generic;",
             ""
         ]
 
@@ -393,7 +392,7 @@ struct ManagedCPPWrapperClass {
         let returnTypeMapping = wrapping(for: unmanagedReturnArgument.typeName)
         let managedReturnTypeName: String = {
             if unmanagedReturnArgument.isArrayType {
-                return "list <" + returnTypeMapping.wrapperTypeName + ">^"
+                return "List<" + returnTypeMapping.wrapperTypeName + ">^"
             } else {
                 return returnTypeMapping.wrapperTypeName
             }
@@ -401,7 +400,7 @@ struct ManagedCPPWrapperClass {
 
         let managedMethodArguments: [String] = unmanagedArguments.map({ argument in
             if argument.isArrayType {
-                return "list<\(wrapping(for: argument.typeName).wrapperTypeName)>^ \(argument.argumentName)"
+                return "List<\(wrapping(for: argument.typeName).wrapperTypeName)>^ \(argument.argumentName)"
             } else {
                 return "\(wrapping(for: argument.typeName).wrapperTypeName) \(argument.argumentName)"
             }
@@ -452,7 +451,7 @@ struct ManagedCPPWrapperClass {
         func adaptArray(fromListNamed sourceName: String, toStdVectorNamed destName: String, using mapping: TypeMapping) -> [String] {
             var lines: [String] = []
             lines.append("std::vector<" + mapping.wrappedTypeName + "> \(destName);")
-            lines.append(destName + ".reserve(" + sourceName + "->size());")
+            lines.append(destName + ".reserve(" + sourceName + "->Count);")
             lines.append("for each(auto element in " + sourceName + ") {")
             lines.append("    " + destName + ".push_back(" + mapping.convertWrapperToWrapped("element", false) + ");")
             lines.append("}")
@@ -537,10 +536,10 @@ struct ManagedCPPWrapperClass {
 
             func adaptArray(fromStdVectorNamed sourceName: String, toListNamed destName: String, using mapping: TypeMapping) -> [String] {
                 var lines: [String] = []
-                lines.append("list<" + mapping.wrapperTypeName + ">^ " + destName + " = gcnew list<" + mapping.wrapperTypeName + ">();")
+                lines.append("List<" + mapping.wrapperTypeName + ">^ " + destName + " = gcnew List<" + mapping.wrapperTypeName + ">();")
                 lines.append("for (auto element : " + sourceName + ") {")
                 lines.append("    auto managedElement = " + mapping.convertWrappedToWrapper("element", false) + ";")
-                lines.append("    " + destName + "->push_back(managedElement);")
+                lines.append("    " + destName + "->Add(managedElement);")
                 lines.append("}")
                 return lines
             }

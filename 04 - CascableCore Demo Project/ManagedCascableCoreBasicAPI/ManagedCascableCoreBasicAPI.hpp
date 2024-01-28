@@ -3,10 +3,9 @@
 #pragma once
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <cliext/list> // This header requires "Conformance Mode" is disabled (/permissive)
 #include <UnmanagedCascableCoreBasicAPI.hpp>
 
-using namespace cliext;
+using namespace System::Collections::Generic;
 
 namespace ManagedCascableCoreBasicAPI {
 
@@ -21,11 +20,11 @@ namespace ManagedCascableCoreBasicAPI {
     public ref class BasicPropertyIdentifier {
     private:
     internal:
-        UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier *wrappedObj;
-        BasicPropertyIdentifier(UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier *objectToTakeOwnershipOf);
+        UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier* wrappedObj;
+        BasicPropertyIdentifier(UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier* objectToTakeOwnershipOf);
     public:
         ~BasicPropertyIdentifier();
-    
+
         static ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^ initWithRawValue(unsigned int rawValue);
         static ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^ isoSpeed();
         static ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^ shutterSpeed();
@@ -59,7 +58,7 @@ namespace ManagedCascableCoreBasicAPI {
         static ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^ maxValue();
         static ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^ unknown();
         static bool operator==(ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^ lhs, ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^ rhs);
-    
+
         bool isIsoSpeed();
         bool isShutterSpeed();
         bool isAperture();
@@ -97,34 +96,34 @@ namespace ManagedCascableCoreBasicAPI {
     public ref class BasicCamera {
     private:
     internal:
-        UnmanagedCascableCoreBasicAPI::BasicCamera *wrappedObj;
-        BasicCamera(UnmanagedCascableCoreBasicAPI::BasicCamera *objectToTakeOwnershipOf);
+        UnmanagedCascableCoreBasicAPI::BasicCamera* wrappedObj;
+        BasicCamera(UnmanagedCascableCoreBasicAPI::BasicCamera* objectToTakeOwnershipOf);
     public:
         ~BasicCamera();
-    
+
         System::String^ getFriendlyIdentifier();
         bool getConnected();
         ManagedCascableCoreBasicAPI::BasicDeviceInfo^ getDeviceInfo();
         System::String^ getFriendlyDisplayName();
         void connect();
         void disconnect();
-        list <ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^>^ getKnownPropertyIdentifiers();
+        List<ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^>^ getKnownPropertyIdentifiers();
         ManagedCascableCoreBasicAPI::BasicCameraProperty^ property(ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^ identifier);
     };
 
     public ref class BasicCameraDiscovery {
     private:
     internal:
-        UnmanagedCascableCoreBasicAPI::BasicCameraDiscovery *wrappedObj;
-        BasicCameraDiscovery(UnmanagedCascableCoreBasicAPI::BasicCameraDiscovery *objectToTakeOwnershipOf);
+        UnmanagedCascableCoreBasicAPI::BasicCameraDiscovery* wrappedObj;
+        BasicCameraDiscovery(UnmanagedCascableCoreBasicAPI::BasicCameraDiscovery* objectToTakeOwnershipOf);
     public:
         ~BasicCameraDiscovery();
-    
+
         static ManagedCascableCoreBasicAPI::BasicCameraDiscovery^ sharedInstance();
-    
+
         bool getDiscoveryRunning();
         void setDiscoveryRunning(bool value);
-        list <ManagedCascableCoreBasicAPI::BasicCamera^>^ getVisibleCameras();
+        List<ManagedCascableCoreBasicAPI::BasicCamera^>^ getVisibleCameras();
         void startDiscovery(System::String^ clientName);
         void stopDiscovery();
     };
@@ -132,11 +131,11 @@ namespace ManagedCascableCoreBasicAPI {
     public ref class BasicCameraProperty {
     private:
     internal:
-        UnmanagedCascableCoreBasicAPI::BasicCameraProperty *wrappedObj;
-        BasicCameraProperty(UnmanagedCascableCoreBasicAPI::BasicCameraProperty *objectToTakeOwnershipOf);
+        UnmanagedCascableCoreBasicAPI::BasicCameraProperty* wrappedObj;
+        BasicCameraProperty(UnmanagedCascableCoreBasicAPI::BasicCameraProperty* objectToTakeOwnershipOf);
     public:
         ~BasicCameraProperty();
-    
+
         ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^ getIdentifier();
         ManagedCascableCoreBasicAPI::BasicCamera^ getCamera();
         System::String^ getLocalizedDisplayName();
@@ -144,19 +143,19 @@ namespace ManagedCascableCoreBasicAPI {
         void setCurrentValue(ManagedCascableCoreBasicAPI::BasicPropertyValue^ value);
         ManagedCascableCoreBasicAPI::BasicPropertyValue^ getPendingValue();
         void setPendingValue(ManagedCascableCoreBasicAPI::BasicPropertyValue^ value);
-        list <ManagedCascableCoreBasicAPI::BasicPropertyValue^>^ getValidSettableValues();
-        void setValidSettableValues(list<ManagedCascableCoreBasicAPI::BasicPropertyValue^>^ value);
+        List<ManagedCascableCoreBasicAPI::BasicPropertyValue^>^ getValidSettableValues();
+        void setValidSettableValues(List<ManagedCascableCoreBasicAPI::BasicPropertyValue^>^ value);
         void setValue(ManagedCascableCoreBasicAPI::BasicPropertyValue^ newValue);
     };
 
     public ref class BasicDeviceInfo {
     private:
     internal:
-        UnmanagedCascableCoreBasicAPI::BasicDeviceInfo *wrappedObj;
-        BasicDeviceInfo(UnmanagedCascableCoreBasicAPI::BasicDeviceInfo *objectToTakeOwnershipOf);
+        UnmanagedCascableCoreBasicAPI::BasicDeviceInfo* wrappedObj;
+        BasicDeviceInfo(UnmanagedCascableCoreBasicAPI::BasicDeviceInfo* objectToTakeOwnershipOf);
     public:
         ~BasicDeviceInfo();
-    
+
         System::String^ getManufacturer();
         System::String^ getModel();
         System::String^ getVersion();
@@ -166,11 +165,11 @@ namespace ManagedCascableCoreBasicAPI {
     public ref class BasicPropertyValue {
     private:
     internal:
-        UnmanagedCascableCoreBasicAPI::BasicPropertyValue *wrappedObj;
-        BasicPropertyValue(UnmanagedCascableCoreBasicAPI::BasicPropertyValue *objectToTakeOwnershipOf);
+        UnmanagedCascableCoreBasicAPI::BasicPropertyValue* wrappedObj;
+        BasicPropertyValue(UnmanagedCascableCoreBasicAPI::BasicPropertyValue* objectToTakeOwnershipOf);
     public:
         ~BasicPropertyValue();
-    
+
         System::String^ getLocalizedDisplayValue();
         System::String^ getStringValue();
     };
@@ -178,13 +177,13 @@ namespace ManagedCascableCoreBasicAPI {
     public ref class BasicSimulatedCameraConfiguration {
     private:
     internal:
-        UnmanagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration *wrappedObj;
-        BasicSimulatedCameraConfiguration(UnmanagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration *objectToTakeOwnershipOf);
+        UnmanagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration* wrappedObj;
+        BasicSimulatedCameraConfiguration(UnmanagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration* objectToTakeOwnershipOf);
     public:
         ~BasicSimulatedCameraConfiguration();
-    
+
         static ManagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration^ defaultConfiguration();
-    
+
         System::String^ getManufacturer();
         void setManufacturer(System::String^ value);
         System::String^ getModel();
