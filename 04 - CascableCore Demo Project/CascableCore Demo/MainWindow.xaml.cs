@@ -29,10 +29,11 @@ namespace CascableCore_Demo
         public MainWindow()
         {
             this.InitializeComponent();
+            this.AppWindow.Resize(new Windows.Graphics.SizeInt32(800, 600));
         }
 
         BasicCameraDiscovery discovery = BasicCameraDiscovery.sharedInstance();
-
+     
         private void myButton_Click(object sender, RoutedEventArgs e)
         {
             if (discovery.getDiscoveryRunning())
@@ -42,6 +43,20 @@ namespace CascableCore_Demo
                 {
                     BasicCamera camera = cameras.First();
                     Debug.WriteLine("Got camera: " + camera.getFriendlyDisplayName());
+                    Debug.WriteLine("Got camera: " + camera.getFriendlyDisplayName());
+                    Debug.WriteLine("Got camera: " + camera.getFriendlyDisplayName());
+                    Debug.WriteLine("Got camera: " + camera.getFriendlyDisplayName());
+                    Debug.WriteLine(camera.getDeviceInfo().getManufacturer());
+
+                    BasicPropertyIdentifier id = BasicPropertyIdentifier.initWithRawValue(4);
+                    BasicPropertyIdentifier bad = BasicPropertyIdentifier.initWithRawValue(6000);
+                    Debug.WriteLine(id.getRawValue());
+
+                    //camera.connect();
+
+                    dynamic something = camera.getKnownPropertyIdentifiers();
+                    BasicCameraProperty property = camera.property(BasicPropertyIdentifier.autoExposureMode());
+                    Debug.WriteLine("Property name: " + property.getLocalizedDisplayName());
                 } else
                 {
                     Debug.WriteLine("No cameras");
