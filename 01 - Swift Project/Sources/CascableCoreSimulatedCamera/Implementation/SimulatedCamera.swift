@@ -237,17 +237,19 @@ class SimulatedLiveViewFrame: NSObject, NSCopying, LiveViewFrame {
 
 class SimulatedCameraInitiatedTransfer: NSObject, CameraInitiatedTransferRequest {
 
-    init(transferring data: Data, connectionSpeed: SimulatedConnectionSpeed) {
+    init(transferring data: Data, configuration: SimulatedCameraConfiguration) {
         transferProgress = Progress(totalUnitCount: 0)
         transferProgress.completedUnitCount = 0
         transferProgress.isCancellable = false
         transferProgress.isPausable = false
-        self.connectionSpeed = connectionSpeed
+        self.connectionSpeed = configuration.connectionSpeed
+        self.callbackQueue = configuration.internalCallbackQueue
         self.dataToTransfer = data
     }
 
     let dataToTransfer: Data
     let connectionSpeed: SimulatedConnectionSpeed
+    let callbackQueue: DispatchQueue
     let isValid: Bool = true
     let fileNameHint: String? = nil
     let isOnlyDestinationForImage: Bool = true
@@ -263,7 +265,7 @@ class SimulatedCameraInitiatedTransfer: NSObject, CameraInitiatedTransferRequest
 
     func executeTransfer(for representations: CameraInitiatedTransferRepresentation,
                          completionHandler: @escaping CameraInitiatedTransferCompletionHandler) {
-        executeTransfer(for: representations, completionQueue: .main, completionHandler: completionHandler)
+        executeTransfer(for: representations, completionQueue: callbackQueue, completionHandler: completionHandler)
     }
 
     func executeTransfer(for representations: CameraInitiatedTransferRepresentation,
@@ -412,10 +414,11 @@ class SimulatedCamera: NSObject, Camera {
         connectionState = .connectionInProgress
         let loadingPropertiesTime: TimeInterval = (configuration.connectionSpeed.smallOperationDuration * 20.0)
         var didCancelAuth: Bool = false
+        let configuration = self.configuration
 
         let completeConnection = {
             guard !didCancelAuth else { return }
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + loadingPropertiesTime) {
+            configuration.internalCallbackQueue.asyncAfter(deadline: DispatchTime.now() + loadingPropertiesTime) {
 
                 //self.willChangeValue(for: \.knownPropertyIdentifiers)
                 let bundle = Bundle.forLocalizations
@@ -525,21 +528,21 @@ class SimulatedCamera: NSObject, Camera {
                     }
                 })
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + self.configuration.connectionSpeed.smallOperationDuration) {
+                configuration.internalCallbackQueue.asyncAfter(deadline: .now() + self.configuration.connectionSpeed.smallOperationDuration) {
                     canAcceptAuthSubmission = true
                     authenticationRequestCallback(retryContext)
                 }
             }
         })
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + configuration.connectionSpeed.smallOperationDuration) {
+        configuration.internalCallbackQueue.asyncAfter(deadline: .now() + configuration.connectionSpeed.smallOperationDuration) {
             canAcceptAuthSubmission = true
             authenticationRequestCallback(initialContext)
         }
 
         // If the authentication is an on-camera pair, simulate the user accepting on the camera after a few seconds.
         if case .pairOnCamera = configuration.connectionAuthentication {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            configuration.internalCallbackQueue.asyncAfter(deadline: .now() + 3.0) {
                 guard canAcceptAuthSubmission else { return }
                 canAcceptAuthSubmission = false
                 authenticationResolvedCallback()
@@ -560,7 +563,7 @@ class SimulatedCamera: NSObject, Camera {
         }
 
         connectionState = .disconnectionInProgress
-        let queue = queue ?? .main
+        let queue = queue ?? configuration.internalCallbackQueue
 
         endStream(on: queue) { error in
             self.disconnectionWasExpected = true
@@ -620,17 +623,18 @@ class SimulatedCamera: NSObject, Camera {
 
             // This is a bit sneaky - rather than chaining it in, we just perform it with a shorter duration than the switch.
             if isRecordingVideo, !categories.contains(.videoRecording) {
-                DispatchQueue.main.asyncAfter(deadline: .now() + configuration.connectionSpeed.smallOperationDuration) {
+                configuration.internalCallbackQueue.asyncAfter(deadline: .now() + configuration.connectionSpeed.smallOperationDuration) {
                     self.endSimulatedVideoRecording()
                 }
             }
 
+            let configuration = self.configuration
             if (!categories.contains(.stillsShooting) && !categories.contains(.videoRecording)) && liveViewStreamActive {
                 endStream(handler: { _ in
-                    DispatchQueue.main.asyncAfter(deadline: .now() + switchDuration, execute: changeCategories)
+                    configuration.internalCallbackQueue.asyncAfter(deadline: .now() + switchDuration, execute: changeCategories)
                 })
             } else {
-                DispatchQueue.main.asyncAfter(deadline: .now() + switchDuration, execute: changeCategories)
+                configuration.internalCallbackQueue.asyncAfter(deadline: .now() + switchDuration, execute: changeCategories)
             }
 
         } else {
@@ -641,7 +645,7 @@ class SimulatedCamera: NSObject, Camera {
     let autoexposureResult: AEResult? = nil
 
     func updateClock(to date: Date, completionCallback block: ErrorableOperationCallback? = nil) {
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + configuration.connectionSpeed.mediumOperationDuration) {
+        configuration.internalCallbackQueue.asyncAfter(deadline: DispatchTime.now() + configuration.connectionSpeed.mediumOperationDuration) {
             block?(nil)
         }
     }
@@ -699,6 +703,7 @@ class SimulatedCamera: NSObject, Camera {
 
         let imageUrls = configuration.liveViewImageFrames
         let operationDuration = configuration.connectionSpeed.largeOperationDuration
+        let configuration = self.configuration
 
         // Off the main queue to load the files.
         DispatchQueue.global(qos: .userInitiated).async {
@@ -726,14 +731,14 @@ class SimulatedCamera: NSObject, Camera {
             })
 
             // Back onto the main queue to set up state and schedule the timer.
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + operationDuration) {
+            configuration.internalCallbackQueue.asyncAfter(deadline: DispatchTime.now() + operationDuration) {
 
                 guard !frames.isEmpty else {
                     terminationHandler(.failed, NSError(cblErrorCode: .invalidInput))
                     return
                 }
 
-                let queue = deliveryQueue ?? .main
+                let queue = deliveryQueue ?? configuration.internalCallbackQueue
                 self.lvDelivery = delivery
                 self.lvDeliveryQueue = queue
                 self.terminationHandler = terminationHandler
@@ -747,7 +752,7 @@ class SimulatedCamera: NSObject, Camera {
                 self.hasReceivedLiveViewFrameReadySignal = true
                 let timer = Timer(timeInterval: 1.0 / 30.0, repeats: true, block: { timer in
                     guard self.hasReceivedLiveViewFrameReadySignal else { return }
-                    let queue = self.lvDeliveryQueue ?? .main
+                    let queue = self.lvDeliveryQueue ?? configuration.internalCallbackQueue
                     guard let delivery = self.lvDelivery else { return }
                     self.hasReceivedLiveViewFrameReadySignal = false
                     let frame = frames[frameIndex]
@@ -764,6 +769,7 @@ class SimulatedCamera: NSObject, Camera {
                 })
 
                 self.liveViewDeliveryTimer = timer
+                #warning("RunLoop.main may not be available")
                 RunLoop.main.add(timer, forMode: .common)
             }
         }
@@ -781,7 +787,11 @@ class SimulatedCamera: NSObject, Camera {
         endStream(handler: nil)
     }
 
-    private func endStream(on callbackQueue: DispatchQueue = .main, handler: ErrorableOperationCallback?) {
+    private func endStream(handler: ErrorableOperationCallback?) {
+        endStream(on: configuration.internalCallbackQueue, handler: handler)
+    }
+
+    private func endStream(on callbackQueue: DispatchQueue, handler: ErrorableOperationCallback?) {
         let time: Double = configuration.connectionSpeed.largeOperationDuration
         callbackQueue.asyncAfter(deadline: DispatchTime.now() + time) {
             self.resetLiveViewState(reason: .endedNormally)
@@ -905,7 +915,7 @@ class SimulatedCamera: NSObject, Camera {
             return
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + configuration.connectionSpeed.largeOperationDuration) {
+        configuration.internalCallbackQueue.asyncAfter(deadline: .now() + configuration.connectionSpeed.largeOperationDuration) {
             self.autoFocusEngaged = true
             block?(nil)
         }
@@ -922,7 +932,7 @@ class SimulatedCamera: NSObject, Camera {
             return
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + configuration.connectionSpeed.smallOperationDuration) {
+        configuration.internalCallbackQueue.asyncAfter(deadline: .now() + configuration.connectionSpeed.smallOperationDuration) {
             self.autoFocusEngaged = false
             block?(nil)
         }
@@ -941,7 +951,7 @@ class SimulatedCamera: NSObject, Camera {
             return
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + configuration.connectionSpeed.largeOperationDuration) {
+        configuration.internalCallbackQueue.asyncAfter(deadline: .now() + configuration.connectionSpeed.largeOperationDuration) {
             self.shutterEngaged = true
             block?(nil)
         }
@@ -958,11 +968,12 @@ class SimulatedCamera: NSObject, Camera {
             return
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + configuration.connectionSpeed.smallOperationDuration) {
+        let configuration = self.configuration
+        configuration.internalCallbackQueue.asyncAfter(deadline: .now() + configuration.connectionSpeed.smallOperationDuration) {
             self.shutterEngaged = false
             block?(nil)
 
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1.0) {
+            configuration.internalCallbackQueue.asyncAfter(deadline: DispatchTime.now() + 1.0) {
                 self.triggerShotPreview()
             }
         }
@@ -974,10 +985,11 @@ class SimulatedCamera: NSObject, Camera {
             return
         }
 
-        DispatchQueue.main.async {
+        let configuration = self.configuration
+        configuration.internalCallbackQueue.async {
             block?(nil)
 
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1.0) {
+            configuration.internalCallbackQueue.asyncAfter(deadline: DispatchTime.now() + 1.0) {
                 self.triggerShotPreview()
             }
         }
@@ -999,7 +1011,7 @@ class SimulatedCamera: NSObject, Camera {
             return
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + configuration.connectionSpeed.largeOperationDuration) {
+        configuration.internalCallbackQueue.asyncAfter(deadline: .now() + configuration.connectionSpeed.largeOperationDuration) {
             self.startSimulatedVideoRecording()
             completionHandler?(nil)
         }
@@ -1011,7 +1023,7 @@ class SimulatedCamera: NSObject, Camera {
             return
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + configuration.connectionSpeed.largeOperationDuration) {
+        configuration.internalCallbackQueue.asyncAfter(deadline: .now() + configuration.connectionSpeed.largeOperationDuration) {
             self.endSimulatedVideoRecording()
             completionHandler?(nil)
         }
@@ -1029,6 +1041,7 @@ class SimulatedCamera: NSObject, Camera {
             let interval = now.timeIntervalSince(recordingStartDate).rounded()
             self.currentVideoTimerValue = SimulatedVideoTimerValue(type: .countingUp, value: interval)
         })
+        #warning("RunLoop.main may not be available")
         RunLoop.main.add(timer, forMode: .common)
         videoRecordingTimer = timer
         currentVideoTimerValue = SimulatedVideoTimerValue(type: .countingUp, value: 0.0)
@@ -1059,8 +1072,7 @@ class SimulatedCamera: NSObject, Camera {
     func triggerShotPreview() {
         guard let imageUrl = configuration.liveViewImageFrames.first else { return }
         guard let imageData = try? Data(contentsOf: imageUrl) else { return }
-        let shotPreviewDelivery = SimulatedCameraInitiatedTransfer(transferring: imageData,
-                                                                   connectionSpeed: configuration.connectionSpeed)
+        let shotPreviewDelivery = SimulatedCameraInitiatedTransfer(transferring: imageData, configuration: configuration)
         for (_, handler) in transferHandlers {
             handler(shotPreviewDelivery)
         }

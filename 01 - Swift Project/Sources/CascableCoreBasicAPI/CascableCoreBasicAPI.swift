@@ -22,6 +22,12 @@ import Foundation
  but this proof-of-concept project is just that - a proof-of-concept. Over time, we hope that the C++ interop will
  improve *and* we get time to flesh this project out further. In the meantime, here we are.
 
+ Other things to be aware of:
+
+ - Public properties with private setters (public private(set) var myString: String) get their setters exposed to C++.
+
+ - When run in the context of a C# app, `DispatchQueue.main` doesn't function as you're used to. This is to be expected.
+
  */
 
 import CascableCore
@@ -57,12 +63,18 @@ public struct BasicSimulatedCameraConfiguration {
     /// camera discovery).
     public func apply() {
         var config = SimulatedCameraConfiguration.default
+        config.internalCallbackQueue = Self.basicCameraQueue
         config.manufacturer = manufacturer
         config.model = model
         config.identifier = identifier
         config.connectionAuthentication = .none
         config.apply()
     }
+
+    // We make our own internal queue because DispatchQueue.main may not be available in certain contexts. Long-term,
+    // we should try to figure out a way to integrate into a Windows app's lifecycle properly.
+    private static let basicCameraQueue: DispatchQueue = DispatchQueue(label: "Basic Camera", qos: .default,
+        autoreleaseFrequency: .inherit, target: .global(qos: .default))
 }
 
 /// Discovering cameras.
@@ -112,7 +124,7 @@ public class BasicCameraDiscovery {
 
 extension BasicCameraDiscovery: CameraDiscoveryProviderDelegate {
     public func cameraDiscoveryProvider(_ provider: CameraDiscoveryProvider, didDiscover camera: Camera) {
-        currentSimulatedCamera = BasicCamera(wrapping: camera)
+        currentSimulatedCamera = BasicCamera(wrapping: camera, callbackQueue: SimulatedCameraDiscovery.shared.configuration.internalCallbackQueue)
     }
 
     public func cameraDiscoveryProvider(_ provider: CameraDiscoveryProvider, didLoseSightOf camera: Camera) {
@@ -129,7 +141,11 @@ public class BasicCamera: Equatable {
     }
 
     internal let wrappedCamera: Camera
-    internal init(wrapping camera: Camera) { wrappedCamera = camera }
+    internal let queue: DispatchQueue
+    internal init(wrapping camera: Camera, callbackQueue: DispatchQueue) {
+        wrappedCamera = camera
+        queue = callbackQueue
+    }
 
     // Basics
 
@@ -165,7 +181,7 @@ public class BasicCamera: Equatable {
     public func disconnect() {
         wrappedCamera.disconnect({ error in
             if let error { print("Disconnection failed: \(error)") }
-        }, callbackQueue: .main)
+        }, callbackQueue: queue)
     }
 
     // TODO: Functionality and categories
@@ -340,7 +356,9 @@ public class BasicCameraProperty {
             return
         }
 
-        wrappedProperty.setValue(newValue.wrappedValue, completionQueue: .main) { error in
+        guard let parentCamera else { return }
+
+        wrappedProperty.setValue(newValue.wrappedValue, completionQueue: parentCamera.queue) { error in
             if let error { print("Setting value of property failed: \(error)") }
         }
     }

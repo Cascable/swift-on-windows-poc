@@ -125,6 +125,7 @@ internal class SimulatedCameraProperty: NSObject, CameraProperty {
         self.identifier = identifier
         self.camera = camera
         self.connectionSpeed = camera.configuration.connectionSpeed
+        self.callbackQueue = camera.configuration.internalCallbackQueue
         self.localizedDisplayName = localizedDisplayName
         self.valueSetType = (validSettableValues?.isEmpty == false) ? valueSetType : []
         self.settableSetType = valueSetType
@@ -135,6 +136,7 @@ internal class SimulatedCameraProperty: NSObject, CameraProperty {
     // MARK: - Public API
 
     private(set) var camera: Camera?
+    private let callbackQueue: DispatchQueue
 
     let identifier: PropertyIdentifier
     var category: PropertyCategory { return identifier.category }
@@ -162,7 +164,7 @@ internal class SimulatedCameraProperty: NSObject, CameraProperty {
     }
 
     func setValue(_ newValue: PropertyValue, completionHandler: @escaping ErrorableOperationCallback) {
-        setValue(newValue, completionQueue: .main, completionHandler: completionHandler)
+        setValue(newValue, completionQueue: callbackQueue, completionHandler: completionHandler)
     }
 
     func setValue(_ newValue: PropertyValue, completionQueue queue: DispatchQueue, completionHandler: @escaping ErrorableOperationCallback) {
@@ -193,7 +195,7 @@ internal class SimulatedCameraProperty: NSObject, CameraProperty {
         pendingValue = newValue
         notifyObservers(type: .pendingValue)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + connectionSpeed.smallOperationDuration) {
+        callbackQueue.asyncAfter(deadline: .now() + connectionSpeed.smallOperationDuration) {
 
             self.pendingValue = nil
             self.notifyObservers(type: .pendingValue)
@@ -206,7 +208,7 @@ internal class SimulatedCameraProperty: NSObject, CameraProperty {
     }
 
     func incrementValue(completionHandler: @escaping ErrorableOperationCallback) {
-        incrementValue(completionQueue: .main, completionHandler: completionHandler)
+        incrementValue(completionQueue: callbackQueue, completionHandler: completionHandler)
     }
 
     func incrementValue(completionQueue: DispatchQueue, completionHandler: @escaping ErrorableOperationCallback) {
@@ -235,7 +237,7 @@ internal class SimulatedCameraProperty: NSObject, CameraProperty {
         if nextIndex >= validSettableValues.endIndex { nextIndex = validSettableValues.endIndex - 1 }
         let nextValue = validSettableValues[nextIndex]
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + connectionSpeed.smallOperationDuration) {
+        callbackQueue.asyncAfter(deadline: .now() + connectionSpeed.smallOperationDuration) {
             self.currentValue = nextValue
             self.notifyObservers(type: .value)
             completionQueue.async { completionHandler(nil) }
@@ -243,7 +245,7 @@ internal class SimulatedCameraProperty: NSObject, CameraProperty {
     }
 
     func decrementValue(completionHandler: @escaping ErrorableOperationCallback) {
-        decrementValue(completionQueue: .main, completionHandler: completionHandler)
+        decrementValue(completionQueue: callbackQueue, completionHandler: completionHandler)
     }
 
     func decrementValue(completionQueue: DispatchQueue, completionHandler: @escaping ErrorableOperationCallback) {
@@ -272,7 +274,7 @@ internal class SimulatedCameraProperty: NSObject, CameraProperty {
         if previousIndex < 0 { previousIndex = 0 }
         let previousValue = validSettableValues[previousIndex]
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + connectionSpeed.smallOperationDuration) {
+        callbackQueue.asyncAfter(deadline: .now() + connectionSpeed.smallOperationDuration) {
             self.currentValue = previousValue
             self.notifyObservers(type: .value)
             completionQueue.async { completionHandler(nil) }

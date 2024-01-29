@@ -111,13 +111,14 @@ class SimulatedCameraFolder: NSObject, FileSystemFolderItem {
 
         let urlToEnumerate = url
         childrenLoading = true
+        let configuration = self.configuration
         DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + configuration.connectionSpeed.mediumOperationDuration) {
             guard let enumerator = FileManager.default.enumerator(at: urlToEnumerate,
                                                                   includingPropertiesForKeys: [.isDirectoryKey],
                                                                   options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants, .skipsPackageDescendants],
                                                                   errorHandler: nil) else
             {
-                DispatchQueue.main.async {
+                configuration.internalCallbackQueue.async {
                     self.childrenLoading = false
                     callback(NSError(cblErrorCode: .deviceBusy))
                 }
@@ -134,7 +135,7 @@ class SimulatedCameraFolder: NSObject, FileSystemFolderItem {
                 }
             }
 
-            DispatchQueue.main.async {
+            configuration.internalCallbackQueue.async {
                 self.children = newChildren
                 self.childrenLoaded = true
                 self.childrenLoading = false
@@ -160,7 +161,7 @@ class SimulatedCameraFolder: NSObject, FileSystemFolderItem {
     }
 
     func fetchThumbnail(preflightBlock preflight: @escaping PreviewImagePreflight, thumbnailDeliveryBlock delivery: @escaping PreviewImageDelivery) {
-        fetchThumbnail(preflightBlock: preflight, thumbnailDeliveryBlock: delivery, deliveryQueue: .main)
+        fetchThumbnail(preflightBlock: preflight, thumbnailDeliveryBlock: delivery, deliveryQueue: configuration.internalCallbackQueue)
     }
 
     func fetchThumbnail(preflightBlock preflight: @escaping PreviewImagePreflight, thumbnailDeliveryBlock delivery: @escaping PreviewImageDelivery, deliveryQueue: DispatchQueue) {
@@ -171,7 +172,7 @@ class SimulatedCameraFolder: NSObject, FileSystemFolderItem {
     }
 
     func fetchEXIFMetadata(preflightBlock preflight: @escaping EXIFPreflight, metadataDeliveryBlock delivery: @escaping EXIFDelivery) {
-        fetchEXIFMetadata(preflightBlock: preflight, metadataDeliveryBlock: delivery, deliveryQueue: .main)
+        fetchEXIFMetadata(preflightBlock: preflight, metadataDeliveryBlock: delivery, deliveryQueue: configuration.internalCallbackQueue)
     }
 
     func fetchEXIFMetadata(preflightBlock preflight: @escaping EXIFPreflight, metadataDeliveryBlock delivery: @escaping EXIFDelivery, deliveryQueue: DispatchQueue) {
@@ -182,7 +183,7 @@ class SimulatedCameraFolder: NSObject, FileSystemFolderItem {
     }
 
     func fetchPreview(preflightBlock preflight: @escaping PreviewImagePreflight, previewDeliveryBlock delivery: @escaping PreviewImageDelivery) {
-        fetchPreview(preflightBlock: preflight, previewDeliveryBlock: delivery, deliveryQueue: .main)
+        fetchPreview(preflightBlock: preflight, previewDeliveryBlock: delivery, deliveryQueue: configuration.internalCallbackQueue)
     }
 
     func fetchPreview(preflightBlock preflight: @escaping PreviewImagePreflight, previewDeliveryBlock delivery: @escaping PreviewImageDelivery, deliveryQueue: DispatchQueue) {
@@ -193,7 +194,7 @@ class SimulatedCameraFolder: NSObject, FileSystemFolderItem {
     }
 
     func streamItem(preflightBlock preflight: @escaping FileStreamPreflight, chunkDeliveryBlock chunkDelivery: @escaping FileStreamChunkDelivery, complete: @escaping FileStreamCompletion) -> Progress {
-        return streamItem(preflightBlock: preflight, preflightQueue: .main, chunkDeliveryBlock: chunkDelivery, deliveryQueue: .main, complete: complete, complete: .main)
+        return streamItem(preflightBlock: preflight, preflightQueue: configuration.internalCallbackQueue, chunkDeliveryBlock: chunkDelivery, deliveryQueue: configuration.internalCallbackQueue, complete: complete, complete: configuration.internalCallbackQueue)
     }
 
     func streamItem(preflightBlock preflight: @escaping FileStreamPreflight, preflightQueue: DispatchQueue, chunkDeliveryBlock chunkDelivery: @escaping FileStreamChunkDelivery, deliveryQueue: DispatchQueue, complete: @escaping FileStreamCompletion, complete completeQueue: DispatchQueue) -> Progress {
@@ -276,7 +277,7 @@ class SimulatedCameraFile: NSObject, FileSystemItem {
     // Streaming
 
     func fetchThumbnail(preflightBlock preflight: @escaping PreviewImagePreflight, thumbnailDeliveryBlock delivery: @escaping PreviewImageDelivery) {
-        fetchThumbnail(preflightBlock: preflight, thumbnailDeliveryBlock: delivery, deliveryQueue: .main)
+        fetchThumbnail(preflightBlock: preflight, thumbnailDeliveryBlock: delivery, deliveryQueue: configuration.internalCallbackQueue)
     }
 
     func fetchThumbnail(preflightBlock preflight: @escaping PreviewImagePreflight, thumbnailDeliveryBlock delivery: @escaping PreviewImageDelivery, deliveryQueue: DispatchQueue) {
@@ -307,7 +308,7 @@ class SimulatedCameraFile: NSObject, FileSystemItem {
     }
 
     func fetchEXIFMetadata(preflightBlock preflight: @escaping EXIFPreflight, metadataDeliveryBlock delivery: @escaping EXIFDelivery) {
-        fetchEXIFMetadata(preflightBlock: preflight, metadataDeliveryBlock: delivery, deliveryQueue: .main)
+        fetchEXIFMetadata(preflightBlock: preflight, metadataDeliveryBlock: delivery, deliveryQueue: configuration.internalCallbackQueue)
     }
 
     func fetchEXIFMetadata(preflightBlock preflight: @escaping EXIFPreflight, metadataDeliveryBlock delivery: @escaping EXIFDelivery, deliveryQueue: DispatchQueue) {
@@ -363,7 +364,7 @@ class SimulatedCameraFile: NSObject, FileSystemItem {
     }
 
     func fetchPreview(preflightBlock preflight: @escaping PreviewImagePreflight, previewDeliveryBlock delivery: @escaping PreviewImageDelivery) {
-        fetchPreview(preflightBlock: preflight, previewDeliveryBlock: delivery, deliveryQueue: .main)
+        fetchPreview(preflightBlock: preflight, previewDeliveryBlock: delivery, deliveryQueue: configuration.internalCallbackQueue)
     }
 
     func fetchPreview(preflightBlock preflight: @escaping PreviewImagePreflight, previewDeliveryBlock delivery: @escaping PreviewImageDelivery, deliveryQueue: DispatchQueue) {
@@ -394,7 +395,7 @@ class SimulatedCameraFile: NSObject, FileSystemItem {
     }
 
     func streamItem(preflightBlock preflight: @escaping FileStreamPreflight, chunkDeliveryBlock chunkDelivery: @escaping FileStreamChunkDelivery, complete: @escaping FileStreamCompletion) -> Progress {
-        return streamItem(preflightBlock: preflight, preflightQueue: .main, chunkDeliveryBlock: chunkDelivery, deliveryQueue: .main, complete: complete, complete: .main)
+        return streamItem(preflightBlock: preflight, preflightQueue: configuration.internalCallbackQueue, chunkDeliveryBlock: chunkDelivery, deliveryQueue: configuration.internalCallbackQueue, complete: complete, complete: configuration.internalCallbackQueue)
     }
 
     func streamItem(preflightBlock preflight: @escaping FileStreamPreflight, preflightQueue: DispatchQueue, chunkDeliveryBlock chunkDelivery: @escaping FileStreamChunkDelivery, deliveryQueue: DispatchQueue, complete: @escaping FileStreamCompletion, complete completeQueue: DispatchQueue) -> Progress {
@@ -403,6 +404,7 @@ class SimulatedCameraFile: NSObject, FileSystemItem {
         progress.isCancellable = false
         progress.isPausable = false
         progress.kind = .file
+        let configuration = self.configuration
 
         preflightQueue.async {
             let context = preflight(self)
@@ -426,7 +428,7 @@ class SimulatedCameraFile: NSObject, FileSystemItem {
 
             let length = Int(handle.seekToEndOfFile())
             handle.seek(toFileOffset: 0)
-            DispatchQueue.main.async { progress.completedUnitCount = Int64(length) }
+            configuration.internalCallbackQueue.async { progress.completedUnitCount = Int64(length) }
 
             self.recursivelyDeliver(from: handle, of: length, progress: progress, context: context, to: chunkDelivery,
                                     on: deliveryQueue, then: { error in
@@ -444,11 +446,12 @@ class SimulatedCameraFile: NSObject, FileSystemItem {
 
         let thisChunk = fileHandle.readData(ofLength: 1024 * 1024)
         let wasLast = fileHandle.offsetInFile >= length
+        let configuration = self.configuration
 
         deliveryQueue.asyncAfter(deadline: .now() + configuration.connectionSpeed.largeOperationDuration) {
             let result = chunkDelivery(self, thisChunk, context)
             let bytesRead = thisChunk.count
-            if result == .continue { DispatchQueue.main.async { progress.totalUnitCount = Int64(bytesRead) } }
+            if result == .continue { configuration.internalCallbackQueue.async { progress.totalUnitCount = Int64(bytesRead) } }
             if wasLast {
                 completionHandler(nil)
             } else if result == .cancel {

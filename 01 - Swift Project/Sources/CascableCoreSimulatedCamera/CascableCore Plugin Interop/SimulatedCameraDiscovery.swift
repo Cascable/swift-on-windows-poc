@@ -29,7 +29,7 @@ public class SimulatedCameraDiscovery: CameraDiscoveryProvider, SimulatedCameraD
     public func startDiscovery(in discoveryMode: CameraDiscoveryMode, clientName: String) {
         isDiscovering = true
         let configuration = self.configuration
-        DispatchQueue.main.asyncAfter(deadline: .now() + configuration.connectionSpeed.largeOperationDuration) {
+        configuration.internalCallbackQueue.asyncAfter(deadline: .now() + configuration.connectionSpeed.largeOperationDuration) {
             guard self.isDiscovering else { return }
 
             let canBeDiscovered: Bool = {
@@ -64,7 +64,7 @@ public class SimulatedCameraDiscovery: CameraDiscoveryProvider, SimulatedCameraD
 
     // MARK: - Internal API
 
-    private var configuration: SimulatedCameraConfiguration = .default
+    public private(set) var configuration: SimulatedCameraConfiguration = .default
 
     internal func applyConfiguration(_ config: SimulatedCameraConfiguration) {
         configuration = config

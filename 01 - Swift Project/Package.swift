@@ -34,7 +34,7 @@ let package = Package(
                     .unsafeFlags(["-Xfrontend", "-validate-tbd-against-ir=none"])
                 ]),
         .testTarget(name: "CascableCore Simulated Camera Tests", // Simulated camera tests.
-                    dependencies: ["CascableCoreSimulatedCamera"],
+                    dependencies: ["CascableCoreSimulatedCamera", "CascableCoreBasicAPI"],
                     swiftSettings: [.interoperabilityMode(.Cxx)]),
         .target(name: "CascableCoreBasicAPI", // A "basic" CascableCore API, working around the limitations of the C++ interop.
                 dependencies: ["CascableCoreSimulatedCamera"],

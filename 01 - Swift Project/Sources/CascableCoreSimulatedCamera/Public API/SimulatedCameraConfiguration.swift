@@ -50,6 +50,10 @@ public struct SimulatedCameraConfiguration {
     /// How the simulated camera grants filesystem access. Defaults to `.alongsideRemoteShooting`.
     public var fileSystemAccess: SimulatedFileSystemAccess
 
+    /// The internal dispatch queue to be used for internal and the default for public callbacks. Leave this as the main
+    /// queue unless you have a specific reason to change it.
+    public var internalCallbackQueue: DispatchQueue
+
     /// Apply the settings for newly-discovered simulated cameras. Changes won't be applied to simulated cameras
     /// that have already been discovered or connected to (i.e., you should apply your configuration before starting
     /// camera discovery).
@@ -76,7 +80,8 @@ public extension SimulatedCameraConfiguration {
                                             exposurePropertyType: .enumerated,
                                             liveViewImageFrames: imageUrls,
                                             storageFileSystemRoot: nil,
-                                            fileSystemAccess: .alongsideRemoteShooting)
+                                            fileSystemAccess: .alongsideRemoteShooting,
+                                            internalCallbackQueue: .main)
     }
 }
 

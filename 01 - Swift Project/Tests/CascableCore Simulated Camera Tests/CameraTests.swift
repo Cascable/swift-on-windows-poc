@@ -2,11 +2,28 @@ import Foundation
 import XCTest
 import CascableCore
 @testable import CascableCoreSimulatedCamera
+@testable import CascableCoreBasicAPI
 
 class CameraTests: XCTestCase, CameraDiscoveryProviderDelegate {
 
     var gotCameraExpectation: XCTestExpectation? = nil
     var discoveredCamera: Camera? = nil
+
+    func testBasicCameraDiscovery() throws {
+        BasicSimulatedCameraConfiguration.defaultConfiguration().apply()
+
+        let basicDiscovery = BasicCameraDiscovery.sharedInstance()
+        basicDiscovery.startDiscovery(clientName: "Windows Test Runner")
+
+        let waitedABitExpectation = XCTestExpectation(description: "Waited for discovery")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+            waitedABitExpectation.fulfill();
+        }
+
+        wait(for: [waitedABitExpectation], timeout: 5.0)
+        print(basicDiscovery.visibleCameras);
+        print(basicDiscovery.visibleCameras.first?.friendlyDisplayName)
+    }
 
     func testCameraDiscoveryAndConnection() throws {
         let modelName = "Windows Camera"
