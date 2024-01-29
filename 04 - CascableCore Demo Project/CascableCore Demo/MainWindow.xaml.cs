@@ -14,6 +14,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 
 using ManagedCascableCoreBasicAPI;
+using System.Diagnostics;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -30,11 +31,30 @@ namespace CascableCore_Demo
             this.InitializeComponent();
         }
 
+        BasicCameraDiscovery discovery = BasicCameraDiscovery.sharedInstance();
+
         private void myButton_Click(object sender, RoutedEventArgs e)
         {
-            BasicSimulatedCameraConfiguration config = BasicSimulatedCameraConfiguration.defaultConfiguration();
-            BasicPropertyIdentifier property = BasicPropertyIdentifier.afSystem();
-            myButton.Content = String.Format("{0} {1}", config.getManufacturer(), config.getModel());
+            if (discovery.getDiscoveryRunning())
+            {
+                ICollection<BasicCamera> cameras = discovery.getVisibleCameras();
+                if (cameras.Count > 0)
+                {
+                    BasicCamera camera = cameras.First();
+                    Debug.WriteLine("Got camera: " + camera.getFriendlyDisplayName());
+                } else
+                {
+                    Debug.WriteLine("No cameras");
+                }
+            } else
+            {
+                BasicSimulatedCameraConfiguration config = BasicSimulatedCameraConfiguration.defaultConfiguration();
+                config.setModel("My Cool Camera");
+                myButton.Content = string.Format("{0} {1}", config.getManufacturer(), config.getModel());
+                config.apply();
+                discovery.startDiscovery("CascableCore Demo");
+                Debug.WriteLine("Starting discovery");
+            }
         }
     }
 }

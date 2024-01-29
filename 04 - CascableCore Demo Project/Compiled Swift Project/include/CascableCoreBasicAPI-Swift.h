@@ -6236,7 +6236,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC18friendlyIdentifierSSSgvg) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 80 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 88 / sizeof(void *));
   return swift::_impl::_impl_Optional<swift::String>::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
     _impl::swift_interop_returnDirect_CascableCoreBasicAPI_uint64_t_0_8_uint64_t_8_16(result, (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
   });
@@ -6251,7 +6251,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC9connectedSbvg) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 88 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 96 / sizeof(void *));
   return (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
   }
   SWIFT_INLINE_THUNK swift::Optional<BasicDeviceInfo> BasicCamera::getDeviceInfo() {
@@ -6264,7 +6264,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC10deviceInfoAA0c6DeviceG0CSgvg) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 96 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 104 / sizeof(void *));
   return swift::_impl::_impl_Optional<BasicDeviceInfo>::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
     _impl::swift_interop_returnDirect_CascableCoreBasicAPI_uint64_t_0_8(result, (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
   });
@@ -6279,7 +6279,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC19friendlyDisplayNameSSSgvg) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 104 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 112 / sizeof(void *));
   return swift::_impl::_impl_Optional<swift::String>::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
     _impl::swift_interop_returnDirect_CascableCoreBasicAPI_uint64_t_0_8_uint64_t_8_16(result, (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
   });
@@ -6294,7 +6294,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC7connectyyF) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 112 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 120 / sizeof(void *));
   return (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
   }
   SWIFT_INLINE_THUNK void BasicCamera::disconnect() {
@@ -6307,7 +6307,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC10disconnectyyF) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 120 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 128 / sizeof(void *));
   return (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
   }
   SWIFT_INLINE_THUNK swift::Array<BasicPropertyIdentifier> BasicCamera::getKnownPropertyIdentifiers() {
@@ -6320,7 +6320,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC24knownPropertyIdentifiersSayAA0cG10IdentifierOGvg) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 128 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 136 / sizeof(void *));
   return swift::_impl::_impl_Array<BasicPropertyIdentifier>::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
     _impl::swift_interop_returnDirect_CascableCoreBasicAPI_void_ptr_0_8(result, (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
   });
@@ -6335,7 +6335,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC8property4withAA0cE8PropertyCAA0cH10IdentifierO_tF) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 136 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 144 / sizeof(void *));
   return _impl::_impl_BasicCameraProperty::makeRetained((* fptrptr_->func)(_impl::swift_interop_passDirect_CascableCoreBasicAPI_uint8_t_0_1(_impl::_impl_BasicPropertyIdentifier::getOpaquePointer(identifier)), ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
   }
   SWIFT_INLINE_THUNK BasicCameraDiscovery BasicCameraDiscovery::sharedInstance() {

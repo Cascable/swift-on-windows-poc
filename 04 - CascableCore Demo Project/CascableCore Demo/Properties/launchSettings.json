@@ -4,7 +4,8 @@
       "commandName": "MsixPackage"
     },
     "CascableCore Demo (Unpackaged)": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "nativeDebugging": true
     }
   }
 }
