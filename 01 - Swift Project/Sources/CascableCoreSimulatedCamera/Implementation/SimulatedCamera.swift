@@ -355,7 +355,26 @@ protocol SimulatedCameraDelegate: AnyObject {
     func simulatedCameraDidDisconnect(_ camera: SimulatedCamera)
 }
 
-class SimulatedCamera: NSObject, Camera {
+class SimulatedCameraPropertyStore {
+    private var store: [SimulatedCameraProperty] = []
+
+    subscript(key: PropertyIdentifier) -> SimulatedCameraProperty? {
+        get { return store.first(where: { $0.identifier == key }) }
+        set(newValue) {
+            if let newValue {
+                 store.append(newValue)
+            } else {
+                store.removeAll(where: { $0.identifier == key })
+            }
+        }
+    }
+
+    var storedProperties: [PropertyIdentifier] {
+        return store.map({ $0.identifier })
+    }
+}
+
+class SimulatedCamera: Camera {
 
     init(configuration: SimulatedCameraConfiguration, clientName: String, transport: CameraTransport) {
         let info = SimulatedCameraInfo(configuration: configuration, clientName: clientName, transport: transport)
@@ -363,6 +382,7 @@ class SimulatedCamera: NSObject, Camera {
         self.service = info
         self.cameraTransport = transport
         self.configuration = configuration
+        self.propertyStore = SimulatedCameraPropertyStore()
     }
 
     weak var simulatedCameraDelegate: SimulatedCameraDelegate?
@@ -801,8 +821,8 @@ class SimulatedCamera: NSObject, Camera {
 
     // MARK: - Modern Property API
 
-    var knownPropertyIdentifiers: [NSNumber] {
-        return propertyStore.keys.map({ NSNumber(value: $0.rawValue) })
+    var knownPropertyIdentifiers: [PropertyIdentifier] {
+        return propertyStore.storedProperties
     }
 
     func property(with identifier: PropertyIdentifier) -> CameraProperty {
@@ -823,7 +843,7 @@ class SimulatedCamera: NSObject, Camera {
 
     // MARK: - Property Internal
 
-    private var propertyStore = [PropertyIdentifier : SimulatedCameraProperty]()
+    private let propertyStore: SimulatedCameraPropertyStore
     //{
         //willSet { willChangeValue(for: \.knownPropertyIdentifiers) }
         //didSet { didChangeValue(for: \.knownPropertyIdentifiers) }

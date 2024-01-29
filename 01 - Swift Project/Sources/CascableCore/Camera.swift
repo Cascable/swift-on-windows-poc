@@ -531,7 +531,7 @@ public protocol CameraProperties {
     // -------------
 
     /// The known property identifiers, encoded as `CBLPropertyIdentifier` values in `NSNumber` objects. Observable with key-value observing.
-    var knownPropertyIdentifiers: [NSNumber] { get }
+    var knownPropertyIdentifiers: [PropertyIdentifier] { get }
 
     /// Returns a property object for the given identifier. If the property is currently unknown, returns an object
     /// with `currentValue`, `validSettableValues`, etc set to `nil`.
