@@ -33,43 +33,58 @@ namespace CascableCore_Demo
         }
 
         BasicCameraDiscovery discovery = BasicCameraDiscovery.sharedInstance();
-     
-        private void myButton_Click(object sender, RoutedEventArgs e)
+
+        private async void myButton_Click(object sender, RoutedEventArgs e)
         {
-            if (discovery.getDiscoveryRunning())
+            BasicSimulatedCameraConfiguration config = BasicSimulatedCameraConfiguration.defaultConfiguration();
+            config.setModel("My Cool Camera");
+            myButton.Content = string.Format("{0} {1}", config.getManufacturer(), config.getModel());
+            config.apply();
+            discovery.startDiscovery("CascableCore Demo");
+            Debug.WriteLine("Starting discovery");
+
+            BasicCamera camera = await PollingUpdater<BasicCameraDiscovery, BasicCamera>.AwaitForNonNil(discovery, TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(4.0), delegate (BasicCameraDiscovery d)
             {
-                ICollection<BasicCamera> cameras = discovery.getVisibleCameras();
-                if (cameras.Count > 0)
-                {
-                    BasicCamera camera = cameras.First();
-                    Debug.WriteLine("Got camera: " + camera.getFriendlyDisplayName());
-                    Debug.WriteLine("Got camera: " + camera.getFriendlyDisplayName());
-                    Debug.WriteLine("Got camera: " + camera.getFriendlyDisplayName());
-                    Debug.WriteLine("Got camera: " + camera.getFriendlyDisplayName());
-                    Debug.WriteLine(camera.getDeviceInfo().getManufacturer());
+                ICollection<BasicCamera> cameras = d.getVisibleCameras();
+                return (cameras.Count == 0 ? null : cameras.First());
+            });
 
-                    BasicPropertyIdentifier id = BasicPropertyIdentifier.initWithRawValue(4);
-                    BasicPropertyIdentifier bad = BasicPropertyIdentifier.initWithRawValue(6000);
-                    Debug.WriteLine(id.getRawValue());
+            Debug.WriteLine("Got camera: " + camera.getFriendlyDisplayName());
+            discovery.stopDiscovery();
 
-                    //camera.connect();
+            dynamic something = camera.getKnownPropertyIdentifiers();
+            BasicCameraProperty property = camera.property(BasicPropertyIdentifier.autoExposureMode());
+            Debug.WriteLine("Property name: " + property.getLocalizedDisplayName());
 
-                    dynamic something = camera.getKnownPropertyIdentifiers();
-                    BasicCameraProperty property = camera.property(BasicPropertyIdentifier.autoExposureMode());
-                    Debug.WriteLine("Property name: " + property.getLocalizedDisplayName());
-                } else
-                {
-                    Debug.WriteLine("No cameras");
-                }
-            } else
+            camera.connect();
+            await PollingUpdater<BasicCamera, bool>.AwaitForTrue(camera, TimeSpan.FromSeconds(0.05), TimeSpan.FromSeconds(4.0), delegate (BasicCamera c)
             {
-                BasicSimulatedCameraConfiguration config = BasicSimulatedCameraConfiguration.defaultConfiguration();
-                config.setModel("My Cool Camera");
-                myButton.Content = string.Format("{0} {1}", config.getManufacturer(), config.getModel());
-                config.apply();
-                discovery.startDiscovery("CascableCore Demo");
-                Debug.WriteLine("Starting discovery");
+                return c.getConnected();
+            });
+
+            Debug.WriteLine("Camera is connected: " + camera.getFriendlyDisplayName());
+            BasicCameraProperty batteryLevel = camera.property(BasicPropertyIdentifier.batteryLevel());
+            Debug.WriteLine("Battery level: " + batteryLevel.getCurrentValue().getLocalizedDisplayValue());
+
+            BasicCameraProperty exposureMode = camera.property(BasicPropertyIdentifier.autoExposureMode());
+            Debug.WriteLine("Exposure mode: " + exposureMode.getCurrentValue().getLocalizedDisplayValue());
+
+            BasicPropertyValue value = exposureMode.getValidSettableValues().First(v => v.getLocalizedDisplayValue() == "M");
+            if (value != null)
+            {
+                exposureMode.setValue(value);
             }
+
+            await PollingUpdater<BasicCameraProperty, bool>.AwaitForTrue(exposureMode, TimeSpan.FromSeconds(0.05), TimeSpan.FromSeconds(4.0), delegate (BasicCameraProperty p)
+            {
+                return p.getCurrentValue()?.getLocalizedDisplayValue() == "M";
+            });
+
+            Debug.WriteLine("Exposure mode: " + exposureMode.getCurrentValue().getLocalizedDisplayValue());
+
+            BasicCameraProperty shutterSpeed = camera.property(BasicPropertyIdentifier.shutterSpeed());
+            Debug.WriteLine("Shutter speed: " + shutterSpeed.getCurrentValue().getLocalizedDisplayValue());
+
         }
     }
 }
