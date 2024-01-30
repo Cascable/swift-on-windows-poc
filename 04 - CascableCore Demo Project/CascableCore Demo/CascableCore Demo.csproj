@@ -3,7 +3,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows10.0.22621.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-    <RootNamespace>CascableCore_Demo</RootNamespace>
+    <RootNamespace>CascableCoreDemo</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x64</Platforms>
     <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
@@ -35,8 +35,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Views\BlankPage1.xaml" />
+    <None Remove="Views\CameraDiscovery.xaml" />
+    <None Remove="Views\ConnectedCamera.xaml" />
+  </ItemGroup>
 	
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.230913002" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
     <Manifest Include="$(ApplicationManifest)" />
@@ -52,6 +59,21 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ManagedCascableCoreBasicAPI\ManagedCascableCoreBasicAPI.vcxproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\BlankPage1.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\ConnectedCamera.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\CameraDiscovery.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <!-- 

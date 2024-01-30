@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Application
-    x:Class="CascableCore_Demo.App"
+    x:Class="CascableCoreDemo.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:CascableCore_Demo">
+    xmlns:local="using:CascableCoreDemo">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

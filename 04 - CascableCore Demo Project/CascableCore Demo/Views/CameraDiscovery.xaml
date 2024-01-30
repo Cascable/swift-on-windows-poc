@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="CascableCoreDemo.Views.CameraDiscovery"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CascableCoreDemo.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock TextAlignment="Center" Margin="0,0,0,10" FontWeight="Bold" FontSize="24">CascableCore Demo</TextBlock>
+        <TextBlock MaxWidth="400" TextWrapping="WrapWholeWords" TextAlignment="Center" Margin="0,0,0,10">This project is a proof-of-concept to build a C# application that calls into a Swift framework.</TextBlock>
+        <TextBlock MaxWidth="400" TextWrapping="WrapWholeWords" TextAlignment="Center" Margin="0,0,0,10">Click "Search for Camera..." to get started.</TextBlock>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <ProgressRing Margin="0,0,10,0" VerticalAlignment="Center" Width="20" Height="20" Visibility="{x:Bind viewModel.SpinnerVisibility, Mode=OneWay}"></ProgressRing>
+            <Button x:Name="searchButton" VerticalAlignment="Center" HorizontalAlignment="Center" Click="searchButton_Click" IsEnabled="{x:Bind viewModel.ButtonEnabled, Mode=OneWay}" Content="{x:Bind viewModel.ButtonTitle, Mode=OneWay}"></Button>
+        </StackPanel>
+    </StackPanel>
+</Page>

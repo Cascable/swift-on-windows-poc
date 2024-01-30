@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace CascableCore_Demo
+namespace CascableCoreDemo
 {
     internal class PollingUpdater<T, Result>
     {
@@ -37,7 +37,7 @@ namespace CascableCore_Demo
             this.inValue = inValue;
             this.comparator = comparator;
             source = new TaskCompletionSource<Result>();
-            timer = new Timer(pollInterval.Milliseconds);
+            timer = new Timer(pollInterval.TotalMilliseconds);
             timer.AutoReset = true;
             timer.Elapsed += OnTimerEvent;
             timer.Start();
