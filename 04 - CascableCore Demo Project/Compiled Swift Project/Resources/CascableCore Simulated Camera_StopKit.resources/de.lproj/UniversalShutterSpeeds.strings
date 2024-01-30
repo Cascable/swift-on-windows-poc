@@ -1,0 +1,13 @@
+/*
+ This file contains translations for shutter speed values.
+ */
+
+"OneOver" = "⅟";
+"BulbValue" = "Bulb";
+"AutoValue" = "Auto";
+"FlashSync" = "Sync";
+
+"livecomp" = "L. Komp.";
+"livetime" = "L. Langzeitaufn.";
+"livebulb" = "Bulb";
+

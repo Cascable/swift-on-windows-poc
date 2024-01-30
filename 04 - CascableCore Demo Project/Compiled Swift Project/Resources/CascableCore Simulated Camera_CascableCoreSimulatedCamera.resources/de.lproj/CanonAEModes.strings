@@ -1,0 +1,30 @@
+/* 
+  This file contains translations for the auto exposure modes provided 
+  by Canon cameras. The values must match the wording used by the
+  camera (if provided) when set to this language.
+*/
+
+"EOSAEModeProgram" = "P";
+"EOSAEModeTv" = "Tv";
+"EOSAEModeAv" = "Av";
+"EOSAEModeManual" = "M";
+"EOSAEModeBulb" = "Mrd";
+"EOSAEModeA_DEP" = "";
+"EOSAEModeDEP" = "";
+"EOSAEModeCustom" = "Persönlich";
+"EOSAEModeLock" = "Sperre";
+"EOSAEModeGreen" = "Grün";
+"EOSAEModeNightPortrait" = "Nachtporträt";
+"EOSAEModeSports" = "Sport";
+"EOSAEModePortrait" = "Hochformat";
+"EOSAEModeLandscape" = "Querformat";
+"EOSAEModeCloseup" = "Makro";
+"EOSAEModeFlashOff" = "Blitz aus";
+"EOSAEModeCreativeAuto" = "CA";
+"EOSAEModeMovie" = "Film";
+"EOSAEModePhotoInMovie" = "Foto in Film";
+"EOSAEModeSceneIntelligentAuto" = "A+";
+"EOSAEModeSceneHandheldNight" = "Nachtaufn. ohne Stativ";
+"EOSAEModeSceneHDRBacklightControl" = "HDR-Gegenlicht";
+"EOSAEModeFlexiblePriorityAuto" = "Flexible Automatik";
+"EOSAEModeUnknown" = "?";

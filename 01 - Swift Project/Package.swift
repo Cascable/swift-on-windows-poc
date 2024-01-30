@@ -7,10 +7,10 @@ let package = Package(
     name: "CascableCore Simulated Camera",
     defaultLocalization: "en",
     products: [
-        .library(name: "CascableCore", targets: ["CascableCore"]),
-        .library(name: "StopKit", targets: ["StopKit"]),
-        .library(name: "CascableCore Simulated Camera", targets: ["CascableCoreSimulatedCamera"]),
-        .library(name: "CascableCore Basic API", targets: ["CascableCoreBasicAPI"])
+        .library(name: "CascableCore", type: .dynamic, targets: ["CascableCore"]),
+        .library(name: "StopKit", type: .dynamic, targets: ["StopKit"]),
+        .library(name: "CascableCore Simulated Camera", type: .dynamic, targets: ["CascableCoreSimulatedCamera"]),
+        .library(name: "CascableCore Basic API", type: .dynamic, targets: ["CascableCoreBasicAPI"])
     ],
     targets: [
         .target(name: "CascableCore", // The public CascableCore API.

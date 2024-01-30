@@ -1,0 +1,11 @@
+/* 
+  UniversalLightMeterStatuses.strings
+  CascableCore
+
+  Created by Daniel Kennett on 22/08/16.
+  Copyright © 2016 Daniel Kennett. All rights reserved.
+*/
+
+"CBLLightMeterStatusNotInUse" = "Not In Use";
+"CBLLightMeterStatusValidReading" = "In Use";
+"CBLLightMeterStatusReadingBeyondBounds" = "In Use (Out of Bounds)";

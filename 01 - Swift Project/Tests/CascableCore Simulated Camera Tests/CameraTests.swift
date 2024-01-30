@@ -83,8 +83,7 @@ class CameraTests: XCTestCase, CameraDiscoveryProviderDelegate {
         XCTAssert(populatedInMProperties.contains(where: { $0.identifier == .shutterSpeed }))
         XCTAssert(populatedInMProperties.contains(where: { $0.identifier == .isoSpeed }))
 
-        for property in camera.knownPropertyIdentifiers {
-            guard let identifier = PropertyIdentifier(rawValue: property.uintValue) else { continue }
+        for identifier in camera.knownPropertyIdentifiers {
             let property = camera.property(with: identifier)
             let currentValue = property.currentValue
             print("Current value of \(property.localizedDisplayName ?? "??") is \(currentValue?.localizedDisplayValue ?? "nil")")

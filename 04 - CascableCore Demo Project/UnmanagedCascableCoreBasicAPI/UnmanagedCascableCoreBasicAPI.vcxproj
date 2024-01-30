@@ -94,43 +94,7 @@
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)UnmanagedCascableCoreBasicAPI\include;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);vcruntimed.lib;ucrtd.lib</AdditionalDependencies>
-      <AdditionalOptions>AEResult.swift.o
-Camera.swift.o
-CameraDiscovery.swift.o
-CameraDiscoveryService.swift.o
-CameraFocusTypes.swift.o
-CameraInitiatedTransfer.swift.o
-CameraPropertyAPI.swift.o
-CascableCore.o
-CascableCoreBasicAPI.o
-CascableCoreBasicAPI.swift.o
-CascableCoreSimulatedCamera.o
-DeviceInfo.swift.o
-FileStorage.swift.o
-FileSystemFolderItem.swift.o
-FileSystemItem.swift.o
-LiveViewFrame.swift.o
-NSError+Extensions.swift.o
-PluginDiscovery.swift.o
-resource_bundle_accessor.swift.o
-SimulatedCamera.swift.o
-SimulatedCamera+FileSystem.swift.o
-SimulatedCamera+Properties.swift.o
-SimulatedCamera+PropertyValues.swift.o
-SimulatedCameraConfiguration.swift.o
-SimulatedCameraDiscovery.swift.o
-SimulatedCameraEntryPoint.swift.o
-StopKit.o
-WindowsHelpers.swift.o
-UniversalPropertyValue.swift.o
-ApertureValue.swift.o
-ExposureCompensationValue.swift.o
-ExposureStops.swift.o
-Helpers.swift.o
-ISOValue.swift.o
-ShutterSpeedValue.swift.o
-stopkit_resource_bundle_accessor.swift.o %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);vcruntimed.lib;ucrtd.lib;CascableCore Simulated Camera.lib;CascableCore.lib;StopKit.lib;CascableCore Basic API.lib;swiftCore.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -155,43 +119,7 @@ stopkit_resource_bundle_accessor.swift.o %(AdditionalOptions)</AdditionalOptions
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)UnmanagedCascableCoreBasicAPI\include;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>AEResult.swift.o
-Camera.swift.o
-CameraDiscovery.swift.o
-CameraDiscoveryService.swift.o
-CameraFocusTypes.swift.o
-CameraInitiatedTransfer.swift.o
-CameraPropertyAPI.swift.o
-CascableCore.o
-CascableCoreBasicAPI.o
-CascableCoreBasicAPI.swift.o
-CascableCoreSimulatedCamera.o
-DeviceInfo.swift.o
-FileStorage.swift.o
-FileSystemFolderItem.swift.o
-FileSystemItem.swift.o
-LiveViewFrame.swift.o
-NSError+Extensions.swift.o
-PluginDiscovery.swift.o
-resource_bundle_accessor.swift.o
-SimulatedCamera.swift.o
-SimulatedCamera+FileSystem.swift.o
-SimulatedCamera+Properties.swift.o
-SimulatedCamera+PropertyValues.swift.o
-SimulatedCameraConfiguration.swift.o
-SimulatedCameraDiscovery.swift.o
-SimulatedCameraEntryPoint.swift.o
-StopKit.o
-WindowsHelpers.swift.o
-UniversalPropertyValue.swift.o
-ApertureValue.swift.o
-ExposureCompensationValue.swift.o
-ExposureStops.swift.o
-Helpers.swift.o
-ISOValue.swift.o
-ShutterSpeedValue.swift.o
-stopkit_resource_bundle_accessor.swift.o %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);CascableCore Simulated Camera.lib;CascableCore.lib;StopKit.lib;CascableCore Basic API.lib;swiftCore.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -212,43 +140,7 @@ stopkit_resource_bundle_accessor.swift.o %(AdditionalOptions)</AdditionalOptions
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Compiled Swift Project\lib;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);vcruntimed.lib;ucrtd.lib</AdditionalDependencies>
-      <AdditionalOptions>AEResult.swift.o
-Camera.swift.o
-CameraDiscovery.swift.o
-CameraDiscoveryService.swift.o
-CameraFocusTypes.swift.o
-CameraInitiatedTransfer.swift.o
-CameraPropertyAPI.swift.o
-CascableCore.o
-CascableCoreBasicAPI.o
-CascableCoreBasicAPI.swift.o
-CascableCoreSimulatedCamera.o
-DeviceInfo.swift.o
-FileStorage.swift.o
-FileSystemFolderItem.swift.o
-FileSystemItem.swift.o
-LiveViewFrame.swift.o
-NSError+Extensions.swift.o
-PluginDiscovery.swift.o
-resource_bundle_accessor.swift.o
-SimulatedCamera.swift.o
-SimulatedCamera+FileSystem.swift.o
-SimulatedCamera+Properties.swift.o
-SimulatedCamera+PropertyValues.swift.o
-SimulatedCameraConfiguration.swift.o
-SimulatedCameraDiscovery.swift.o
-SimulatedCameraEntryPoint.swift.o
-StopKit.o
-WindowsHelpers.swift.o
-UniversalPropertyValue.swift.o
-ApertureValue.swift.o
-ExposureCompensationValue.swift.o
-ExposureStops.swift.o
-Helpers.swift.o
-ISOValue.swift.o
-ShutterSpeedValue.swift.o
-stopkit_resource_bundle_accessor.swift.o %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);vcruntimed.lib;ucrtd.lib;CascableCore Simulated Camera.lib;CascableCore.lib;StopKit.lib;CascableCore Basic API.lib;swiftCore.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -273,43 +165,7 @@ stopkit_resource_bundle_accessor.swift.o %(AdditionalOptions)</AdditionalOptions
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)UnmanagedCascableCoreBasicAPI\include;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>AEResult.swift.o
-Camera.swift.o
-CameraDiscovery.swift.o
-CameraDiscoveryService.swift.o
-CameraFocusTypes.swift.o
-CameraInitiatedTransfer.swift.o
-CameraPropertyAPI.swift.o
-CascableCore.o
-CascableCoreBasicAPI.o
-CascableCoreBasicAPI.swift.o
-CascableCoreSimulatedCamera.o
-DeviceInfo.swift.o
-FileStorage.swift.o
-FileSystemFolderItem.swift.o
-FileSystemItem.swift.o
-LiveViewFrame.swift.o
-NSError+Extensions.swift.o
-PluginDiscovery.swift.o
-resource_bundle_accessor.swift.o
-SimulatedCamera.swift.o
-SimulatedCamera+FileSystem.swift.o
-SimulatedCamera+Properties.swift.o
-SimulatedCamera+PropertyValues.swift.o
-SimulatedCameraConfiguration.swift.o
-SimulatedCameraDiscovery.swift.o
-SimulatedCameraEntryPoint.swift.o
-StopKit.o
-WindowsHelpers.swift.o
-UniversalPropertyValue.swift.o
-ApertureValue.swift.o
-ExposureCompensationValue.swift.o
-ExposureStops.swift.o
-Helpers.swift.o
-ISOValue.swift.o
-ShutterSpeedValue.swift.o
-stopkit_resource_bundle_accessor.swift.o %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);CascableCore Simulated Camera.lib;CascableCore.lib;StopKit.lib;CascableCore Basic API.lib;swiftCore.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

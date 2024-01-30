@@ -1,0 +1,19 @@
+/* 
+  This file contains translations for the drive modes provided 
+  by Canon cameras. The values must match the wording used by the
+  camera (if provided) when set to this language.
+*/
+
+"EOSDriveModeSingle" = "Einzelbild";
+"EOSDriveModeContinuous" = "Fortlaufend";
+"EOSDriveModeHighSpeedContinuous" = "Reihenaufn. m. hoh. Geschw.";
+"EOSDriveModeLowSpeedContinuous" = "Reihenaufn. m. niedr. Geschw.";
+"EOSDriveModeContinuousTimer" = "Selbstauslöser: Reihenaufnahme";
+"EOSDriveMode10SecTimer" = "Selbstauslöser: 10s";
+"EOSDriveMode2SecTimer" = "Selbstauslöser: 2s";
+"EOSDriveModeSingleSilent" = "Leises Einzelbild";
+"EOSDriveModeContinuousSilent" = "Stille Reihenaufnahme";
+"EOSDriveModeSingleSilent2" = "Stilles Einzelbild";
+"EOSDriveModeSilentHSContinuous" = "Stille HS Reihenaufnahme";
+"EOSDriveModeSilentLSContinuous" = "Stille LS Reihenaufnahme";
+"EOSDriveModeHighSpeedContinuousPlus" = "Reihenaufn. m. hoh. Geschw. +";
