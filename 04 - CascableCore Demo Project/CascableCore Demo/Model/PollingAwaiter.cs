@@ -9,19 +9,19 @@ using System.Timers;
 
 namespace CascableCoreDemo
 {
-    internal class PollingUpdater<T, Result>
+    internal class PollingAwaiter<T, Result>
     {
         internal static async Task<Result> AwaitForNonNil(T inValue, TimeSpan pollInterval, TimeSpan timeout, Func<T, Result> func)
         {
             Func<Result, bool> comparator = delegate (Result r) { return r != null; };
-            PollingUpdater<T, Result> poller = new PollingUpdater<T, Result>(func, comparator, inValue, pollInterval);
+            PollingAwaiter<T, Result> poller = new PollingAwaiter<T, Result>(func, comparator, inValue, pollInterval);
             return await poller.source.Task.WaitAsync(timeout);
         }
 
         internal static async Task<bool> AwaitForTrue(T inValue, TimeSpan pollInterval, TimeSpan timeout, Func<T, bool> func)
         {
             Func<bool, bool> comparator = delegate (bool r) { return r != false; };
-            PollingUpdater<T, bool> poller = new PollingUpdater<T, bool>(func, comparator, inValue, pollInterval);
+            PollingAwaiter<T, bool> poller = new PollingAwaiter<T, bool>(func, comparator, inValue, pollInterval);
             return await poller.source.Task.WaitAsync(timeout);
         }
 
@@ -31,7 +31,7 @@ namespace CascableCoreDemo
         private Timer timer;
         private TaskCompletionSource<Result> source;
 
-        public PollingUpdater(Func<T, Result> func, Func<Result, bool> comparator, T inValue, TimeSpan pollInterval)
+        public PollingAwaiter(Func<T, Result> func, Func<Result, bool> comparator, T inValue, TimeSpan pollInterval)
         {
             this.func = func;
             this.inValue = inValue;

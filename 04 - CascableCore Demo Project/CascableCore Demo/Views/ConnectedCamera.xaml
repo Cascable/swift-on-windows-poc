@@ -8,10 +8,23 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,10,20,10">
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+    <Grid Margin="20,10,20,10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="100"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Top">
             <TextBlock Margin="0,0,12,0" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Text="{x:Bind viewModel.FullCameraName, Mode=OneWay}"></TextBlock>
             <Button Click="disconnectButton_Click" IsEnabled="{x:Bind viewModel.DisconnectButtonEnabled, Mode=OneWay}">Disconnect</Button>
         </StackPanel>
-    </StackPanel>
+
+        <Grid Grid.Row="1" Background="AliceBlue"></Grid>
+        
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Name="propertyPanel"/>
+    </Grid>
 </Page>

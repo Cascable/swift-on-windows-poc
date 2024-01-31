@@ -78,7 +78,7 @@ namespace CascableCoreDemo.Views
             BasicCamera camera = null;
             try
             {
-                camera = await PollingUpdater<BasicCameraDiscovery, BasicCamera>.AwaitForNonNil(discovery, TimeSpan.FromSeconds(1.0), TimeSpan.FromSeconds(4.0), delegate (BasicCameraDiscovery d)
+                camera = await PollingAwaiter<BasicCameraDiscovery, BasicCamera>.AwaitForNonNil(discovery, TimeSpan.FromSeconds(1.0), TimeSpan.FromSeconds(4.0), delegate (BasicCameraDiscovery d)
                 {
                     ICollection<BasicCamera> cameras = d.getVisibleCameras();
                     return (cameras.Count == 0 ? null : cameras.First());
@@ -109,7 +109,7 @@ namespace CascableCoreDemo.Views
             camera.connect();
             try
             {
-                await PollingUpdater<BasicCamera, bool>.AwaitForTrue(camera, TimeSpan.FromSeconds(1.0), TimeSpan.FromSeconds(4.0), delegate (BasicCamera c)
+                await PollingAwaiter<BasicCamera, bool>.AwaitForTrue(camera, TimeSpan.FromSeconds(1.0), TimeSpan.FromSeconds(4.0), delegate (BasicCamera c)
                 {
                     return c.getConnected();
                 });

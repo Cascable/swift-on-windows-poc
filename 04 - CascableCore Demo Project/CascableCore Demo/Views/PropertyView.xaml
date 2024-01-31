@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<StackPanel 
+    x:Class="CascableCoreDemo.Views.PropertyView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CascableCoreDemo.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" Width="150" VerticalAlignment="Center">
+
+    <Border BorderThickness="0" Background="Transparent">
+        <StackPanel Name="MenuContainer" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Margin="0,0,0,6" HorizontalAlignment="Center" FontWeight="Bold" FontSize="16" Text="{x:Bind viewModel.PropertyName, Mode=OneWay}"></TextBlock>
+            <TextBlock HorizontalAlignment="Center" FontSize="18" Foreground="{x:Bind viewModel.PropertyValueColor, Mode=OneWay}" Text="{x:Bind viewModel.PropertyValue, Mode=OneWay}"></TextBlock>
+            <StackPanel.ContextFlyout>
+                <MenuFlyout x:Name="ValueMenu"/>
+            </StackPanel.ContextFlyout>
+        </StackPanel>
+    </Border>
+</StackPanel>

@@ -38,6 +38,18 @@ namespace CascableCoreDemo.Views
             {
                 viewModel.FullCameraName = camera.getFriendlyDisplayName() ?? "Unknown Camera";
             }
+
+            BasicPropertyIdentifier[] properties = [
+                BasicPropertyIdentifier.autoExposureMode(),
+                BasicPropertyIdentifier.aperture(),
+                BasicPropertyIdentifier.shutterSpeed(),
+                BasicPropertyIdentifier.isoSpeed(),
+                BasicPropertyIdentifier.exposureCompensation()
+            ];
+
+            foreach(BasicPropertyIdentifier property in properties) {
+               propertyPanel.Children.Add(new PropertyView(camera.property(property)));
+            }
         }
 
         partial class ConnectedCameraViewModel : ObservableObject
@@ -61,7 +73,7 @@ namespace CascableCoreDemo.Views
 
             try
             {
-                await PollingUpdater<BasicCamera, bool>.AwaitForTrue(camera, TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(4.0), delegate (BasicCamera c)
+                await PollingAwaiter<BasicCamera, bool>.AwaitForTrue(camera, TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(4.0), delegate (BasicCamera c)
                 {
                     return !c.getConnected();
                 });
