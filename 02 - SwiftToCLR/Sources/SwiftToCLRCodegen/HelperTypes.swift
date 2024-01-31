@@ -20,13 +20,18 @@ struct MethodArgument: Hashable {
         // RED FLAG: This is definitely not the best way to do this. However, clang seems to trip up and report
         // swift::Optional<T> types as just "int", which is what it seems to do if it can't find the definition
         // of a type. I can't immediately figure out why this is, so here's a stopgap solution in the meantime.
-        let extractedType: String = {
+        var extractedType: String = {
             if let argumentNameInSpellingRange = argumentSpelling.range(of: argumentName) {
                 return String(argumentSpelling[argumentSpelling.startIndex..<argumentNameInSpellingRange.lowerBound])
             } else {
                 return argumentSpelling
             }
         }()
+
+        // RED FLAG 2: clang's property parsing deals with this.
+        if extractedType.hasSuffix("_Nonnull") {
+            extractedType = String(extractedType.dropLast("_Nonnull".count))
+        }
 
         let demangledType: String = {
             // "Condensed" tokens have spaces stripped.
