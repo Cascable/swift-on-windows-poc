@@ -23,7 +23,7 @@
             <Button Click="disconnectButton_Click" IsEnabled="{x:Bind viewModel.DisconnectButtonEnabled, Mode=OneWay}">Disconnect</Button>
         </StackPanel>
 
-        <Grid Grid.Row="1" Background="AliceBlue"></Grid>
+        <Image Grid.Row="1" Name="ImageView"></Image>
         
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Name="propertyPanel"/>
     </Grid>

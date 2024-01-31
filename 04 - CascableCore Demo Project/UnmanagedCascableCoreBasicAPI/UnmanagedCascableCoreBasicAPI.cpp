@@ -392,6 +392,34 @@ void UnmanagedCascableCoreBasicAPI::BasicCamera::disconnect() {
     swiftObj->disconnect();
 }
 
+void UnmanagedCascableCoreBasicAPI::BasicCamera::beginLiveViewStream() {
+    swiftObj->beginLiveViewStream();
+}
+
+void UnmanagedCascableCoreBasicAPI::BasicCamera::endLiveViewStream() {
+    swiftObj->endLiveViewStream();
+}
+
+bool UnmanagedCascableCoreBasicAPI::BasicCamera::getLiveViewStreamActive() {
+    bool swiftResult = swiftObj->getLiveViewStreamActive();
+    return swiftResult;
+}
+
+std::optional<UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame> UnmanagedCascableCoreBasicAPI::BasicCamera::getLastLiveViewFrame() {
+    swift::Optional<CascableCoreBasicAPI::BasicLiveViewFrame> swiftResult = swiftObj->getLastLiveViewFrame();
+    if (swiftResult) {
+        CascableCoreBasicAPI::BasicLiveViewFrame unwrapped = swiftResult.get();
+        return std::optional<UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame>(UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame(std::make_shared<CascableCoreBasicAPI::BasicLiveViewFrame>(unwrapped)));
+    } else {
+        return std::nullopt;
+    }
+}
+
+void UnmanagedCascableCoreBasicAPI::BasicCamera::setLastLiveViewFrame(const std::optional<UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame> & value) {
+    swift::Optional<CascableCoreBasicAPI::BasicLiveViewFrame> arg0 = (value.has_value() ? swift::Optional<CascableCoreBasicAPI::BasicLiveViewFrame>::init(*value->swiftObj.get()) : swift::Optional<CascableCoreBasicAPI::BasicLiveViewFrame>::none());
+    swiftObj->setLastLiveViewFrame(arg0);
+}
+
 std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier> UnmanagedCascableCoreBasicAPI::BasicCamera::getKnownPropertyIdentifiers() {
     swift::Array<CascableCoreBasicAPI::BasicPropertyIdentifier> swiftResult = swiftObj->getKnownPropertyIdentifiers();
     std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier> resultArray;
@@ -584,6 +612,34 @@ std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicDeviceInfo::getSe
     }
 }
 
+// Implementation of UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame
+
+UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::BasicLiveViewFrame(std::shared_ptr<CascableCoreBasicAPI::BasicLiveViewFrame> swiftObj) {
+    this->swiftObj = swiftObj;
+}
+
+UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::~BasicLiveViewFrame() {}
+
+double UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::getDateProduced() {
+    double swiftResult = swiftObj->getDateProduced();
+    return swiftResult;
+}
+
+int UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::getRawPixelDataLength() {
+    swift::Int swiftResult = swiftObj->getRawPixelDataLength();
+    return (int)swiftResult;
+}
+
+void UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::copyPixelData(uint8_t* pointer) {
+    uint8_t* arg0 = pointer;
+    swiftObj->copyPixelData(arg0);
+}
+
+UnmanagedCascableCoreBasicAPI::BasicSize UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::getRawPixelSize() {
+    CascableCoreBasicAPI::BasicSize swiftResult = swiftObj->getRawPixelSize();
+    return UnmanagedCascableCoreBasicAPI::BasicSize(std::make_shared<CascableCoreBasicAPI::BasicSize>(swiftResult));
+}
+
 // Implementation of UnmanagedCascableCoreBasicAPI::BasicPropertyValue
 
 UnmanagedCascableCoreBasicAPI::BasicPropertyValue::BasicPropertyValue(std::shared_ptr<CascableCoreBasicAPI::BasicPropertyValue> swiftObj) {
@@ -650,7 +706,35 @@ void UnmanagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::setIdenti
     swiftObj->setIdentifier(arg0);
 }
 
+std::string UnmanagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::getLiveViewImageContainerPath() {
+    swift::String swiftResult = swiftObj->getLiveViewImageContainerPath();
+    return (std::string)swiftResult;
+}
+
+void UnmanagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::setLiveViewImageContainerPath(const std::string & value) {
+    const swift::String & arg0 = (swift::String)value;
+    swiftObj->setLiveViewImageContainerPath(arg0);
+}
+
 void UnmanagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::apply() {
     swiftObj->apply();
+}
+
+// Implementation of UnmanagedCascableCoreBasicAPI::BasicSize
+
+UnmanagedCascableCoreBasicAPI::BasicSize::BasicSize(std::shared_ptr<CascableCoreBasicAPI::BasicSize> swiftObj) {
+    this->swiftObj = swiftObj;
+}
+
+UnmanagedCascableCoreBasicAPI::BasicSize::~BasicSize() {}
+
+double UnmanagedCascableCoreBasicAPI::BasicSize::getWidth() {
+    double swiftResult = swiftObj->getWidth();
+    return swiftResult;
+}
+
+double UnmanagedCascableCoreBasicAPI::BasicSize::getHeight() {
+    double swiftResult = swiftObj->getHeight();
+    return swiftResult;
 }
 

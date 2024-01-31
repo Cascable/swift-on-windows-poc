@@ -8,7 +8,7 @@ using namespace System::Collections::Generic;
 
 // Implementation of ManagedCascableCoreBasicAPI::BasicPropertyIdentifier
 
-ManagedCascableCoreBasicAPI::BasicPropertyIdentifier::BasicPropertyIdentifier(UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier* objectToTakeOwnershipOf) {
+ManagedCascableCoreBasicAPI::BasicPropertyIdentifier::BasicPropertyIdentifier(UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier *objectToTakeOwnershipOf) {
     wrappedObj = objectToTakeOwnershipOf;
 }
 
@@ -345,7 +345,7 @@ unsigned int ManagedCascableCoreBasicAPI::BasicPropertyIdentifier::getRawValue()
 
 // Implementation of ManagedCascableCoreBasicAPI::BasicCamera
 
-ManagedCascableCoreBasicAPI::BasicCamera::BasicCamera(UnmanagedCascableCoreBasicAPI::BasicCamera* objectToTakeOwnershipOf) {
+ManagedCascableCoreBasicAPI::BasicCamera::BasicCamera(UnmanagedCascableCoreBasicAPI::BasicCamera *objectToTakeOwnershipOf) {
     wrappedObj = objectToTakeOwnershipOf;
 }
 
@@ -381,6 +381,29 @@ void ManagedCascableCoreBasicAPI::BasicCamera::disconnect() {
     wrappedObj->disconnect();
 }
 
+void ManagedCascableCoreBasicAPI::BasicCamera::beginLiveViewStream() {
+    wrappedObj->beginLiveViewStream();
+}
+
+void ManagedCascableCoreBasicAPI::BasicCamera::endLiveViewStream() {
+    wrappedObj->endLiveViewStream();
+}
+
+bool ManagedCascableCoreBasicAPI::BasicCamera::getLiveViewStreamActive() {
+    bool unmanagedResult = wrappedObj->getLiveViewStreamActive();
+    return unmanagedResult;
+}
+
+ManagedCascableCoreBasicAPI::BasicLiveViewFrame^ ManagedCascableCoreBasicAPI::BasicCamera::getLastLiveViewFrame() {
+    std::optional<UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame> unmanagedResult = wrappedObj->getLastLiveViewFrame();
+    return (unmanagedResult.has_value() ? gcnew ManagedCascableCoreBasicAPI::BasicLiveViewFrame(new UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame(unmanagedResult.value())) : nullptr);
+}
+
+void ManagedCascableCoreBasicAPI::BasicCamera::setLastLiveViewFrame(ManagedCascableCoreBasicAPI::BasicLiveViewFrame^ value) {
+    std::optional<UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame> arg0 = (value == nullptr ? std::nullopt : std::optional<UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame>(*value->wrappedObj));
+    wrappedObj->setLastLiveViewFrame(arg0);
+}
+
 List<ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^>^ ManagedCascableCoreBasicAPI::BasicCamera::getKnownPropertyIdentifiers() {
     std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier> unmanagedResult = wrappedObj->getKnownPropertyIdentifiers();
     List<ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^>^ managedResult = gcnew List<ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^>();
@@ -399,7 +422,7 @@ ManagedCascableCoreBasicAPI::BasicCameraProperty^ ManagedCascableCoreBasicAPI::B
 
 // Implementation of ManagedCascableCoreBasicAPI::BasicCameraDiscovery
 
-ManagedCascableCoreBasicAPI::BasicCameraDiscovery::BasicCameraDiscovery(UnmanagedCascableCoreBasicAPI::BasicCameraDiscovery* objectToTakeOwnershipOf) {
+ManagedCascableCoreBasicAPI::BasicCameraDiscovery::BasicCameraDiscovery(UnmanagedCascableCoreBasicAPI::BasicCameraDiscovery *objectToTakeOwnershipOf) {
     wrappedObj = objectToTakeOwnershipOf;
 }
 
@@ -433,7 +456,7 @@ List<ManagedCascableCoreBasicAPI::BasicCamera^>^ ManagedCascableCoreBasicAPI::Ba
 }
 
 void ManagedCascableCoreBasicAPI::BasicCameraDiscovery::startDiscovery(System::String^ clientName) {
-    const std::string& arg0 = marshal_as<std::string>(clientName);
+    const std::string & arg0 = marshal_as<std::string>(clientName);
     wrappedObj->startDiscovery(arg0);
 }
 
@@ -443,7 +466,7 @@ void ManagedCascableCoreBasicAPI::BasicCameraDiscovery::stopDiscovery() {
 
 // Implementation of ManagedCascableCoreBasicAPI::BasicCameraProperty
 
-ManagedCascableCoreBasicAPI::BasicCameraProperty::BasicCameraProperty(UnmanagedCascableCoreBasicAPI::BasicCameraProperty* objectToTakeOwnershipOf) {
+ManagedCascableCoreBasicAPI::BasicCameraProperty::BasicCameraProperty(UnmanagedCascableCoreBasicAPI::BasicCameraProperty *objectToTakeOwnershipOf) {
     wrappedObj = objectToTakeOwnershipOf;
 }
 
@@ -499,7 +522,7 @@ List<ManagedCascableCoreBasicAPI::BasicPropertyValue^>^ ManagedCascableCoreBasic
 void ManagedCascableCoreBasicAPI::BasicCameraProperty::setValidSettableValues(List<ManagedCascableCoreBasicAPI::BasicPropertyValue^>^ value) {
     std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> arg0Array;
     arg0Array.reserve(value->Count);
-    for each (auto element in value) {
+    for each(auto element in value) {
         arg0Array.push_back(*element->wrappedObj);
     }
     wrappedObj->setValidSettableValues(arg0Array);
@@ -512,7 +535,7 @@ void ManagedCascableCoreBasicAPI::BasicCameraProperty::setValue(ManagedCascableC
 
 // Implementation of ManagedCascableCoreBasicAPI::BasicDeviceInfo
 
-ManagedCascableCoreBasicAPI::BasicDeviceInfo::BasicDeviceInfo(UnmanagedCascableCoreBasicAPI::BasicDeviceInfo* objectToTakeOwnershipOf) {
+ManagedCascableCoreBasicAPI::BasicDeviceInfo::BasicDeviceInfo(UnmanagedCascableCoreBasicAPI::BasicDeviceInfo *objectToTakeOwnershipOf) {
     wrappedObj = objectToTakeOwnershipOf;
 }
 
@@ -540,9 +563,39 @@ System::String^ ManagedCascableCoreBasicAPI::BasicDeviceInfo::getSerialNumber() 
     return (unmanagedResult.has_value() ? marshal_as<System::String^>(unmanagedResult.value()) : nullptr);
 }
 
+// Implementation of ManagedCascableCoreBasicAPI::BasicLiveViewFrame
+
+ManagedCascableCoreBasicAPI::BasicLiveViewFrame::BasicLiveViewFrame(UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame *objectToTakeOwnershipOf) {
+    wrappedObj = objectToTakeOwnershipOf;
+}
+
+ManagedCascableCoreBasicAPI::BasicLiveViewFrame::~BasicLiveViewFrame() {
+    delete wrappedObj;
+}
+
+double ManagedCascableCoreBasicAPI::BasicLiveViewFrame::getDateProduced() {
+    double unmanagedResult = wrappedObj->getDateProduced();
+    return unmanagedResult;
+}
+
+int ManagedCascableCoreBasicAPI::BasicLiveViewFrame::getRawPixelDataLength() {
+    int unmanagedResult = wrappedObj->getRawPixelDataLength();
+    return unmanagedResult;
+}
+
+void ManagedCascableCoreBasicAPI::BasicLiveViewFrame::copyPixelData(uint8_t * pointer) {
+    uint8_t * arg0 = pointer;
+    wrappedObj->copyPixelData(arg0);
+}
+
+ManagedCascableCoreBasicAPI::BasicSize^ ManagedCascableCoreBasicAPI::BasicLiveViewFrame::getRawPixelSize() {
+    UnmanagedCascableCoreBasicAPI::BasicSize unmanagedResult = wrappedObj->getRawPixelSize();
+    return gcnew ManagedCascableCoreBasicAPI::BasicSize(new UnmanagedCascableCoreBasicAPI::BasicSize(unmanagedResult));
+}
+
 // Implementation of ManagedCascableCoreBasicAPI::BasicPropertyValue
 
-ManagedCascableCoreBasicAPI::BasicPropertyValue::BasicPropertyValue(UnmanagedCascableCoreBasicAPI::BasicPropertyValue* objectToTakeOwnershipOf) {
+ManagedCascableCoreBasicAPI::BasicPropertyValue::BasicPropertyValue(UnmanagedCascableCoreBasicAPI::BasicPropertyValue *objectToTakeOwnershipOf) {
     wrappedObj = objectToTakeOwnershipOf;
 }
 
@@ -562,7 +615,7 @@ System::String^ ManagedCascableCoreBasicAPI::BasicPropertyValue::getStringValue(
 
 // Implementation of ManagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration
 
-ManagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::BasicSimulatedCameraConfiguration(UnmanagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration* objectToTakeOwnershipOf) {
+ManagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::BasicSimulatedCameraConfiguration(UnmanagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration *objectToTakeOwnershipOf) {
     wrappedObj = objectToTakeOwnershipOf;
 }
 
@@ -581,7 +634,7 @@ System::String^ ManagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::
 }
 
 void ManagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::setManufacturer(System::String^ value) {
-    const std::string& arg0 = marshal_as<std::string>(value);
+    const std::string & arg0 = marshal_as<std::string>(value);
     wrappedObj->setManufacturer(arg0);
 }
 
@@ -591,7 +644,7 @@ System::String^ ManagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::
 }
 
 void ManagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::setModel(System::String^ value) {
-    const std::string& arg0 = marshal_as<std::string>(value);
+    const std::string & arg0 = marshal_as<std::string>(value);
     wrappedObj->setModel(arg0);
 }
 
@@ -601,10 +654,41 @@ System::String^ ManagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::
 }
 
 void ManagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::setIdentifier(System::String^ value) {
-    const std::string& arg0 = marshal_as<std::string>(value);
+    const std::string & arg0 = marshal_as<std::string>(value);
     wrappedObj->setIdentifier(arg0);
+}
+
+System::String^ ManagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::getLiveViewImageContainerPath() {
+    std::string unmanagedResult = wrappedObj->getLiveViewImageContainerPath();
+    return marshal_as<System::String^>(unmanagedResult);
+}
+
+void ManagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::setLiveViewImageContainerPath(System::String^ value) {
+    const std::string & arg0 = marshal_as<std::string>(value);
+    wrappedObj->setLiveViewImageContainerPath(arg0);
 }
 
 void ManagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::apply() {
     wrappedObj->apply();
 }
+
+// Implementation of ManagedCascableCoreBasicAPI::BasicSize
+
+ManagedCascableCoreBasicAPI::BasicSize::BasicSize(UnmanagedCascableCoreBasicAPI::BasicSize *objectToTakeOwnershipOf) {
+    wrappedObj = objectToTakeOwnershipOf;
+}
+
+ManagedCascableCoreBasicAPI::BasicSize::~BasicSize() {
+    delete wrappedObj;
+}
+
+double ManagedCascableCoreBasicAPI::BasicSize::getWidth() {
+    double unmanagedResult = wrappedObj->getWidth();
+    return unmanagedResult;
+}
+
+double ManagedCascableCoreBasicAPI::BasicSize::getHeight() {
+    double unmanagedResult = wrappedObj->getHeight();
+    return unmanagedResult;
+}
+

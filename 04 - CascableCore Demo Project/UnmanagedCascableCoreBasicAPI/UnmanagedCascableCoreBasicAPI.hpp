@@ -13,8 +13,10 @@ namespace CascableCoreBasicAPI {
     class BasicCameraDiscovery;
     class BasicCameraProperty;
     class BasicDeviceInfo;
+    class BasicLiveViewFrame;
     class BasicPropertyValue;
     class BasicSimulatedCameraConfiguration;
+    class BasicSize;
 }
 
 namespace UnmanagedCascableCoreBasicAPI {
@@ -24,8 +26,10 @@ namespace UnmanagedCascableCoreBasicAPI {
     class BasicCameraDiscovery;
     class BasicCameraProperty;
     class BasicDeviceInfo;
+    class BasicLiveViewFrame;
     class BasicPropertyValue;
     class BasicSimulatedCameraConfiguration;
+    class BasicSize;
 
     class BasicPropertyIdentifier {
     private:
@@ -117,6 +121,11 @@ namespace UnmanagedCascableCoreBasicAPI {
         std::optional<std::string> getFriendlyDisplayName();
         void connect();
         void disconnect();
+        void beginLiveViewStream();
+        void endLiveViewStream();
+        bool getLiveViewStreamActive();
+        std::optional<UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame> getLastLiveViewFrame();
+        void setLastLiveViewFrame(const std::optional<UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame> & value);
         std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier> getKnownPropertyIdentifiers();
         UnmanagedCascableCoreBasicAPI::BasicCameraProperty property(const UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier & identifier);
     };
@@ -168,6 +177,19 @@ namespace UnmanagedCascableCoreBasicAPI {
         std::optional<std::string> getSerialNumber();
     };
 
+    class BasicLiveViewFrame {
+    private:
+    public:
+        std::shared_ptr<CascableCoreBasicAPI::BasicLiveViewFrame> swiftObj;
+        BasicLiveViewFrame(std::shared_ptr<CascableCoreBasicAPI::BasicLiveViewFrame> swiftObj);
+        ~BasicLiveViewFrame();
+    
+        double getDateProduced();
+        int getRawPixelDataLength();
+        void copyPixelData(uint8_t* pointer);
+        UnmanagedCascableCoreBasicAPI::BasicSize getRawPixelSize();
+    };
+
     class BasicPropertyValue {
     private:
     public:
@@ -193,7 +215,20 @@ namespace UnmanagedCascableCoreBasicAPI {
         void setModel(const std::string & value);
         std::string getIdentifier();
         void setIdentifier(const std::string & value);
+        std::string getLiveViewImageContainerPath();
+        void setLiveViewImageContainerPath(const std::string & value);
         void apply();
+    };
+
+    class BasicSize {
+    private:
+    public:
+        std::shared_ptr<CascableCoreBasicAPI::BasicSize> swiftObj;
+        BasicSize(std::shared_ptr<CascableCoreBasicAPI::BasicSize> swiftObj);
+        ~BasicSize();
+    
+        double getWidth();
+        double getHeight();
     };
 }
 

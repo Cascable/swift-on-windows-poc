@@ -5122,6 +5122,22 @@ SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint64_t_0_8 $
 SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint64_t_0_8_uint64_t_8_16 $s20CascableCoreBasicAPI0C6CameraC19friendlyDisplayNameSSSgvg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 SWIFT_EXTERN void $s20CascableCoreBasicAPI0C6CameraC7connectyyF(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // connect()
 SWIFT_EXTERN void $s20CascableCoreBasicAPI0C6CameraC10disconnectyyF(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // disconnect()
+SWIFT_EXTERN void $s20CascableCoreBasicAPI0C6CameraC19beginLiveViewStreamyyF(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // beginLiveViewStream()
+SWIFT_EXTERN void $s20CascableCoreBasicAPI0C6CameraC17endLiveViewStreamyyF(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // endLiveViewStream()
+SWIFT_EXTERN bool $s20CascableCoreBasicAPI0C6CameraC20liveViewStreamActiveSbvg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
+SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint64_t_0_8 $s20CascableCoreBasicAPI0C6CameraC17lastLiveViewFrameAA0cghI0CSgvg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
+// Stub struct to be used to pass/return values to/from Swift functions.
+struct swift_interop_passStub_CascableCoreBasicAPI_uint64_t_0_8 {
+  uint64_t _1;
+};
+
+static SWIFT_C_INLINE_THUNK struct swift_interop_passStub_CascableCoreBasicAPI_uint64_t_0_8 swift_interop_passDirect_CascableCoreBasicAPI_uint64_t_0_8(const char * _Nonnull value) {
+  struct swift_interop_passStub_CascableCoreBasicAPI_uint64_t_0_8 result;
+  memcpy(&result._1, value + 0, 8);
+  return result;
+}
+
+SWIFT_EXTERN void $s20CascableCoreBasicAPI0C6CameraC17lastLiveViewFrameAA0cghI0CSgvs(struct swift_interop_passStub_CascableCoreBasicAPI_uint64_t_0_8 value, SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 // Stub struct to be used to pass/return values to/from Swift functions.
 struct swift_interop_returnStub_CascableCoreBasicAPI_void_ptr_0_8 {
   void * _Nullable _1;
@@ -5176,17 +5192,6 @@ SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint8_t_0_1 $s
 SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint64_t_0_8 $s20CascableCoreBasicAPI0C14CameraPropertyC6cameraAA0cE0CSgvg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint64_t_0_8_uint64_t_8_16 $s20CascableCoreBasicAPI0C14CameraPropertyC20localizedDisplayNameSSSgvg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint64_t_0_8 $s20CascableCoreBasicAPI0C14CameraPropertyC12currentValueAA0cfH0CSgvg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
-// Stub struct to be used to pass/return values to/from Swift functions.
-struct swift_interop_passStub_CascableCoreBasicAPI_uint64_t_0_8 {
-  uint64_t _1;
-};
-
-static SWIFT_C_INLINE_THUNK struct swift_interop_passStub_CascableCoreBasicAPI_uint64_t_0_8 swift_interop_passDirect_CascableCoreBasicAPI_uint64_t_0_8(const char * _Nonnull value) {
-  struct swift_interop_passStub_CascableCoreBasicAPI_uint64_t_0_8 result;
-  memcpy(&result._1, value + 0, 8);
-  return result;
-}
-
 SWIFT_EXTERN void $s20CascableCoreBasicAPI0C14CameraPropertyC12currentValueAA0cfH0CSgvs(struct swift_interop_passStub_CascableCoreBasicAPI_uint64_t_0_8 value, SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint64_t_0_8 $s20CascableCoreBasicAPI0C14CameraPropertyC12pendingValueAA0cfH0CSgvg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 SWIFT_EXTERN void $s20CascableCoreBasicAPI0C14CameraPropertyC12pendingValueAA0cfH0CSgvs(struct swift_interop_passStub_CascableCoreBasicAPI_uint64_t_0_8 value, SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
@@ -5208,6 +5213,10 @@ SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint64_t_0_8_u
 SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint64_t_0_8_uint64_t_8_16 $s20CascableCoreBasicAPI0C10DeviceInfoC5modelSSSgvg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint64_t_0_8_uint64_t_8_16 $s20CascableCoreBasicAPI0C10DeviceInfoC7versionSSSgvg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint64_t_0_8_uint64_t_8_16 $s20CascableCoreBasicAPI0C10DeviceInfoC12serialNumberSSSgvg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
+SWIFT_EXTERN double $s20CascableCoreBasicAPI0C13LiveViewFrameC12dateProducedSdvg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
+SWIFT_EXTERN ptrdiff_t $s20CascableCoreBasicAPI0C13LiveViewFrameC18rawPixelDataLengthSivg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
+SWIFT_EXTERN void $s20CascableCoreBasicAPI0C13LiveViewFrameC13copyPixelData4intoySpys5UInt8VG_tF(uint8_t * _Nonnull pointer, SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // copyPixelData(into:)
+SWIFT_EXTERN void * _Nonnull $s20CascableCoreBasicAPI0C13LiveViewFrameC12rawPixelSizeAA0cJ0Cvg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint8_t_0_1 $s20CascableCoreBasicAPI0C18PropertyIdentifierO8rawValueACSgSu_tcfC(size_t rawValue) SWIFT_NOEXCEPT SWIFT_CALL; // init(rawValue:)
 SWIFT_EXTERN size_t $s20CascableCoreBasicAPI0C18PropertyIdentifierO8rawValueSuvg(struct swift_interop_passStub_CascableCoreBasicAPI_uint8_t_0_1 _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 struct CascableCoreBasicAPI_BasicPropertyIdentifier {
@@ -5234,11 +5243,15 @@ SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint64_t_0_8_v
 SWIFT_EXTERN void $s20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV5modelSSvs(struct swift_interop_passStub_CascableCoreBasicAPI_uint64_t_0_8_void_ptr_8_16 value, SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint64_t_0_8_void_ptr_8_16 $s20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV10identifierSSvg(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 SWIFT_EXTERN void $s20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV10identifierSSvs(struct swift_interop_passStub_CascableCoreBasicAPI_uint64_t_0_8_void_ptr_8_16 value, SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
+SWIFT_EXTERN struct swift_interop_returnStub_CascableCoreBasicAPI_uint64_t_0_8_void_ptr_8_16 $s20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV26liveViewImageContainerPathSSvg(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
+SWIFT_EXTERN void $s20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV26liveViewImageContainerPathSSvs(struct swift_interop_passStub_CascableCoreBasicAPI_uint64_t_0_8_void_ptr_8_16 value, SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 SWIFT_EXTERN void $s20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV5applyyyF(SWIFT_CONTEXT const void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // apply()
 struct CascableCoreBasicAPI_BasicSimulatedCameraConfiguration {
-  _Alignas(8) char _storage[48];
+  _Alignas(8) char _storage[64];
 };
 
+SWIFT_EXTERN double $s20CascableCoreBasicAPI0C4SizeC5widthSdvg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
+SWIFT_EXTERN double $s20CascableCoreBasicAPI0C4SizeC6heightSdvg(SWIFT_CONTEXT void * _Nonnull _self) SWIFT_NOEXCEPT SWIFT_CALL; // _
 
 #ifdef __cplusplus
 }
@@ -5292,6 +5305,13 @@ public:
   SWIFT_INLINE_THUNK void connect() SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C6CameraC7connectyyF");
 /// Attempt to disconnect from the device.
   SWIFT_INLINE_THUNK void disconnect() SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C6CameraC10disconnectyyF");
+/// Start streaming the live view image from the camera.
+  SWIFT_INLINE_THUNK void beginLiveViewStream() SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C6CameraC19beginLiveViewStreamyyF");
+/// Ends the current live view stream, if one is running. Will cause the stream’s termination handler to be called with <code>CBLCameraLiveViewTerminationReasonEndedNormally</code>.
+  SWIFT_INLINE_THUNK void endLiveViewStream() SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C6CameraC17endLiveViewStreamyyF");
+  SWIFT_INLINE_THUNK bool getLiveViewStreamActive() SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C6CameraC20liveViewStreamActiveSbvp");
+  SWIFT_INLINE_THUNK swift::Optional<BasicLiveViewFrame> getLastLiveViewFrame() SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C6CameraC17lastLiveViewFrameAA0cghI0CSgvp");
+  SWIFT_INLINE_THUNK void setLastLiveViewFrame(const swift::Optional<BasicLiveViewFrame>& value) SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C6CameraC17lastLiveViewFrameAA0cghI0CSgvp");
   SWIFT_INLINE_THUNK swift::Array<BasicPropertyIdentifier> getKnownPropertyIdentifiers() SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C6CameraC24knownPropertyIdentifiersSayAA0cG10IdentifierOGvp");
 /// Returns a property object for the given identifier. If the property is currently unknown, returns an object
 /// with <code>currentValue</code>, <code>validSettableValues</code>, etc set to <code>nil</code>.
@@ -5575,6 +5595,80 @@ struct TypeMetadataTrait<CascableCoreBasicAPI::BasicDeviceInfo> {
 namespace _impl{
 template<>
 struct implClassFor<CascableCoreBasicAPI::BasicDeviceInfo> { using type = CascableCoreBasicAPI::_impl::_impl_BasicDeviceInfo; };
+} // namespace
+#pragma clang diagnostic pop
+} // namespace swift
+
+namespace CascableCoreBasicAPI SWIFT_PRIVATE_ATTR SWIFT_SYMBOL_MODULE("CascableCoreBasicAPI") {
+
+
+/// Represents a single frame of a streaming live view image, along with any associated metadata.
+class SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C13LiveViewFrameC") BasicLiveViewFrame;
+} // end namespace 
+
+namespace swift SWIFT_PRIVATE_ATTR {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++17-extensions"
+template<>
+static inline const constexpr bool isUsableInGenericContext<CascableCoreBasicAPI::BasicLiveViewFrame> = true;
+#pragma clang diagnostic pop
+} // namespace swift
+
+namespace CascableCoreBasicAPI SWIFT_PRIVATE_ATTR SWIFT_SYMBOL_MODULE("CascableCoreBasicAPI") {
+namespace _impl {
+
+class _impl_BasicLiveViewFrame;
+// Type metadata accessor for BasicLiveViewFrame
+SWIFT_EXTERN swift::_impl::MetadataResponseTy $s20CascableCoreBasicAPI0C13LiveViewFrameCMa(swift::_impl::MetadataRequestTy) SWIFT_NOEXCEPT SWIFT_CALL;
+
+
+} // namespace _impl
+
+class SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C13LiveViewFrameC") BasicLiveViewFrame : public swift::_impl::RefCountedClass {
+public:
+  using RefCountedClass::RefCountedClass;
+  using RefCountedClass::operator=;
+  SWIFT_INLINE_THUNK double getDateProduced() SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C13LiveViewFrameC12dateProducedSdvp");
+  SWIFT_INLINE_THUNK swift::Int getRawPixelDataLength() SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C13LiveViewFrameC18rawPixelDataLengthSivp");
+  SWIFT_INLINE_THUNK void copyPixelData(uint8_t * _Nonnull pointer) SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C13LiveViewFrameC13copyPixelData4intoySpys5UInt8VG_tF");
+  SWIFT_INLINE_THUNK BasicSize getRawPixelSize() SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C13LiveViewFrameC12rawPixelSizeAA0cJ0Cvp");
+protected:
+  SWIFT_INLINE_THUNK BasicLiveViewFrame(void * _Nonnull ptr) noexcept : RefCountedClass(ptr) {}
+private:
+  friend class _impl::_impl_BasicLiveViewFrame;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++17-extensions"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+  typedef char $s20CascableCoreBasicAPI0C13LiveViewFrameCD;
+  static inline constexpr $s20CascableCoreBasicAPI0C13LiveViewFrameCD __swift_mangled_name = 0;
+#pragma clang diagnostic pop
+#pragma clang diagnostic pop
+};
+
+namespace _impl {
+
+class _impl_BasicLiveViewFrame {
+public:
+static SWIFT_INLINE_THUNK BasicLiveViewFrame makeRetained(void * _Nonnull ptr) noexcept { return BasicLiveViewFrame(ptr); }
+};
+
+} // namespace _impl
+
+} // end namespace 
+
+namespace swift SWIFT_PRIVATE_ATTR {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++17-extensions"
+template<>
+struct TypeMetadataTrait<CascableCoreBasicAPI::BasicLiveViewFrame> {
+  static SWIFT_INLINE_PRIVATE_HELPER void * _Nonnull getTypeMetadata() {
+    return CascableCoreBasicAPI::_impl::$s20CascableCoreBasicAPI0C13LiveViewFrameCMa(0)._0;
+  }
+};
+namespace _impl{
+template<>
+struct implClassFor<CascableCoreBasicAPI::BasicLiveViewFrame> { using type = CascableCoreBasicAPI::_impl::_impl_BasicLiveViewFrame; };
 } // namespace
 #pragma clang diagnostic pop
 } // namespace swift
@@ -6197,6 +6291,8 @@ public:
   SWIFT_INLINE_THUNK void setModel(const swift::String& value) SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV5modelSSvp");
   SWIFT_INLINE_THUNK swift::String getIdentifier() const SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV10identifierSSvp");
   SWIFT_INLINE_THUNK void setIdentifier(const swift::String& value) SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV10identifierSSvp");
+  SWIFT_INLINE_THUNK swift::String getLiveViewImageContainerPath() const SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV26liveViewImageContainerPathSSvp");
+  SWIFT_INLINE_THUNK void setLiveViewImageContainerPath(const swift::String& value) SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV26liveViewImageContainerPathSSvp");
 /// Apply the settings for newly-discovered simulated cameras. Changes won’t be applied to simulated cameras
 /// that have already been discovered or connected to (i.e., you should apply your configuration before starting
 /// camera discovery).
@@ -6207,7 +6303,7 @@ private:
   SWIFT_INLINE_THUNK const char * _Nonnull _getOpaquePointer() const noexcept { return _storage; }
   SWIFT_INLINE_THUNK char * _Nonnull _getOpaquePointer() noexcept { return _storage; }
 
-  alignas(8) char _storage[48];
+  alignas(8) char _storage[64];
   friend class _impl::_impl_BasicSimulatedCameraConfiguration;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wc++17-extensions"
@@ -6267,6 +6363,77 @@ struct implClassFor<CascableCoreBasicAPI::BasicSimulatedCameraConfiguration> { u
 
 namespace CascableCoreBasicAPI SWIFT_PRIVATE_ATTR SWIFT_SYMBOL_MODULE("CascableCoreBasicAPI") {
 
+
+class SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C4SizeC") BasicSize;
+} // end namespace 
+
+namespace swift SWIFT_PRIVATE_ATTR {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++17-extensions"
+template<>
+static inline const constexpr bool isUsableInGenericContext<CascableCoreBasicAPI::BasicSize> = true;
+#pragma clang diagnostic pop
+} // namespace swift
+
+namespace CascableCoreBasicAPI SWIFT_PRIVATE_ATTR SWIFT_SYMBOL_MODULE("CascableCoreBasicAPI") {
+namespace _impl {
+
+class _impl_BasicSize;
+// Type metadata accessor for BasicSize
+SWIFT_EXTERN swift::_impl::MetadataResponseTy $s20CascableCoreBasicAPI0C4SizeCMa(swift::_impl::MetadataRequestTy) SWIFT_NOEXCEPT SWIFT_CALL;
+
+
+} // namespace _impl
+
+class SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C4SizeC") BasicSize : public swift::_impl::RefCountedClass {
+public:
+  using RefCountedClass::RefCountedClass;
+  using RefCountedClass::operator=;
+  SWIFT_INLINE_THUNK double getWidth() SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C4SizeC5widthSdvp");
+  SWIFT_INLINE_THUNK double getHeight() SWIFT_SYMBOL("s:20CascableCoreBasicAPI0C4SizeC6heightSdvp");
+protected:
+  SWIFT_INLINE_THUNK BasicSize(void * _Nonnull ptr) noexcept : RefCountedClass(ptr) {}
+private:
+  friend class _impl::_impl_BasicSize;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++17-extensions"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+  typedef char $s20CascableCoreBasicAPI0C4SizeCD;
+  static inline constexpr $s20CascableCoreBasicAPI0C4SizeCD __swift_mangled_name = 0;
+#pragma clang diagnostic pop
+#pragma clang diagnostic pop
+};
+
+namespace _impl {
+
+class _impl_BasicSize {
+public:
+static SWIFT_INLINE_THUNK BasicSize makeRetained(void * _Nonnull ptr) noexcept { return BasicSize(ptr); }
+};
+
+} // namespace _impl
+
+} // end namespace 
+
+namespace swift SWIFT_PRIVATE_ATTR {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++17-extensions"
+template<>
+struct TypeMetadataTrait<CascableCoreBasicAPI::BasicSize> {
+  static SWIFT_INLINE_PRIVATE_HELPER void * _Nonnull getTypeMetadata() {
+    return CascableCoreBasicAPI::_impl::$s20CascableCoreBasicAPI0C4SizeCMa(0)._0;
+  }
+};
+namespace _impl{
+template<>
+struct implClassFor<CascableCoreBasicAPI::BasicSize> { using type = CascableCoreBasicAPI::_impl::_impl_BasicSize; };
+} // namespace
+#pragma clang diagnostic pop
+} // namespace swift
+
+namespace CascableCoreBasicAPI SWIFT_PRIVATE_ATTR SWIFT_SYMBOL_MODULE("CascableCoreBasicAPI") {
+
   SWIFT_INLINE_THUNK swift::Optional<swift::String> BasicCamera::getFriendlyIdentifier() {
 void ***selfPtr_ = reinterpret_cast<void ***>( ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
 #ifdef __arm64e__
@@ -6277,7 +6444,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC18friendlyIdentifierSSSgvg) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 88 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 96 / sizeof(void *));
   return swift::_impl::_impl_Optional<swift::String>::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
     _impl::swift_interop_returnDirect_CascableCoreBasicAPI_uint64_t_0_8_uint64_t_8_16(result, (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
   });
@@ -6292,7 +6459,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC9connectedSbvg) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 96 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 104 / sizeof(void *));
   return (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
   }
   SWIFT_INLINE_THUNK swift::Optional<BasicDeviceInfo> BasicCamera::getDeviceInfo() {
@@ -6305,7 +6472,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC10deviceInfoAA0c6DeviceG0CSgvg) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 104 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 112 / sizeof(void *));
   return swift::_impl::_impl_Optional<BasicDeviceInfo>::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
     _impl::swift_interop_returnDirect_CascableCoreBasicAPI_uint64_t_0_8(result, (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
   });
@@ -6320,7 +6487,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC19friendlyDisplayNameSSSgvg) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 112 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 120 / sizeof(void *));
   return swift::_impl::_impl_Optional<swift::String>::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
     _impl::swift_interop_returnDirect_CascableCoreBasicAPI_uint64_t_0_8_uint64_t_8_16(result, (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
   });
@@ -6335,7 +6502,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC7connectyyF) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 120 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 128 / sizeof(void *));
   return (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
   }
   SWIFT_INLINE_THUNK void BasicCamera::disconnect() {
@@ -6348,8 +6515,78 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC10disconnectyyF) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 128 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 136 / sizeof(void *));
   return (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+  }
+  SWIFT_INLINE_THUNK void BasicCamera::beginLiveViewStream() {
+void ***selfPtr_ = reinterpret_cast<void ***>( ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+#ifdef __arm64e__
+void **vtable_ = ptrauth_auth_data(*selfPtr_, ptrauth_key_process_independent_data, ptrauth_blend_discriminator(selfPtr_,27361));
+#else
+void **vtable_ = *selfPtr_;
+#endif
+struct FTypeAddress {
+decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC19beginLiveViewStreamyyF) * func;
+};
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 144 / sizeof(void *));
+  return (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+  }
+  SWIFT_INLINE_THUNK void BasicCamera::endLiveViewStream() {
+void ***selfPtr_ = reinterpret_cast<void ***>( ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+#ifdef __arm64e__
+void **vtable_ = ptrauth_auth_data(*selfPtr_, ptrauth_key_process_independent_data, ptrauth_blend_discriminator(selfPtr_,27361));
+#else
+void **vtable_ = *selfPtr_;
+#endif
+struct FTypeAddress {
+decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC17endLiveViewStreamyyF) * func;
+};
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 152 / sizeof(void *));
+  return (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+  }
+  SWIFT_INLINE_THUNK bool BasicCamera::getLiveViewStreamActive() {
+void ***selfPtr_ = reinterpret_cast<void ***>( ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+#ifdef __arm64e__
+void **vtable_ = ptrauth_auth_data(*selfPtr_, ptrauth_key_process_independent_data, ptrauth_blend_discriminator(selfPtr_,27361));
+#else
+void **vtable_ = *selfPtr_;
+#endif
+struct FTypeAddress {
+decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC20liveViewStreamActiveSbvg) * func;
+};
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 160 / sizeof(void *));
+  return (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+  }
+  SWIFT_INLINE_THUNK swift::Optional<BasicLiveViewFrame> BasicCamera::getLastLiveViewFrame() {
+void ***selfPtr_ = reinterpret_cast<void ***>( ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+#ifdef __arm64e__
+void **vtable_ = ptrauth_auth_data(*selfPtr_, ptrauth_key_process_independent_data, ptrauth_blend_discriminator(selfPtr_,27361));
+#else
+void **vtable_ = *selfPtr_;
+#endif
+struct FTypeAddress {
+decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC17lastLiveViewFrameAA0cghI0CSgvg) * func;
+};
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 168 / sizeof(void *));
+  return swift::_impl::_impl_Optional<BasicLiveViewFrame>::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
+    _impl::swift_interop_returnDirect_CascableCoreBasicAPI_uint64_t_0_8(result, (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
+  });
+  }
+  SWIFT_INLINE_THUNK void BasicCamera::setLastLiveViewFrame(const swift::Optional<BasicLiveViewFrame>& value) {
+void ***selfPtr_ = reinterpret_cast<void ***>( ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+#ifdef __arm64e__
+void **vtable_ = ptrauth_auth_data(*selfPtr_, ptrauth_key_process_independent_data, ptrauth_blend_discriminator(selfPtr_,27361));
+#else
+void **vtable_ = *selfPtr_;
+#endif
+struct FTypeAddress {
+decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC17lastLiveViewFrameAA0cghI0CSgvs) * func;
+};
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 176 / sizeof(void *));
+  alignas(alignof(swift::Optional<BasicLiveViewFrame>)) char copyBuffer_consumedParamCopy_value[sizeof(swift::Optional<BasicLiveViewFrame>)];
+  auto &consumedParamCopy_value = *(new(copyBuffer_consumedParamCopy_value) swift::Optional<BasicLiveViewFrame>(value));
+  swift::_impl::ConsumedValueStorageDestroyer<swift::Optional<BasicLiveViewFrame>> storageGuard_consumedParamCopy_value(consumedParamCopy_value);
+  return (* fptrptr_->func)(_impl::swift_interop_passDirect_CascableCoreBasicAPI_uint64_t_0_8(swift::_impl::_impl_Optional<BasicLiveViewFrame>::getOpaquePointer(consumedParamCopy_value)), ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
   }
   SWIFT_INLINE_THUNK swift::Array<BasicPropertyIdentifier> BasicCamera::getKnownPropertyIdentifiers() {
 void ***selfPtr_ = reinterpret_cast<void ***>( ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
@@ -6361,7 +6598,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC24knownPropertyIdentifiersSayAA0cG10IdentifierOGvg) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 136 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 192 / sizeof(void *));
   return swift::_impl::_impl_Array<BasicPropertyIdentifier>::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
     _impl::swift_interop_returnDirect_CascableCoreBasicAPI_void_ptr_0_8(result, (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
   });
@@ -6376,7 +6613,7 @@ void **vtable_ = *selfPtr_;
 struct FTypeAddress {
 decltype(_impl::$s20CascableCoreBasicAPI0C6CameraC8property4withAA0cE8PropertyCAA0cH10IdentifierO_tF) * func;
 };
-FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 144 / sizeof(void *));
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 200 / sizeof(void *));
   return _impl::_impl_BasicCameraProperty::makeRetained((* fptrptr_->func)(_impl::swift_interop_passDirect_CascableCoreBasicAPI_uint8_t_0_1(_impl::_impl_BasicPropertyIdentifier::getOpaquePointer(identifier)), ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
   }
   SWIFT_INLINE_THUNK BasicCameraDiscovery BasicCameraDiscovery::sharedInstance() {
@@ -6659,6 +6896,58 @@ FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 96 / sizeof(
   return swift::_impl::_impl_Optional<swift::String>::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
     _impl::swift_interop_returnDirect_CascableCoreBasicAPI_uint64_t_0_8_uint64_t_8_16(result, (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
   });
+  }
+  SWIFT_INLINE_THUNK double BasicLiveViewFrame::getDateProduced() {
+void ***selfPtr_ = reinterpret_cast<void ***>( ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+#ifdef __arm64e__
+void **vtable_ = ptrauth_auth_data(*selfPtr_, ptrauth_key_process_independent_data, ptrauth_blend_discriminator(selfPtr_,27361));
+#else
+void **vtable_ = *selfPtr_;
+#endif
+struct FTypeAddress {
+decltype(_impl::$s20CascableCoreBasicAPI0C13LiveViewFrameC12dateProducedSdvg) * func;
+};
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 72 / sizeof(void *));
+  return (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+  }
+  SWIFT_INLINE_THUNK swift::Int BasicLiveViewFrame::getRawPixelDataLength() {
+void ***selfPtr_ = reinterpret_cast<void ***>( ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+#ifdef __arm64e__
+void **vtable_ = ptrauth_auth_data(*selfPtr_, ptrauth_key_process_independent_data, ptrauth_blend_discriminator(selfPtr_,27361));
+#else
+void **vtable_ = *selfPtr_;
+#endif
+struct FTypeAddress {
+decltype(_impl::$s20CascableCoreBasicAPI0C13LiveViewFrameC18rawPixelDataLengthSivg) * func;
+};
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 88 / sizeof(void *));
+  return (* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+  }
+  SWIFT_INLINE_THUNK void BasicLiveViewFrame::copyPixelData(uint8_t * _Nonnull pointer) {
+void ***selfPtr_ = reinterpret_cast<void ***>( ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+#ifdef __arm64e__
+void **vtable_ = ptrauth_auth_data(*selfPtr_, ptrauth_key_process_independent_data, ptrauth_blend_discriminator(selfPtr_,27361));
+#else
+void **vtable_ = *selfPtr_;
+#endif
+struct FTypeAddress {
+decltype(_impl::$s20CascableCoreBasicAPI0C13LiveViewFrameC13copyPixelData4intoySpys5UInt8VG_tF) * func;
+};
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 96 / sizeof(void *));
+  return (* fptrptr_->func)(pointer, ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+  }
+  SWIFT_INLINE_THUNK BasicSize BasicLiveViewFrame::getRawPixelSize() {
+void ***selfPtr_ = reinterpret_cast<void ***>( ::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+#ifdef __arm64e__
+void **vtable_ = ptrauth_auth_data(*selfPtr_, ptrauth_key_process_independent_data, ptrauth_blend_discriminator(selfPtr_,27361));
+#else
+void **vtable_ = *selfPtr_;
+#endif
+struct FTypeAddress {
+decltype(_impl::$s20CascableCoreBasicAPI0C13LiveViewFrameC12rawPixelSizeAA0cJ0Cvg) * func;
+};
+FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 104 / sizeof(void *));
+  return _impl::_impl_BasicSize::makeRetained((* fptrptr_->func)(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this)));
   }
   SWIFT_INLINE_THUNK BasicPropertyIdentifier BasicPropertyIdentifier::_impl_isoSpeed::operator()() const {
     auto result = BasicPropertyIdentifier::_make();
@@ -6984,8 +7273,25 @@ FTypeAddress *fptrptr_ = reinterpret_cast<FTypeAddress *>(vtable_ + 80 / sizeof(
   swift::_impl::ConsumedValueStorageDestroyer<swift::String> storageGuard_consumedParamCopy_value(consumedParamCopy_value);
   return _impl::$s20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV10identifierSSvs(_impl::swift_interop_passDirect_CascableCoreBasicAPI_uint64_t_0_8_void_ptr_8_16(swift::_impl::_impl_String::getOpaquePointer(consumedParamCopy_value)), _getOpaquePointer());
   }
+  SWIFT_INLINE_THUNK swift::String BasicSimulatedCameraConfiguration::getLiveViewImageContainerPath() const {
+  return swift::_impl::_impl_String::returnNewValue([&](char * _Nonnull result) SWIFT_INLINE_THUNK_ATTRIBUTES {
+    _impl::swift_interop_returnDirect_CascableCoreBasicAPI_uint64_t_0_8_void_ptr_8_16(result, _impl::$s20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV26liveViewImageContainerPathSSvg(_getOpaquePointer()));
+  });
+  }
+  SWIFT_INLINE_THUNK void BasicSimulatedCameraConfiguration::setLiveViewImageContainerPath(const swift::String& value) {
+  alignas(alignof(swift::String)) char copyBuffer_consumedParamCopy_value[sizeof(swift::String)];
+  auto &consumedParamCopy_value = *(new(copyBuffer_consumedParamCopy_value) swift::String(value));
+  swift::_impl::ConsumedValueStorageDestroyer<swift::String> storageGuard_consumedParamCopy_value(consumedParamCopy_value);
+  return _impl::$s20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV26liveViewImageContainerPathSSvs(_impl::swift_interop_passDirect_CascableCoreBasicAPI_uint64_t_0_8_void_ptr_8_16(swift::_impl::_impl_String::getOpaquePointer(consumedParamCopy_value)), _getOpaquePointer());
+  }
   SWIFT_INLINE_THUNK void BasicSimulatedCameraConfiguration::apply() const {
   return _impl::$s20CascableCoreBasicAPI0C28SimulatedCameraConfigurationV5applyyyF(_getOpaquePointer());
+  }
+  SWIFT_INLINE_THUNK double BasicSize::getWidth() {
+  return _impl::$s20CascableCoreBasicAPI0C4SizeC5widthSdvg(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
+  }
+  SWIFT_INLINE_THUNK double BasicSize::getHeight() {
+  return _impl::$s20CascableCoreBasicAPI0C4SizeC6heightSdvg(::swift::_impl::_impl_RefCountedClass::getOpaquePointer(*this));
   }
 
 } // namespace CascableCoreBasicAPI

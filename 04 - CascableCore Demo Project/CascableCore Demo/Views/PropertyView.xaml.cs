@@ -51,12 +51,14 @@ namespace CascableCoreDemo.Views
             mainQueue = DispatcherQueue.GetForCurrentThread();
             viewModel.PropertyName = property.getLocalizedDisplayName() ?? "Unknown";
 
-            valueObserver = new PollingObserver<BasicCameraProperty, string>(property, TimeSpan.FromSeconds(0.25), delegate (BasicCameraProperty p)
+            valueObserver = PollingObserver<BasicCameraProperty, BasicCameraProperty, string>
+                .observing<BasicCameraProperty, string>(property, TimeSpan.FromSeconds(0.25), delegate (BasicCameraProperty p)
             {
                 return p.getCurrentValue()?.getLocalizedDisplayValue();
             });
 
-            settableValuesObserver = new PollingObserver<BasicCameraProperty, int>(property, TimeSpan.FromSeconds(0.25), delegate (BasicCameraProperty p)
+            settableValuesObserver = PollingObserver<BasicCameraProperty, BasicCameraProperty, int>
+                .observing<BasicCameraProperty, int>(property, TimeSpan.FromSeconds(0.25), delegate (BasicCameraProperty p)
             {
                 return p.getValidSettableValues()?.Count ?? 0;
             });
@@ -87,8 +89,8 @@ namespace CascableCoreDemo.Views
 
         private BasicCameraProperty property;
         PropertyViewModel viewModel = new PropertyViewModel();
-        private PollingObserver<BasicCameraProperty, string> valueObserver;
-        private PollingObserver<BasicCameraProperty, int> settableValuesObserver;
+        private PollingObserver<BasicCameraProperty, BasicCameraProperty, string> valueObserver;
+        private PollingObserver<BasicCameraProperty, BasicCameraProperty, int> settableValuesObserver;
         private DispatcherQueue mainQueue;
 
         private void updateCurrentValue()

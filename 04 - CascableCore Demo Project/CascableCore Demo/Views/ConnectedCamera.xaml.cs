@@ -6,14 +6,19 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Channels;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Microsoft.UI.Dispatching;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -29,6 +34,7 @@ namespace CascableCoreDemo.Views
         {
             this.InitializeComponent();
             this.camera = camera;
+            mainQueue = DispatcherQueue.GetForCurrentThread();
             string manufacturer = camera.getDeviceInfo()?.getManufacturer();
             string model = camera.getDeviceInfo()?.getModel();
             if (manufacturer != null && model != null)
@@ -50,6 +56,40 @@ namespace CascableCoreDemo.Views
             foreach(BasicPropertyIdentifier property in properties) {
                propertyPanel.Children.Add(new PropertyView(camera.property(property)));
             }
+
+            frameObserver = new PollingObserver<BasicCamera, BasicLiveViewFrame, double>(camera, TimeSpan.FromSeconds(0.1),
+                delegate (BasicCamera c) { return c.getLastLiveViewFrame(); }, 
+                delegate (BasicLiveViewFrame f) { return f?.getDateProduced(); });
+            frameObserver.ValueChanged += FrameObserver_ValueChanged;
+            camera.beginLiveViewStream();
+            frameObserver.Start();
+        }
+
+        private void FrameObserver_ValueChanged(object sender, BasicLiveViewFrame e)
+        {
+            if (e == null) { return; }
+            Debug.WriteLine("Got live view frame of size: " + e.getRawPixelSize().getWidth() + "x" + e.getRawPixelSize().getHeight());
+            mainQueue.TryEnqueue(() => { handleLiveViewFrame(e); });
+           
+        }
+
+        private void handleLiveViewFrame(BasicLiveViewFrame e)
+        {
+            byte[] data = extractFrame(e);
+            BitmapImage image = new BitmapImage();
+            image.SetSource(data.AsBuffer().AsStream().AsRandomAccessStream());
+            ImageView.Source = image;
+        }
+
+        private unsafe byte[] extractFrame(BasicLiveViewFrame frame)
+        {
+            int byteCount = frame.getRawPixelDataLength();
+            byte[] destination = new byte[byteCount];
+            IntPtr buffer = Marshal.AllocHGlobal(byteCount);
+            frame.copyPixelData((byte *)buffer.ToPointer());
+            Marshal.Copy(buffer, destination, 0, byteCount);
+            Marshal.FreeHGlobal(buffer);
+            return destination;
         }
 
         partial class ConnectedCameraViewModel : ObservableObject
@@ -63,6 +103,8 @@ namespace CascableCoreDemo.Views
 
         BasicCamera camera;
         ConnectedCameraViewModel viewModel = new ConnectedCameraViewModel();
+        PollingObserver<BasicCamera, BasicLiveViewFrame, double> frameObserver;
+        private DispatcherQueue mainQueue;
 
         public event EventHandler<BasicCamera> DisconnectedFromCamera;
 
