@@ -66,7 +66,7 @@ public extension SimulatedCameraConfiguration {
 
     /// Returns the default simulated camera configuration. Use this as the base for customisation.
     static var `default`: SimulatedCameraConfiguration {
-        let bundle = Bundle(for: SimulatedCamera.self)
+        let bundle = Bundle.module
         let imageUrls: [URL] = (bundle.urls(forResourcesWithExtension: "jpg", subdirectory: "Live View Images") ?? [])
             .map({ $0 as URL })
             .sorted(by: { $0.lastPathComponent < $1.lastPathComponent })

@@ -676,7 +676,7 @@ class SimulatedCamera: Camera {
     private var terminationHandler: LiveViewTerminationHandler?
     private var lvDelivery: LiveViewFrameDelivery?
     private var lvDeliveryQueue: DispatchQueue?
-    private var liveViewDeliveryTimer: Timer?
+    private var liveViewDeliveryTimer: DispatchSourceTimer?
 
     func setLiveViewCrop(_ cropRect: CGRect, completionCallback block: ErrorableOperationCallback? = nil) {
         block?(NSError(cblErrorCode: .notAvailable))
@@ -691,7 +691,7 @@ class SimulatedCamera: Camera {
     }
 
     private func resetLiveViewState(reason: LiveViewTerminationReason) {
-        liveViewDeliveryTimer?.invalidate()
+        liveViewDeliveryTimer?.cancel()
         liveViewDeliveryTimer = nil
         lvDelivery = nil
         lvDeliveryQueue = nil
@@ -770,7 +770,9 @@ class SimulatedCamera: Camera {
                 var frameIndex: Int = 0
 
                 self.hasReceivedLiveViewFrameReadySignal = true
-                let timer = Timer(timeInterval: 1.0 / 30.0, repeats: true, block: { timer in
+
+                let timer: DispatchSourceTimer = DispatchSource.makeTimerSource(flags: [.strict], queue: configuration.internalCallbackQueue)
+                timer.setEventHandler {
                     guard self.hasReceivedLiveViewFrameReadySignal else { return }
                     let queue = self.lvDeliveryQueue ?? configuration.internalCallbackQueue
                     guard let delivery = self.lvDelivery else { return }
@@ -786,11 +788,11 @@ class SimulatedCamera: Camera {
                         //…but actually deliver the frame on the queue we're asked to.
                         queue.async { delivery(simulatedFrame, { self.hasReceivedLiveViewFrameReadySignal = true }) }
                     }
-                })
+                }
 
                 self.liveViewDeliveryTimer = timer
-                #warning("RunLoop.main may not be available")
-                RunLoop.main.add(timer, forMode: .common)
+                timer.schedule(deadline: DispatchTime.now() + (1.0 / 30.0), repeating: .milliseconds(Int((1.0 / 30.0) * 1000.0)))
+                timer.activate()
             }
         }
     }
@@ -1049,27 +1051,29 @@ class SimulatedCamera: Camera {
         }
     }
 
-    private var videoRecordingTimer: Timer? = nil
+    private var videoRecordingTimer: DispatchSourceTimer? = nil
 
     private func startSimulatedVideoRecording() {
         endSimulatedVideoRecording()
 
         let recordingStartDate = Date()
-        let timer = Timer(timeInterval: 1.0, repeats: true, block: { [weak self] _ in
+        let timer: DispatchSourceTimer = DispatchSource.makeTimerSource(flags: [.strict], queue: configuration.internalCallbackQueue)
+        timer.setEventHandler { [weak self] in
             guard let self, self.isRecordingVideo else { return }
             let now = Date()
             let interval = now.timeIntervalSince(recordingStartDate).rounded()
             self.currentVideoTimerValue = SimulatedVideoTimerValue(type: .countingUp, value: interval)
-        })
-        #warning("RunLoop.main may not be available")
-        RunLoop.main.add(timer, forMode: .common)
+        }
+
+        timer.schedule(deadline: DispatchTime.now() + 1.0, repeating: .seconds(1))
+        timer.activate()
         videoRecordingTimer = timer
         currentVideoTimerValue = SimulatedVideoTimerValue(type: .countingUp, value: 0.0)
         isRecordingVideo = true
     }
 
     private func endSimulatedVideoRecording() {
-        videoRecordingTimer?.invalidate()
+        videoRecordingTimer?.cancel()
         videoRecordingTimer = nil
         currentVideoTimerValue = nil
         isRecordingVideo = false

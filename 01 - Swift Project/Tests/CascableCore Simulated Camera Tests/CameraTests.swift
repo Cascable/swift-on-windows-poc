@@ -16,13 +16,32 @@ class CameraTests: XCTestCase, CameraDiscoveryProviderDelegate {
         basicDiscovery.startDiscovery(clientName: "Windows Test Runner")
 
         let waitedABitExpectation = XCTestExpectation(description: "Waited for discovery")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             waitedABitExpectation.fulfill();
         }
 
         wait(for: [waitedABitExpectation], timeout: 5.0)
-        print(basicDiscovery.visibleCameras);
-        print(basicDiscovery.visibleCameras.first?.friendlyDisplayName)
+
+        let camera: BasicCamera = try XCTUnwrap(basicDiscovery.visibleCameras.first)
+        print(camera.friendlyDisplayName)
+
+        camera.connect();
+
+        let waitedABitMoreExpectation = XCTestExpectation(description: "Waited for connection")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            waitedABitMoreExpectation.fulfill();
+        }
+
+        wait(for: [waitedABitMoreExpectation], timeout: 5.0)
+        camera.beginLiveViewStream();
+
+        let waitedForLiveView = XCTestExpectation(description: "Waited for connection")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            waitedForLiveView.fulfill();
+        }
+
+        wait(for: [waitedForLiveView], timeout: 5.0)
+        XCTAssertNotNil(camera.lastLiveViewFrame)
     }
 
     func testCameraDiscoveryAndConnection() throws {

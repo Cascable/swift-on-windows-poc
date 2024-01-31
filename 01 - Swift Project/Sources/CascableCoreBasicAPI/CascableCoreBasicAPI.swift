@@ -1,4 +1,5 @@
 import Foundation
+import CascableCoreSimulatedCamera
 
 /**
 
@@ -46,10 +47,16 @@ public struct BasicSimulatedCameraConfiguration {
     /// Create a default configuration object.
     public static func defaultConfiguration() -> BasicSimulatedCameraConfiguration {
         let wrappedDefault = SimulatedCameraConfiguration.default
+        let bundle = Bundle(for: BasicCamera.self)
+        // The bundle resource autodetect seems to fall over from a DLL on Windows,
+        // so we find the live view frames manually.
         return BasicSimulatedCameraConfiguration(
             manufacturer: wrappedDefault.manufacturer,
             model: wrappedDefault.model,
-            identifier: wrappedDefault.identifier
+            identifier: wrappedDefault.identifier,
+            liveViewImageContainerPath: (bundle.resourceURL ?? bundle.bundleURL)
+                .appendingPathComponent("CascableCore Simulated Camera_CascableCoreSimulatedCamera.resources")
+                .appendingPathComponent("Live View Images").path
         )
     }
 
@@ -63,11 +70,28 @@ public struct BasicSimulatedCameraConfiguration {
     /// The default value is the plugin's identifier (`se.cascable.CascableCore.plugin.simulated-camera`).
     public var identifier: String
 
+    /// The container folder for JPEG live view images. This folder will be scanned and JPEG images within will be used.
+    public var liveViewImageContainerPath: String
+
     /// Apply the settings for newly-discovered simulated cameras. Changes won't be applied to simulated cameras
     /// that have already been discovered or connected to (i.e., you should apply your configuration before starting
     /// camera discovery).
     public func apply() {
         var config = SimulatedCameraConfiguration.default
+        var imageUrls: [URL] = []
+        let container = URL(fileURLWithPath: liveViewImageContainerPath)
+        if let enumerator = FileManager.default.enumerator(at: container,
+                                                           includingPropertiesForKeys: [],
+                                                           options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants, .skipsPackageDescendants],
+                                                           errorHandler: nil) {
+            for case let fileUrl as URL in enumerator {
+                if fileUrl.pathExtension.caseInsensitiveCompare("jpg") == .orderedSame { imageUrls.append(fileUrl) }
+            }
+        }
+
+        imageUrls = imageUrls.map({ $0 as URL }).sorted(by: { $0.lastPathComponent < $1.lastPathComponent })
+        if !imageUrls.isEmpty { config.liveViewImageFrames = imageUrls }
+
         config.internalCallbackQueue = Self.basicCameraQueue
         config.manufacturer = manufacturer
         config.model = model
@@ -190,11 +214,46 @@ public class BasicCamera: Equatable {
     }
 
     // TODO: Functionality and categories
-    // TODO: Live view
     // TODO: Filesystem
     // TODO: Focus and shutter
     // TODO: Camera-initiated transfer
     // TODO: Video recording
+
+    //Live View
+
+    /// Start streaming the live view image from the camera.
+    public func beginLiveViewStream() {
+        let delivery: LiveViewFrameDelivery = { [weak self] frame, completion in
+            let wrappedFrame = BasicLiveViewFrame(wrapping: frame)
+            self?.lastLiveViewFrame = wrappedFrame
+            completion()
+        }
+
+        wrappedCamera.beginStream(delivery: delivery,
+                                  deliveryQueue: queue,
+                                  options: [CBLLiveViewOptionSkipImageDecoding: true],
+                                  terminationHandler: { [weak self] reason, error in
+                                      if let error {
+                                          print("Got live view termination:", reason, error)
+                                      } else {
+                                          print("Got live view termination:", reason)
+                                      }
+                                      self?.lastLiveViewFrame = nil
+                                  })
+    }
+
+    /// Ends the current live view stream, if one is running. Will cause the stream's termination handler to be called with `CBLCameraLiveViewTerminationReasonEndedNormally`.
+    public func endLiveViewStream() {
+        wrappedCamera.endStream()
+    }
+
+    /// Returns `YES` if the camera is currently streaming a live view image.
+    public var liveViewStreamActive: Bool {
+        return wrappedCamera.liveViewStreamActive
+    }
+
+    /// The most recently produced live view frame.
+    public private(set) var lastLiveViewFrame: BasicLiveViewFrame? = nil
 
     // Camera Properties
 
@@ -237,6 +296,53 @@ public class BasicCamera: Equatable {
         var storedProperties: [BasicPropertyIdentifier] {
             return store.map({ $0.identifier })
         }
+    }
+}
+
+// MARK: - Live View
+
+public class BasicSize {
+    init(width: Double, height: Double) {
+        self.width = width
+        self.height = height
+    }
+
+    public let width: Double
+    public let height: Double
+}
+
+/// Represents a single frame of a streaming live view image, along with any associated metadata.
+public class BasicLiveViewFrame {
+    internal let wrappedValue: LiveViewFrame
+    internal init(wrapping value: LiveViewFrame) {
+        wrappedValue = value
+    }
+
+    /// Returns the date and time at which this frame was generated.
+    public var dateProduced: Double {
+        return wrappedValue.dateProduced.timeIntervalSince1970
+    }
+
+    /// Returns the raw image data for the frame. See the `rawPixelFormat` and `rawPixelFormatDescription` properties
+    /// for detailed information on the pixel format.
+    ///
+    /// It may be necessary to crop this image to avoid black bars. See `rawImageCropRect`.
+    public var rawPixelData: Data {
+        return wrappedValue.rawPixelData
+    }
+
+    public var rawPixelDataLength: Int {
+        return wrappedValue.rawPixelData.count
+    }
+
+    public func copyPixelData(into pointer: UnsafeMutablePointer<UInt8>) {
+        rawPixelData.copyBytes(to: pointer, count: rawPixelDataLength)
+    }
+
+    /// Returns the size of the image contained in the `rawPixelData` property, in pixels.
+    public var rawPixelSize: BasicSize {
+        let size = wrappedValue.rawPixelSize
+        return BasicSize(width: size.width, height: size.height)
     }
 }
 
