@@ -29,11 +29,6 @@ import CascableCoreSimulatedCamera
 
  - When run in the context of a C# app, `DispatchQueue.main` doesn't function as you're used to. This is to be expected.
 
- Things I'm completely confused about:
-
- - Accessing a dictionary crashes when the object is being used by the C++ bridge (see property storage). Switching to
-   an array instead stops the crash. I have *no* idea why.
-
  */
 
 import CascableCore
@@ -277,26 +272,8 @@ public class BasicCamera: Equatable {
         return wrappedProperty
     }
 
-    private let propertyStorage = BasicCameraPropertyStore()
+    private var propertyStorage: [BasicPropertyIdentifier: BasicCameraProperty] = [:]
 
-    private class BasicCameraPropertyStore {
-        private var store: [BasicCameraProperty] = []
-
-        subscript(key: BasicPropertyIdentifier) -> BasicCameraProperty? {
-            get { return store.first(where: { $0.identifier == key }) }
-            set(newValue) {
-                if let newValue {
-                    store.append(newValue)
-                } else {
-                    store.removeAll(where: { $0.identifier == key })
-                }
-            }
-        }
-
-        var storedProperties: [BasicPropertyIdentifier] {
-            return store.map({ $0.identifier })
-        }
-    }
 }
 
 // MARK: - Live View

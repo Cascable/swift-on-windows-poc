@@ -355,26 +355,7 @@ protocol SimulatedCameraDelegate: AnyObject {
     func simulatedCameraDidDisconnect(_ camera: SimulatedCamera)
 }
 
-class SimulatedCameraPropertyStore {
-    private var store: [SimulatedCameraProperty] = []
-
-    subscript(key: PropertyIdentifier) -> SimulatedCameraProperty? {
-        get { return store.first(where: { $0.identifier == key }) }
-        set(newValue) {
-            if let newValue {
-                 store.append(newValue)
-            } else {
-                store.removeAll(where: { $0.identifier == key })
-            }
-        }
-    }
-
-    var storedProperties: [PropertyIdentifier] {
-        return store.map({ $0.identifier })
-    }
-}
-
-class SimulatedCamera: Camera {
+class SimulatedCamera: NSObject, Camera {
 
     init(configuration: SimulatedCameraConfiguration, clientName: String, transport: CameraTransport) {
         let info = SimulatedCameraInfo(configuration: configuration, clientName: clientName, transport: transport)
@@ -382,7 +363,6 @@ class SimulatedCamera: Camera {
         self.service = info
         self.cameraTransport = transport
         self.configuration = configuration
-        self.propertyStore = SimulatedCameraPropertyStore()
     }
 
     weak var simulatedCameraDelegate: SimulatedCameraDelegate?
@@ -824,7 +804,7 @@ class SimulatedCamera: Camera {
     // MARK: - Modern Property API
 
     var knownPropertyIdentifiers: [PropertyIdentifier] {
-        return propertyStore.storedProperties
+        return Array(propertyStore.keys)
     }
 
     func property(with identifier: PropertyIdentifier) -> CameraProperty {
@@ -845,7 +825,7 @@ class SimulatedCamera: Camera {
 
     // MARK: - Property Internal
 
-    private let propertyStore: SimulatedCameraPropertyStore
+    private var propertyStore = [PropertyIdentifier : SimulatedCameraProperty]()
     //{
         //willSet { willChangeValue(for: \.knownPropertyIdentifiers) }
         //didSet { didChangeValue(for: \.knownPropertyIdentifiers) }
