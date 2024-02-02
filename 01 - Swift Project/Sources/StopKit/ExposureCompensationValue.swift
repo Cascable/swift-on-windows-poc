@@ -73,7 +73,7 @@ public class ExposureCompensationValue: NSObject, NSCopying, NSSecureCoding, Uni
         let fractionString: String = {
             switch stopsFromZeroEV.fraction {
             case .none: return ""
-            case .oneThird: return StopKitLocalizedString("TwoThirdsFraction", "UniversalExposureCompensations")
+            case .oneThird: return StopKitLocalizedString("OneThirdFraction", "UniversalExposureCompensations")
             case .oneHalf: return StopKitLocalizedString("OneHalfFraction", "UniversalExposureCompensations")
             case .twoThirds: return StopKitLocalizedString("TwoThirdsFraction", "UniversalExposureCompensations")
             }
