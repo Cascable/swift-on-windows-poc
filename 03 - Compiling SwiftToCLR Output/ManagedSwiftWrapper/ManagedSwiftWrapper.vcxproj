@@ -88,6 +88,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>$(SolutionDir)ManagedSwiftWrapper\Built Unmanaged Wrapper;$(SwiftBinariesRoot)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);UnmanagedBasicTest.obj;UnmanagedSwiftWrapper.lib;API.swift.o</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -107,6 +109,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>$(SolutionDir)ManagedSwiftWrapper\Built Unmanaged Wrapper;$(SwiftBinariesRoot)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -124,7 +127,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(SolutionDir)ManagedSwiftWrapper\Built Unmanaged Wrapper;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)ManagedSwiftWrapper\Built Unmanaged Wrapper;$(SwiftBinariesRoot)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);UnmanagedBasicTest.obj;UnmanagedSwiftWrapper.lib;API.swift.o</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -147,7 +150,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(SolutionDir)ManagedSwiftWrapper\Built Unmanaged Wrapper</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)ManagedSwiftWrapper\Built Unmanaged Wrapper;$(SwiftBinariesRoot)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);UnmanagedBasicTest.obj</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

@@ -90,7 +90,7 @@
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);API.swift.o</AdditionalDependencies>
       <AdditionalManifestDependencies>
       </AdditionalManifestDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)UnmanagedSwiftWrapper\include</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)UnmanagedSwiftWrapper\include;$(SwiftBinariesRoot)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -116,7 +116,7 @@
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);API.swift.o</AdditionalDependencies>
       <AdditionalManifestDependencies>
       </AdditionalManifestDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)UnmanagedSwiftWrapper\include</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)UnmanagedSwiftWrapper\include;$(SwiftBinariesRoot)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -139,7 +139,7 @@
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);API.swift.o;vcruntimed.lib;ucrtd.lib</AdditionalDependencies>
       <AdditionalManifestDependencies>
       </AdditionalManifestDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)UnmanagedSwiftWrapper\include;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)UnmanagedSwiftWrapper\include;$(SwiftBinariesRoot)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -165,7 +165,7 @@
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);API.swift.o</AdditionalDependencies>
       <AdditionalManifestDependencies>
       </AdditionalManifestDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)UnmanagedSwiftWrapper\include;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)UnmanagedSwiftWrapper\include;$(SwiftBinariesRoot)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

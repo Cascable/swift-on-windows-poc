@@ -98,7 +98,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)UnmanagedCascableCoreBasicAPI\$(Platform)\$(Configuration);$(SolutionDir)Compiled Swift Project\lib;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)UnmanagedCascableCoreBasicAPI\$(Platform)\$(Configuration);$(SolutionDir)Compiled Swift Project\lib;$(SwiftBinariesRoot)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);UnmanagedCascableCoreBasicAPI.obj;CascableCore Simulated Camera.lib;CascableCore.lib;StopKit.lib;CascableCore Basic API.lib;swiftCore.lib</AdditionalDependencies>
       <AdditionalOptions>
       </AdditionalOptions>
@@ -123,7 +123,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)UnmanagedCascableCoreBasicAPI\$(Platform)\$(Configuration);$(SolutionDir)Compiled Swift Project\lib;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)UnmanagedCascableCoreBasicAPI\$(Platform)\$(Configuration);$(SolutionDir)Compiled Swift Project\lib;$(SwiftBinariesRoot)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);UnmanagedCascableCoreBasicAPI.obj;CascableCore Simulated Camera.lib;CascableCore.lib;StopKit.lib;CascableCore Basic API.lib;swiftCore.lib</AdditionalDependencies>
       <AdditionalOptions>
       </AdditionalOptions>
@@ -146,7 +146,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)UnmanagedCascableCoreBasicAPI\$(Platform)\$(Configuration);$(SolutionDir)Compiled Swift Project\lib;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)UnmanagedCascableCoreBasicAPI\$(Platform)\$(Configuration);$(SolutionDir)Compiled Swift Project\lib;$(SwiftBinariesRoot)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);UnmanagedCascableCoreBasicAPI.obj;CascableCore Simulated Camera.lib;CascableCore.lib;StopKit.lib;CascableCore Basic API.lib;swiftCore.lib</AdditionalDependencies>
       <AdditionalOptions>
       </AdditionalOptions>
@@ -171,7 +171,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)UnmanagedCascableCoreBasicAPI\$(Platform)\$(Configuration);$(SolutionDir)Compiled Swift Project\lib;C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\Platforms\0.0.0\Windows.platform\Developer\SDKs\Windows.sdk\usr\lib\swift\windows\x86_64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)UnmanagedCascableCoreBasicAPI\$(Platform)\$(Configuration);$(SolutionDir)Compiled Swift Project\lib;$(SwiftBinariesRoot)</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);UnmanagedCascableCoreBasicAPI.obj;CascableCore Simulated Camera.lib;CascableCore.lib;StopKit.lib;CascableCore Basic API.lib;swiftCore.lib</AdditionalDependencies>
       <AdditionalOptions>
       </AdditionalOptions>
