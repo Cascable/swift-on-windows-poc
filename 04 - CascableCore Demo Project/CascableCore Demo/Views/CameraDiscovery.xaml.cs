@@ -17,14 +17,8 @@ using Windows.Foundation.Collections;
 using System.Diagnostics;
 using Windows.UI.Popups;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace CascableCoreDemo.Views
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class CameraDiscovery : Page
     {
         public CameraDiscovery()
@@ -56,6 +50,8 @@ namespace CascableCoreDemo.Views
             viewModel.ButtonTitle = "Search for Camera...";
             viewModel.SpinnerVisibility = Visibility.Collapsed;
         }
+
+        #region Button Handlers
 
         private async void searchButton_Click(object sender, RoutedEventArgs e)
         {
@@ -133,5 +129,7 @@ namespace CascableCoreDemo.Views
             if (connectedEvent != null) { connectedEvent(this, camera); }
             resetState();
         }
+
+        #endregion
     }
 }
