@@ -57,7 +57,14 @@ namespace CascableCoreDemo.Views
                propertyPanel.Children.Add(new PropertyView(camera.property(property)));
             }
 
-            frameObserver = new PollingObserver<BasicCamera, BasicLiveViewFrame, double>(camera, TimeSpan.FromSeconds(0.1),
+            camera.setHandleCameraInitiatedPreviews(true);
+            cameraPreviewObserver = new PollingObserver<BasicCamera, BasicCameraInitiatedTransferResult, double>(camera, TimeSpan.FromSeconds(0.5),
+                delegate (BasicCamera c) { return c.getLastReceivedPreview(); },
+                delegate (BasicCameraInitiatedTransferResult r) { return r?.getDateProduced(); });
+            cameraPreviewObserver.ValueChanged += CameraPreviewObserver_ValueChanged;
+            cameraPreviewObserver.Start();
+
+            frameObserver = new PollingObserver<BasicCamera, BasicLiveViewFrame, double>(camera, TimeSpan.FromSeconds(0.25),
                 delegate (BasicCamera c) { return c.getLastLiveViewFrame(); }, 
                 delegate (BasicLiveViewFrame f) { return f?.getDateProduced(); });
             frameObserver.ValueChanged += FrameObserver_ValueChanged;
@@ -65,12 +72,25 @@ namespace CascableCoreDemo.Views
             frameObserver.Start();
         }
 
+        private void CameraPreviewObserver_ValueChanged(object sender, BasicCameraInitiatedTransferResult e)
+        {
+            if (e == null) { return; }
+            mainQueue.TryEnqueue(() => { handleCameraInitiatedPreview(e); });
+        }
+
+        private void handleCameraInitiatedPreview(BasicCameraInitiatedTransferResult preview)
+        {
+            PreviewWindow window = new PreviewWindow(preview);
+            double scale = Content.XamlRoot.RasterizationScale;
+            // This takes actual pixels rather than scaled pixels, hence the need for scale.
+            window.AppWindow.Resize(new Windows.Graphics.SizeInt32((Int32)(800.0 * scale), (Int32)(600.0 * scale)));
+            window.Activate();
+        }
+
         private void FrameObserver_ValueChanged(object sender, BasicLiveViewFrame e)
         {
             if (e == null) { return; }
-            Debug.WriteLine("Got live view frame of size: " + e.getRawPixelSize().getWidth() + "x" + e.getRawPixelSize().getHeight());
             mainQueue.TryEnqueue(() => { handleLiveViewFrame(e); });
-           
         }
 
         private void handleLiveViewFrame(BasicLiveViewFrame e)
@@ -104,9 +124,15 @@ namespace CascableCoreDemo.Views
         BasicCamera camera;
         ConnectedCameraViewModel viewModel = new ConnectedCameraViewModel();
         PollingObserver<BasicCamera, BasicLiveViewFrame, double> frameObserver;
+        PollingObserver<BasicCamera, BasicCameraInitiatedTransferResult, double> cameraPreviewObserver;
         private DispatcherQueue mainQueue;
 
         public event EventHandler<BasicCamera> DisconnectedFromCamera;
+
+        private void takePictureButton_Click(object sender, RoutedEventArgs e)
+        {
+            camera.invokeOneShotShutterExplicitlyEngagingAutoFocus(true);
+        }
 
         private async void disconnectButton_Click(object sender, RoutedEventArgs e)
         {

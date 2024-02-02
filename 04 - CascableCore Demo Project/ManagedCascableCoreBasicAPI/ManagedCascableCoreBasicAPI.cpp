@@ -381,6 +381,57 @@ void ManagedCascableCoreBasicAPI::BasicCamera::disconnect() {
     wrappedObj->disconnect();
 }
 
+bool ManagedCascableCoreBasicAPI::BasicCamera::getAutoFocusEngaged() {
+    bool unmanagedResult = wrappedObj->getAutoFocusEngaged();
+    return unmanagedResult;
+}
+
+void ManagedCascableCoreBasicAPI::BasicCamera::engageAutoFocus() {
+    wrappedObj->engageAutoFocus();
+}
+
+void ManagedCascableCoreBasicAPI::BasicCamera::disengageAutoFocus() {
+    wrappedObj->disengageAutoFocus();
+}
+
+bool ManagedCascableCoreBasicAPI::BasicCamera::getShutterEngaged() {
+    bool unmanagedResult = wrappedObj->getShutterEngaged();
+    return unmanagedResult;
+}
+
+void ManagedCascableCoreBasicAPI::BasicCamera::engageShutter() {
+    wrappedObj->engageShutter();
+}
+
+void ManagedCascableCoreBasicAPI::BasicCamera::disengageShutter() {
+    wrappedObj->disengageShutter();
+}
+
+void ManagedCascableCoreBasicAPI::BasicCamera::invokeOneShotShutterExplicitlyEngagingAutoFocus(bool triggerAutoFocus) {
+    bool arg0 = triggerAutoFocus;
+    wrappedObj->invokeOneShotShutterExplicitlyEngagingAutoFocus(arg0);
+}
+
+ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult^ ManagedCascableCoreBasicAPI::BasicCamera::getLastReceivedPreview() {
+    std::optional<UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult> unmanagedResult = wrappedObj->getLastReceivedPreview();
+    return (unmanagedResult.has_value() ? gcnew ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult(new UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult(unmanagedResult.value())) : nullptr);
+}
+
+void ManagedCascableCoreBasicAPI::BasicCamera::setLastReceivedPreview(ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult^ value) {
+    std::optional<UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult> arg0 = (value == nullptr ? std::nullopt : std::optional<UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult>(*value->wrappedObj));
+    wrappedObj->setLastReceivedPreview(arg0);
+}
+
+bool ManagedCascableCoreBasicAPI::BasicCamera::getHandleCameraInitiatedPreviews() {
+    bool unmanagedResult = wrappedObj->getHandleCameraInitiatedPreviews();
+    return unmanagedResult;
+}
+
+void ManagedCascableCoreBasicAPI::BasicCamera::setHandleCameraInitiatedPreviews(bool newValue) {
+    bool arg0 = newValue;
+    wrappedObj->setHandleCameraInitiatedPreviews(arg0);
+}
+
 void ManagedCascableCoreBasicAPI::BasicCamera::beginLiveViewStream() {
     wrappedObj->beginLiveViewStream();
 }
@@ -462,6 +513,51 @@ void ManagedCascableCoreBasicAPI::BasicCameraDiscovery::startDiscovery(System::S
 
 void ManagedCascableCoreBasicAPI::BasicCameraDiscovery::stopDiscovery() {
     wrappedObj->stopDiscovery();
+}
+
+// Implementation of ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult
+
+ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::BasicCameraInitiatedTransferResult(UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult *objectToTakeOwnershipOf) {
+    wrappedObj = objectToTakeOwnershipOf;
+}
+
+ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::~BasicCameraInitiatedTransferResult() {
+    delete wrappedObj;
+}
+
+double ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getDateProduced() {
+    double unmanagedResult = wrappedObj->getDateProduced();
+    return unmanagedResult;
+}
+
+bool ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::isOnlyDestinationForImage() {
+    bool unmanagedResult = wrappedObj->isOnlyDestinationForImage();
+    return unmanagedResult;
+}
+
+System::String^ ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getFileNameHint() {
+    std::optional<std::string> unmanagedResult = wrappedObj->getFileNameHint();
+    return (unmanagedResult.has_value() ? marshal_as<System::String^>(unmanagedResult.value()) : nullptr);
+}
+
+System::String^ ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getSuggestedFileNameExtensionForRepresentation() {
+    std::optional<std::string> unmanagedResult = wrappedObj->getSuggestedFileNameExtensionForRepresentation();
+    return (unmanagedResult.has_value() ? marshal_as<System::String^>(unmanagedResult.value()) : nullptr);
+}
+
+System::String^ ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getUtiForRepresentation() {
+    std::optional<std::string> unmanagedResult = wrappedObj->getUtiForRepresentation();
+    return (unmanagedResult.has_value() ? marshal_as<System::String^>(unmanagedResult.value()) : nullptr);
+}
+
+int ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getRawImageDataLength() {
+    int unmanagedResult = wrappedObj->getRawImageDataLength();
+    return unmanagedResult;
+}
+
+void ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::copyPixelData(uint8_t * pointer) {
+    uint8_t * arg0 = pointer;
+    wrappedObj->copyPixelData(arg0);
 }
 
 // Implementation of ManagedCascableCoreBasicAPI::BasicCameraProperty

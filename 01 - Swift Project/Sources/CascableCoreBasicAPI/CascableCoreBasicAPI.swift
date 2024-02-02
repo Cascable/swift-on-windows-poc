@@ -29,6 +29,9 @@ import CascableCoreSimulatedCamera
 
  - When run in the context of a C# app, `DispatchQueue.main` doesn't function as you're used to. This is to be expected.
 
+ - Methods that contain types that can't be exposed to C++ are just omitted from the header rather than erroring (hence
+   our custom size type over CGSize).
+
  */
 
 import CascableCore
@@ -210,9 +213,115 @@ public class BasicCamera: Equatable {
 
     // TODO: Functionality and categories
     // TODO: Filesystem
-    // TODO: Focus and shutter
-    // TODO: Camera-initiated transfer
     // TODO: Video recording
+
+    //Shutter
+
+    /// Returns `YES` if autofocus is currently engaged, otherwise `NO`.
+    public var autoFocusEngaged: Bool {
+        return wrappedCamera.autoFocusEngaged
+    }
+
+    /// Engages autofocus.
+    ///
+    /// @note Autofocus will remain engaged until `disengageAutoFocus:` is called. While autofocus is engaged,
+    /// functionality not directly to taking a shot will be unavailable. Live view (if on before this method is called)
+    /// will continue to stream, and you can use the `engageShutter:`, `disengageShutter:`, and `disengageAutoFocus:`
+    /// methods.
+    ///
+    /// The typical ordering for taking a photograph using these methods is as follows:
+    ///
+    /// - `engageAutoFocus:`
+    /// - `engageShutter:`
+    /// - `disengageShutter:`
+    /// - `disengageAutoFocus:`
+    public func engageAutoFocus() {
+        wrappedCamera.engageAutoFocus(nil)
+    }
+
+    /// Disengages autofocus.
+    public func disengageAutoFocus() {
+        wrappedCamera.disengageAutoFocus(nil)
+    }
+
+    /// Returns `YES` if the shutter is currently engaged, otherwise `NO`.
+    public var shutterEngaged: Bool {
+        return wrappedCamera.shutterEngaged
+    }
+
+    /// Engages the shutter.
+    ///
+    /// The shutter will remain "engaged" until `disengageShutter:` is called. However,
+    /// if the camera is set to take an exposure of a specific length (i.e., anything other than "bulb"
+    /// mode) the timing of these calls will have no effect on the exposure.
+    ///
+    /// @note This may not engage autofocus if the camera is configured to use back-button autofocus.
+    ///
+    /// @note Even if you don't call `engageAutoFocus:` prior to this method, calling this method may cause `autoFocusEngaged`
+    ///       to become `YES`. It is the client's responsibility to detect this and called `disengageAutoFocus:` if needed.
+    public func engageShutter() {
+        wrappedCamera.engageShutter(nil)
+    }
+
+    /// Disengages the shutter.
+    public func disengageShutter() {
+        wrappedCamera.disengageShutter(nil)
+    }
+
+    /// Takes a single photo.
+    ///
+    /// This method will (optionally) engage autofocus, engage the shutter, disengage the shutter and
+    /// disengage autofocus. Think of it as a "Take a photo!" button.
+    ///
+    /// @param triggerAutoFocus Pass `YES` to explicitly engage autofocus during the process, otherwise `NO`.
+    public func invokeOneShotShutterExplicitlyEngagingAutoFocus(_ triggerAutoFocus: Bool) {
+        wrappedCamera.invokeOneShotShutterExplicitlyEngagingAutoFocus(triggerAutoFocus, completionCallback: nil)
+    }
+
+    //Camera-Initiated Transfers
+
+    private var cameraInitiatedTransferToken: ObserverToken? = nil
+
+    /// The most recently-received camera-initiated preview object. Set `handleCameraInitiatedPreviews` to  `true` to
+    /// start populating this.
+    public private(set) var lastReceivedPreview: BasicCameraInitiatedTransferResult? = nil
+
+    /// Set to `true` to handle camera-initiated previews (i.e., automatic previewing of photos after they're taken).
+    public var handleCameraInitiatedPreviews: Bool {
+        get { return cameraInitiatedTransferToken != nil }
+        set {
+            if newValue {
+                guard cameraInitiatedTransferToken == nil else { return }
+                cameraInitiatedTransferToken = wrappedCamera.addCameraInitiatedTransferHandler({ [weak self] request in
+                    self?.handleTransferRequest(request)
+                })
+            } else if let token = cameraInitiatedTransferToken {
+                wrappedCamera.removeCameraInitiatedTransferHandler(with: token)
+                cameraInitiatedTransferToken = nil
+                lastReceivedPreview = nil
+            }
+        }
+    }
+
+    private func handleTransferRequest(_ request: CameraInitiatedTransferRequest) {
+        guard request.isValid, (request.isOnlyDestinationForImage || request.executionRequiredToClearBuffer || request.canProvide(.preview)) else { return }
+        let representation: CameraInitiatedTransferRepresentation = (request.canProvide(.preview) ? .preview : .original)
+        request.executeTransfer(for: representation, completionQueue: queue, completionHandler: { result, error in
+           guard error == nil, let result else {
+                print("Executing camera-initiated request failed: \(error?.localizedDescription ?? "unknown error")")
+                return
+            }
+            result.generateData(for: representation, completionHandler: { [weak self] data, error in
+            guard let self else { return }
+                guard error == nil, let data else {
+                    print("Getting data from camera-initiated request failed: \(error?.localizedDescription ?? "unknown error")")
+                    return
+                }
+                let wrappedResult = BasicCameraInitiatedTransferResult(wrapping: result, representation: representation, imageData: data)
+                if self.handleCameraInitiatedPreviews { self.lastReceivedPreview = wrappedResult }
+            })
+        })
+    }
 
     //Live View
 
@@ -274,6 +383,60 @@ public class BasicCamera: Equatable {
 
     private var propertyStorage: [BasicPropertyIdentifier: BasicCameraProperty] = [:]
 
+}
+
+// MARK: - Camera-Initiated Transfers
+
+public class BasicCameraInitiatedTransferResult {
+    internal let wrappedValue: CameraInitiatedTransferResult
+    internal let representation: CameraInitiatedTransferRepresentation
+    internal let imageData: Data
+    internal init(wrapping value: CameraInitiatedTransferResult, representation: CameraInitiatedTransferRepresentation, imageData: Data) {
+        wrappedValue = value
+        dateProduced = Date().timeIntervalSince1970
+        self.representation = representation
+        self.imageData = imageData
+    }
+
+    /// Returns the date and time at which this preview was generated.
+    public let dateProduced: Double
+
+    /// Returns `YES` if not saving the contents of this result may cause data loss. For example, a camera
+    /// set to only save images to the connected host would set this to `YES`.
+    public var isOnlyDestinationForImage: Bool {
+        return wrappedValue.isOnlyDestinationForImage
+    }
+
+    /// A file name hint for the original representation of the image, if available.
+    public var fileNameHint: String? {
+        return wrappedValue.fileNameHint
+    }
+
+    /// Returns a suggested file name extension for the given representation or `nil` if the representation isn't available.
+    ///
+    /// To match camera conventions, extensions will be uppercase ("JPG", "CR3", "ARW", "HEIC", etc).
+    ///
+    /// @note This method is guaranteed to return a valid value as long as the representation is available. This can be
+    ///       useful if the `fileNameHint` property is `nil` and you need to write a representation to disk.
+    public var suggestedFileNameExtensionForRepresentation: String? {
+        return wrappedValue.suggestedFileNameExtension(for: representation)
+    }
+
+    /// Returns the type UTI for the given representation, or `nil` if the representation isn't available.
+    ///
+    /// @note This method may fall back to returning `kUTTypeData` if the representation is in a RAW image format
+    /// not recognised by the operating system.
+    public var utiForRepresentation: String? {
+        return wrappedValue.uti(for: representation)
+    }
+
+    public var rawImageDataLength: Int {
+        return imageData.count
+    }
+
+    public func copyPixelData(into pointer: UnsafeMutablePointer<UInt8>) {
+        imageData.copyBytes(to: pointer, count: rawImageDataLength)
+    }
 }
 
 // MARK: - Live View

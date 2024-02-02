@@ -12,6 +12,7 @@ namespace ManagedCascableCoreBasicAPI {
     ref class BasicPropertyIdentifier;
     ref class BasicCamera;
     ref class BasicCameraDiscovery;
+    ref class BasicCameraInitiatedTransferResult;
     ref class BasicCameraProperty;
     ref class BasicDeviceInfo;
     ref class BasicLiveViewFrame;
@@ -109,6 +110,17 @@ namespace ManagedCascableCoreBasicAPI {
         System::String^ getFriendlyDisplayName();
         void connect();
         void disconnect();
+        bool getAutoFocusEngaged();
+        void engageAutoFocus();
+        void disengageAutoFocus();
+        bool getShutterEngaged();
+        void engageShutter();
+        void disengageShutter();
+        void invokeOneShotShutterExplicitlyEngagingAutoFocus(bool triggerAutoFocus);
+        ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult^ getLastReceivedPreview();
+        void setLastReceivedPreview(ManagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult^ value);
+        bool getHandleCameraInitiatedPreviews();
+        void setHandleCameraInitiatedPreviews(bool newValue);
         void beginLiveViewStream();
         void endLiveViewStream();
         bool getLiveViewStreamActive();
@@ -133,6 +145,23 @@ namespace ManagedCascableCoreBasicAPI {
         List<ManagedCascableCoreBasicAPI::BasicCamera^>^ getVisibleCameras();
         void startDiscovery(System::String^ clientName);
         void stopDiscovery();
+    };
+
+    public ref class BasicCameraInitiatedTransferResult {
+    private:
+    internal:
+        UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult *wrappedObj;
+        BasicCameraInitiatedTransferResult(UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult *objectToTakeOwnershipOf);
+    public:
+        ~BasicCameraInitiatedTransferResult();
+    
+        double getDateProduced();
+        bool isOnlyDestinationForImage();
+        System::String^ getFileNameHint();
+        System::String^ getSuggestedFileNameExtensionForRepresentation();
+        System::String^ getUtiForRepresentation();
+        int getRawImageDataLength();
+        void copyPixelData(uint8_t * pointer);
     };
 
     public ref class BasicCameraProperty {

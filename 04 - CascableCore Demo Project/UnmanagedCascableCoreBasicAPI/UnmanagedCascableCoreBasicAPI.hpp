@@ -11,6 +11,7 @@ namespace CascableCoreBasicAPI {
     class BasicPropertyIdentifier;
     class BasicCamera;
     class BasicCameraDiscovery;
+    class BasicCameraInitiatedTransferResult;
     class BasicCameraProperty;
     class BasicDeviceInfo;
     class BasicLiveViewFrame;
@@ -24,6 +25,7 @@ namespace UnmanagedCascableCoreBasicAPI {
     class BasicPropertyIdentifier;
     class BasicCamera;
     class BasicCameraDiscovery;
+    class BasicCameraInitiatedTransferResult;
     class BasicCameraProperty;
     class BasicDeviceInfo;
     class BasicLiveViewFrame;
@@ -121,6 +123,17 @@ namespace UnmanagedCascableCoreBasicAPI {
         std::optional<std::string> getFriendlyDisplayName();
         void connect();
         void disconnect();
+        bool getAutoFocusEngaged();
+        void engageAutoFocus();
+        void disengageAutoFocus();
+        bool getShutterEngaged();
+        void engageShutter();
+        void disengageShutter();
+        void invokeOneShotShutterExplicitlyEngagingAutoFocus(bool triggerAutoFocus);
+        std::optional<UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult> getLastReceivedPreview();
+        void setLastReceivedPreview(const std::optional<UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult> & value);
+        bool getHandleCameraInitiatedPreviews();
+        void setHandleCameraInitiatedPreviews(bool newValue);
         void beginLiveViewStream();
         void endLiveViewStream();
         bool getLiveViewStreamActive();
@@ -143,6 +156,22 @@ namespace UnmanagedCascableCoreBasicAPI {
         std::vector<UnmanagedCascableCoreBasicAPI::BasicCamera> getVisibleCameras();
         void startDiscovery(const std::string & clientName);
         void stopDiscovery();
+    };
+
+    class BasicCameraInitiatedTransferResult {
+    private:
+    public:
+        std::shared_ptr<CascableCoreBasicAPI::BasicCameraInitiatedTransferResult> swiftObj;
+        BasicCameraInitiatedTransferResult(std::shared_ptr<CascableCoreBasicAPI::BasicCameraInitiatedTransferResult> swiftObj);
+        ~BasicCameraInitiatedTransferResult();
+    
+        double getDateProduced();
+        bool isOnlyDestinationForImage();
+        std::optional<std::string> getFileNameHint();
+        std::optional<std::string> getSuggestedFileNameExtensionForRepresentation();
+        std::optional<std::string> getUtiForRepresentation();
+        int getRawImageDataLength();
+        void copyPixelData(uint8_t* pointer);
     };
 
     class BasicCameraProperty {
