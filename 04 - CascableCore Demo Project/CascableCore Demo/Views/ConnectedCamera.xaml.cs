@@ -146,6 +146,12 @@ namespace CascableCoreDemo.Views
             frameObserver.Start();
         }
 
+        private void stopLiveView()
+        {
+            camera.endLiveViewStream();
+            frameObserver.Stop();
+        }
+
         private void FrameObserver_ValueChanged(object sender, BasicLiveViewFrame e)
         {
             if (e == null) { return; }
@@ -154,10 +160,19 @@ namespace CascableCoreDemo.Views
 
         private void handleLiveViewFrame(BasicLiveViewFrame e)
         {
-            byte[] data = extractFrame(e);
-            BitmapImage image = new BitmapImage();
-            image.SetSource(data.AsBuffer().AsStream().AsRandomAccessStream());
-            ImageView.Source = image;
+            try
+            {
+                byte[] data = extractFrame(e);
+                BitmapImage image = new BitmapImage();
+                image.SetSource(data.AsBuffer().AsStream().AsRandomAccessStream());
+                ImageView.Source = image;
+            } catch
+            {
+                // We can throw here if the window is closed while live view is running. We should
+                // stop live view and disconnect properly when the user requests a window close
+                // rather than reacting like this.
+                stopLiveView();
+            }
         }
 
         private unsafe byte[] extractFrame(BasicLiveViewFrame frame)
