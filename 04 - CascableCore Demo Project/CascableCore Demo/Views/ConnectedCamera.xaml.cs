@@ -64,7 +64,7 @@ namespace CascableCoreDemo.Views
             cameraPreviewObserver.ValueChanged += CameraPreviewObserver_ValueChanged;
             cameraPreviewObserver.Start();
 
-            frameObserver = new PollingObserver<BasicCamera, BasicLiveViewFrame, double>(camera, TimeSpan.FromSeconds(0.25),
+            frameObserver = new PollingObserver<BasicCamera, BasicLiveViewFrame, double>(camera, TimeSpan.FromSeconds(1.0 / 300.0),
                 delegate (BasicCamera c) { return c.getLastLiveViewFrame(); }, 
                 delegate (BasicLiveViewFrame f) { return f?.getDateProduced(); });
             frameObserver.ValueChanged += FrameObserver_ValueChanged;
