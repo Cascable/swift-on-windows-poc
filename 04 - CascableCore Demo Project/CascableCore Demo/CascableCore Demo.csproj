@@ -14,6 +14,7 @@
     <EnableMsixTooling>true</EnableMsixTooling>
 	<LangVersion>12.0</LangVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<ApplicationIcon>Assets\CoreIcon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -63,6 +64,14 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ManagedCascableCoreBasicAPI\ManagedCascableCoreBasicAPI.vcxproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Assets\CoreIcon%402x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\CoreIcon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\PreviewWindow.xaml">

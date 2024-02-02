@@ -15,6 +15,7 @@ using Windows.Foundation.Collections;
 using CascableCoreDemo.Views;
 using ManagedCascableCoreBasicAPI;
 using System.Diagnostics;
+using Windows.ApplicationModel;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -33,6 +34,11 @@ namespace CascableCoreDemo
             Content = discoveryView;
             discoveryView.Loaded += uiLoaded;
             discoveryView.ConnectedToCamera += connectedToCamera;
+            string icon = Path.Combine(
+                Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).LocalPath),
+                "Assets", "CoreIcon.ico"
+            );
+            this.AppWindow.SetIcon(icon);
         }
 
         // We'll just use the one of these throughout the lifecycle.
@@ -45,7 +51,7 @@ namespace CascableCoreDemo
             // Scale isn't available until we're loaded and about to be onscreen.
             double scale = Content.XamlRoot.RasterizationScale;
             // This takes actual pixels rather than scaled pixels, hence the need for scale.
-            AppWindow.Resize(new Windows.Graphics.SizeInt32((Int32)(800.0 * scale), (Int32)(600.0 * scale)));
+            AppWindow.Resize(new Windows.Graphics.SizeInt32((Int32)(800.0 * scale), (Int32)(700.0 * scale)));
             hasResizedWindow = true;
         }
 

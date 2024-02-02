@@ -9,6 +9,7 @@
     mc:Ignorable="d">
 
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Image Width="180" Height="180" Source="/Assets/CoreIcon@2x.png"></Image>
         <TextBlock TextAlignment="Center" Margin="0,0,0,10" FontWeight="Bold" FontSize="24">CascableCore Demo</TextBlock>
         <TextBlock MaxWidth="400" TextWrapping="WrapWholeWords" TextAlignment="Center" Margin="0,0,0,10">This project is a proof-of-concept to build a C# application that calls into a Swift framework.</TextBlock>
         <TextBlock MaxWidth="400" TextWrapping="WrapWholeWords" TextAlignment="Center" Margin="0,0,0,10">Click "Search for Camera..." to get started.</TextBlock>

@@ -35,6 +35,11 @@ namespace CascableCoreDemo.Views
             BitmapImage image = new BitmapImage();
             image.SetSource(data.AsBuffer().AsStream().AsRandomAccessStream());
             ImageView.Source = image;
+            string icon = Path.Combine(
+                Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).LocalPath),
+                "Assets", "CoreIcon.ico"
+            );
+            this.AppWindow.SetIcon(icon);
         }
 
         private BasicCameraInitiatedTransferResult preview;
