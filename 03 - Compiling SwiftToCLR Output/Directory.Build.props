@@ -1,8 +1,0 @@
-<Project>
-	<PropertyGroup>
-		<SwiftInstallVersion>0.0.0</SwiftInstallVersion>
-		<SwiftInstallRoot>C:\Users\Daniel Kennett\AppData\Local\Programs\Swift\</SwiftInstallRoot>
-		<SwiftSDKRoot>$(SwiftInstallRoot)Platforms\$(SwiftInstallVersion)\Windows.platform\Developer\SDKs\Windows.sdk\</SwiftSDKRoot>
-		<SwiftBinariesRoot>$(SwiftSDKRoot)usr\lib\swift\windows\x86_64\</SwiftBinariesRoot>
-	</PropertyGroup>
-</Project>
