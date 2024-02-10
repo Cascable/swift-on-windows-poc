@@ -30,7 +30,7 @@ When you start to explore this idea, however, it quickly becomes apparent that i
 
 This means we need not one, but *two* C++ wrappers.
 
-1) A 'simplification' wrapper, compiled by `clang`, that takes the Swift interop header and re-defines it using a, er,  "normal" C++ header that `MSVC` can understand.
+1) A 'simplification' wrapper, compiled by `clang`, that takes the Swift interop header and re-defines it using a, er, "normal" C++ header that `MSVC` can understand.
 
 2) A 'CLRification' wrapper, compiled by `MSVC`, that takes the simplified header and redefines it in C++/CLI that can be called from within the CLR and from C++.
 
@@ -79,6 +79,18 @@ The **Windows CascableCore Demo Project** contains a Visual Studio solution cont
 The **Mac CascableCore Demo Project** folder contains an Xcode project implementing the same app as the Windows demo project, but on macOS using SwiftUI. It's just here to provide a fun comparison on how you might build the same app in C# on Windows and in SwiftUI on the Mac.
 
 **Note:** Each project in this repo is standalone, so if you want to just fire up the demo project and look around you don't need to build the Swift project then run SwiftToCLR on it (although you can if you want!). **However**, for the Visual Studio solution you _will_ need to edit the `Directory.Build.props` file to point Visual Studio to your local Swift installation. For more details, see the "Technical Notes: Windows Demo Project" section below.
+
+## Interesting Files
+
+If you want to see the "journey" of a Swift API into C# without having to fiddle around with the repo, you can check out: 
+
+- [CascableCoreBasicAPI-Swift.h](03%20-%20Windows%20CascableCore%20Demo%20Project/Compiled%20Swift%20Project/include/CascableCoreBasicAPI-Swift.h) is the Swift C++ interop header for our Swift module, and it's what you'd give to SwiftToCLR. **Warning:** It's nearly 8,000 lines — the actual API definition is near the bottom.
+
+- [UnmanagedCascableCoreBasicAPI.hpp](03%20-%20Windows%20CascableCore%20Demo%20Project/UnmanagedCascableCoreBasicAPI/UnmanagedCascableCoreBasicAPI.hpp) is SwiftToCLR's output for the first wrapper (wrapping the Swift C++ header in "normal" C++). The implementation is in [UnmanagedCascableCoreBasicAPI.cpp](03%20-%20Windows%20CascableCore%20Demo%20Project/UnmanagedCascableCoreBasicAPI/UnmanagedCascableCoreBasicAPI.cpp).
+
+- [ManagedCascableCoreBasicAPI.hpp](03%20-%20Windows%20CascableCore%20Demo%20Project/ManagedCascableCoreBasicAPI/ManagedCascableCoreBasicAPI.hpp) is SwiftToCLR's output for the second wrapper (wrapping the "normal" C++ header in C++/CLI). The implementation is in [ManagedCascableCoreBasicAPI.cpp](03%20-%20Windows%20CascableCore%20Demo%20Project/ManagedCascableCoreBasicAPI/ManagedCascableCoreBasicAPI.cpp).
+
+- There's no C# definition of the API since .NET automatically exposes C++/CLI symbols to C# with no additional steps required.
 
 ## How To Use SwiftToCLR
 
