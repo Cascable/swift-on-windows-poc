@@ -48,7 +48,7 @@ This is a job for automated code generation, and that's the meat of this proof-o
 
 `SwiftToCLR` takes the C++ interop header produced by the Swift compiler and uses [libclang](https://clang.llvm.org/docs/LibClang.html) to parse it and create both wrapper layers needed to get into the CLR.
 
-### This Repository's Contents
+## This Repository's Contents
 
 There are multiple projects in this repository, which together provide an end-to-end implementation of the task at hand for you to experiment with:
 
@@ -75,6 +75,8 @@ The **Windows CascableCore Demo Project** contains a Visual Studio solution cont
 - The `ManagedCascableCoreBasicAPI` project compiles the "second" wrapper layer from SwiftToCLR using `MSVC`.
 
 - The `CascableCore Demo` project is a C# demo application that lets you connect to a camera, see the live view stream, and adjust some camera settings. A screenshot of this is what's at the top of this README.
+
+The **Mac CascableCore Demo Project** folder contains an Xcode project implementing the same app as the Windows demo project, but on macOS using SwiftUI. It's just here to provide a fun comparison on how you might build the same app in C# on Windows and in SwiftUI on the Mac.
 
 **Note:** Each project in this repo is standalone, so if you want to just fire up the demo project and look around you don't need to build the Swift project then run SwiftToCLR on it (although you can if you want!). **However**, for the Visual Studio solution you _will_ need to edit the `Directory.Build.props` file to point Visual Studio to your local Swift installation. For more details, see the "Technical Notes: Windows Demo Project" section below.
 

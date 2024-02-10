@@ -1,0 +1,392 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		509303042B778EDA0052C30E /* CascableCoreDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509303032B778EDA0052C30E /* CascableCoreDemoApp.swift */; };
+		509303062B778EDA0052C30E /* CameraDiscoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509303052B778EDA0052C30E /* CameraDiscoveryView.swift */; };
+		509303082B778EDB0052C30E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 509303072B778EDB0052C30E /* Assets.xcassets */; };
+		509303142B778F080052C30E /* CascableCoreSimulatedCamera in Frameworks */ = {isa = PBXBuildFile; productRef = 509303132B778F080052C30E /* CascableCoreSimulatedCamera */; };
+		509303172B77919D0052C30E /* CascableCore in Frameworks */ = {isa = PBXBuildFile; productRef = 509303162B77919D0052C30E /* CascableCore */; };
+		5093031A2B7791BE0052C30E /* BasicCameraDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509303192B7791BE0052C30E /* BasicCameraDiscovery.swift */; };
+		5093031C2B77B99D0052C30E /* ConnectedCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093031B2B77B99D0052C30E /* ConnectedCameraView.swift */; };
+		5093031E2B77CD570052C30E /* PropertyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093031D2B77CD570052C30E /* PropertyView.swift */; };
+		509303202B7808B00052C30E /* PreviewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5093031F2B7808B00052C30E /* PreviewSheet.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		509303002B778EDA0052C30E /* CascableCore Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CascableCore Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		509303032B778EDA0052C30E /* CascableCoreDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CascableCoreDemoApp.swift; sourceTree = "<group>"; };
+		509303052B778EDA0052C30E /* CameraDiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraDiscoveryView.swift; sourceTree = "<group>"; };
+		509303072B778EDB0052C30E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5093030C2B778EDB0052C30E /* CascableCoreDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CascableCoreDemo.entitlements; sourceTree = "<group>"; };
+		509303192B7791BE0052C30E /* BasicCameraDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicCameraDiscovery.swift; sourceTree = "<group>"; };
+		5093031B2B77B99D0052C30E /* ConnectedCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectedCameraView.swift; sourceTree = "<group>"; };
+		5093031D2B77CD570052C30E /* PropertyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyView.swift; sourceTree = "<group>"; };
+		5093031F2B7808B00052C30E /* PreviewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewSheet.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		509302FD2B778EDA0052C30E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				509303142B778F080052C30E /* CascableCoreSimulatedCamera in Frameworks */,
+				509303172B77919D0052C30E /* CascableCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		509302F72B778EDA0052C30E = {
+			isa = PBXGroup;
+			children = (
+				509303022B778EDA0052C30E /* CascableCore Demo */,
+				509303012B778EDA0052C30E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		509303012B778EDA0052C30E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				509303002B778EDA0052C30E /* CascableCore Demo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		509303022B778EDA0052C30E /* CascableCore Demo */ = {
+			isa = PBXGroup;
+			children = (
+				509303032B778EDA0052C30E /* CascableCoreDemoApp.swift */,
+				509303052B778EDA0052C30E /* CameraDiscoveryView.swift */,
+				5093031B2B77B99D0052C30E /* ConnectedCameraView.swift */,
+				5093031D2B77CD570052C30E /* PropertyView.swift */,
+				5093031F2B7808B00052C30E /* PreviewSheet.swift */,
+				509303192B7791BE0052C30E /* BasicCameraDiscovery.swift */,
+				509303072B778EDB0052C30E /* Assets.xcassets */,
+				5093030C2B778EDB0052C30E /* CascableCoreDemo.entitlements */,
+			);
+			path = "CascableCore Demo";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		509302FF2B778EDA0052C30E /* CascableCore Demo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5093030F2B778EDB0052C30E /* Build configuration list for PBXNativeTarget "CascableCore Demo" */;
+			buildPhases = (
+				509302FC2B778EDA0052C30E /* Sources */,
+				509302FD2B778EDA0052C30E /* Frameworks */,
+				509302FE2B778EDA0052C30E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CascableCore Demo";
+			packageProductDependencies = (
+				509303132B778F080052C30E /* CascableCoreSimulatedCamera */,
+				509303162B77919D0052C30E /* CascableCore */,
+			);
+			productName = "CascableCore Demo";
+			productReference = 509303002B778EDA0052C30E /* CascableCore Demo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		509302F82B778EDA0052C30E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1510;
+				LastUpgradeCheck = 1510;
+				TargetAttributes = {
+					509302FF2B778EDA0052C30E = {
+						CreatedOnToolsVersion = 15.1;
+					};
+				};
+			};
+			buildConfigurationList = 509302FB2B778EDA0052C30E /* Build configuration list for PBXProject "CascableCore Demo" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 509302F72B778EDA0052C30E;
+			packageReferences = (
+				509303122B778F080052C30E /* XCRemoteSwiftPackageReference "cascablecore-simulated-camera" */,
+				509303152B77919D0052C30E /* XCRemoteSwiftPackageReference "cascablecore-distribution" */,
+			);
+			productRefGroup = 509303012B778EDA0052C30E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				509302FF2B778EDA0052C30E /* CascableCore Demo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		509302FE2B778EDA0052C30E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				509303082B778EDB0052C30E /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		509302FC2B778EDA0052C30E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				509303202B7808B00052C30E /* PreviewSheet.swift in Sources */,
+				509303062B778EDA0052C30E /* CameraDiscoveryView.swift in Sources */,
+				5093031E2B77CD570052C30E /* PropertyView.swift in Sources */,
+				5093031A2B7791BE0052C30E /* BasicCameraDiscovery.swift in Sources */,
+				509303042B778EDA0052C30E /* CascableCoreDemoApp.swift in Sources */,
+				5093031C2B77B99D0052C30E /* ConnectedCameraView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		5093030D2B778EDB0052C30E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		5093030E2B778EDB0052C30E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		509303102B778EDB0052C30E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "CascableCore Demo/CascableCoreDemo.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EB5BP6YJ4R;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "se.cascable.CascableCore-Demo";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		509303112B778EDB0052C30E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "CascableCore Demo/CascableCoreDemo.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EB5BP6YJ4R;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "se.cascable.CascableCore-Demo";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		509302FB2B778EDA0052C30E /* Build configuration list for PBXProject "CascableCore Demo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5093030D2B778EDB0052C30E /* Debug */,
+				5093030E2B778EDB0052C30E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5093030F2B778EDB0052C30E /* Build configuration list for PBXNativeTarget "CascableCore Demo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				509303102B778EDB0052C30E /* Debug */,
+				509303112B778EDB0052C30E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		509303122B778F080052C30E /* XCRemoteSwiftPackageReference "cascablecore-simulated-camera" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Cascable/cascablecore-simulated-camera";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		509303152B77919D0052C30E /* XCRemoteSwiftPackageReference "cascablecore-distribution" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/cascable/cascablecore-distribution/";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		509303132B778F080052C30E /* CascableCoreSimulatedCamera */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 509303122B778F080052C30E /* XCRemoteSwiftPackageReference "cascablecore-simulated-camera" */;
+			productName = CascableCoreSimulatedCamera;
+		};
+		509303162B77919D0052C30E /* CascableCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 509303152B77919D0052C30E /* XCRemoteSwiftPackageReference "cascablecore-distribution" */;
+			productName = CascableCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 509302F82B778EDA0052C30E /* Project object */;
+}
