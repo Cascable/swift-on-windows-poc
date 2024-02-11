@@ -22,15 +22,15 @@ Since we can call into C++/CLI from C#, this should be a piece of cake!
 
 When you start to explore this idea, however, it quickly becomes apparent that it's not going to be as simple as it seems. The relevant facts are these:
 
-- The Swift compiler, `clang`, generates an API header that I can only describe as "5000 lines of chaos" for the simplest of Swift APIs. This header can, as far as I can make out, only be parsed by `clang` itself, and not the Microsoft C++ compiler (`MSVC`).
+- The Swift compiler, `Clang`, generates an API header that I can only describe as "5000 lines of chaos" for the simplest of Swift APIs. This header can, as far as I can make out, only be parsed by `Clang` itself, and not the Microsoft C++ compiler (`MSVC`).
 
 - The A**B**I, however, is standard C++.
 
-- In order to be called from CLR (i.e., the garbage-collected runtime environment C# code runs in), we need to use a variant of C++ called [C++/CLI](https://en.wikipedia.org/wiki/C%2B%2B/CLI). `clang` can't generate C++/CLI, but `MSVC` can.
+- In order to be called from CLR (i.e., the garbage-collected runtime environment C# code runs in), we need to use a variant of C++ called [C++/CLI](https://en.wikipedia.org/wiki/C%2B%2B/CLI). `Clang` can't generate C++/CLI, but `MSVC` can.
 
 This means we need not one, but *two* C++ wrappers.
 
-1) A 'simplification' wrapper, compiled by `clang`, that takes the Swift interop header and re-defines it using a, er, "normal" C++ header that `MSVC` can understand.
+1) A 'simplification' wrapper, compiled by `Clang`, that takes the Swift interop header and re-defines it using a, er, "normal" C++ header that `MSVC` can understand.
 
 2) A 'CLRification' wrapper, compiled by `MSVC`, that takes the simplified header and redefines it in C++/CLI that can be called from within the CLR and from C++.
 
@@ -46,7 +46,7 @@ However, that's no fun! And, what if you're building _new_ code and want to prot
 
 This is a job for automated code generation, and that's the meat of this proof-of-concept: a command-line tool, written in Swift, called `SwiftToCLR`.
 
-`SwiftToCLR` takes the C++ interop header produced by the Swift compiler and uses [libclang](https://clang.llvm.org/docs/LibClang.html) to parse it and create both wrapper layers needed to get into the CLR.
+`SwiftToCLR` takes the C++ interop header produced by the Swift compiler and uses [LibClang](https://clang.llvm.org/docs/LibClang.html) to parse it and create both wrapper layers needed to get into the CLR.
 
 ## This Repository's Contents
 
@@ -70,7 +70,7 @@ The **SwiftToCLR** folder contains the SwiftToCLR tool itself.
 
 The **Windows CascableCore Demo Project** contains a Visual Studio solution containing three projects:
 
-- The `UnmanagedCascableCoreBasicAPI` project compiles the "first" wrapper layer from SwiftToCLR using `clang`.
+- The `UnmanagedCascableCoreBasicAPI` project compiles the "first" wrapper layer from SwiftToCLR using `Clang`.
 
 - The `ManagedCascableCoreBasicAPI` project compiles the "second" wrapper layer from SwiftToCLR using `MSVC`.
 
@@ -82,7 +82,9 @@ The **Mac CascableCore Demo Project** folder contains an Xcode project implement
 
 ## Interesting Files
 
-If you want to see the "journey" of a Swift API into C# without having to fiddle around with the repo, you can check out: 
+If you want to see the "journey" of a Swift API into C# without having to fiddle around with the repo, you can check out:
+
+- [CascableCoreBasicAPI.swift](01%20-%20Swift%20Project/Sources/CascableCoreBasicAPI/CascableCoreBasicAPI.swift) contains the definition and implementation of the Swift API that we want to call from C#.
 
 - [CascableCoreBasicAPI-Swift.h](03%20-%20Windows%20CascableCore%20Demo%20Project/Compiled%20Swift%20Project/include/CascableCoreBasicAPI-Swift.h) is the Swift C++ interop header for our Swift module, and it's what you'd give to SwiftToCLR. **Warning:** It's nearly 8,000 lines — the actual API definition is near the bottom.
 
@@ -94,7 +96,7 @@ If you want to see the "journey" of a Swift API into C# without having to fiddle
 
 ## How To Use SwiftToCLR
 
-**Note:** SwiftToCLR will compile and work on macOS as well as Windows. The examples here are for Windows.
+**Note:** SwiftToCLR will compile and work on macOS as well as Windows (although it requires Xcode to build on macOS - see the SwiftToCLR technical notes section below). The examples here are for Windows.
 
 SwiftToCLR has a simple command-line interface. Once you've compiled your Swift target and have a C++ header file for it, give it to SwiftToCLR along with your target's module name, a path to Swift's `swiftToCxx` header directory (which contains supporting headers for Swift's C++ interop), and an output directory.
 
@@ -130,6 +132,10 @@ Once you have your header files, you need to make a couple of Visual Studio proj
 For an example of all this, see the Windows Demo Project included in this repository. [See below for important compiling instructions](#windows-demo-project).
 
 ## Technical Notes
+
+### Source Code License
+
+All of the source code in this repo is licensed under the MIT open-source license. However, the Cascable and CascableCore logos and graphics used in the demo projects are *not* included in this license — they remain the exclusive intellectual property of Cascable AB and cannot be reproduced or re-used without the express permission of Cascable AB.
 
 ### General
 
@@ -225,7 +231,7 @@ It's beyond my understanding to know _why_ this happened or why static vs. dynam
 
 ### SwiftToCLR
 
-SwiftToCLR uses `libclang` to parse the Swift C++ interop header. `libclang` is included in Xcode on macOS and in the Swift distribution on Windows, and the package should be able to autodetect its location (on Windows, this requires that Swift is installed in a "standard" location).
+SwiftToCLR uses `LibClang` to parse the Swift C++ interop header. `LibClang` is included in Xcode on macOS and in the Swift distribution on Windows, and the package should be able to autodetect its location (on Windows, this requires that Swift is installed in a "standard" location).
 
 **Note:** Running `swift build` on macOS will fail with an error about an unknown linker flag. The package compiles correctly in Xcode.
 
@@ -237,7 +243,7 @@ In addition, there are the following known limitations:
 
 - Our API doesn't expose any dictionary types, so support for those wasn't implemented.
 
-- `libclang` seems to have trouble handling container types declared by Swift (such as `swift::Array`, `swift::Optional`, etc), so SwiftToCLR falls back to string parsing for these types. I've noted this as a red flag in the code - hopefully it's user error on my part.
+- `LibClang` seems to have trouble handling container types declared by Swift (such as `swift::Array`, `swift::Optional`, etc), so SwiftToCLR falls back to string parsing for these types. I've noted this as a red flag in the code - hopefully it's user error on my part.
 
 ### Performance Concerns
 
@@ -251,7 +257,7 @@ As noted above, thanks to the CLR's ability to work with unmanaged memory, we ca
 
 ### Windows Demo Project
 
-The demo project requires a modern version of Visual Studio (Community edition is fine) with the `clang` toolchain installed. I've been building this project on Windows 11 with a recent Swift development build installed - earlier versions are untested.
+The demo project requires a modern version of Visual Studio (Community edition is fine) with the `Clang` toolchain installed. I've been building this project on Windows 11 with a recent Swift development build installed - earlier versions are untested.
 
 The project won't build out-of-the-box due to a hard-coded path to the Swift runtime, which is needed by the linker.
 
