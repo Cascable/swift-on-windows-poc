@@ -2,6 +2,8 @@
 
 This repository contains three projects that explore the idea of calling Swift code from CLR languages (in this case, C#) via the relatively new C++ interop feature of Swift.
 
+**Note:** You can find a less technical writeup of this project in my blog post [Proof of Concept Project: Combining Swift and C# on Windows with SwiftToCLR](https://ikennd.ac/blog/2024/02/swift-on-windows-with-swifttoclr/).
+
 ![The CascableCore demo app, rendering a basic camera remote control UI in C# that calls to a Swift SDK providing camera communication](Documentation%20Images/Windows%20Demo%20App.png)
 
 ### The Goal
