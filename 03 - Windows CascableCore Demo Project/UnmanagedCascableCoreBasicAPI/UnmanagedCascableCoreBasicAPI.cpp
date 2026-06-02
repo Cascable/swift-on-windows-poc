@@ -3,6 +3,140 @@
 #include "UnmanagedCascableCoreBasicAPI.hpp"
 #include <CascableCoreBasicAPI-Swift.h>
 
+// Implementation of UnmanagedCascableCoreBasicAPI::BasicDeviceInfo
+
+UnmanagedCascableCoreBasicAPI::BasicDeviceInfo::BasicDeviceInfo(std::shared_ptr<CascableCoreBasicAPI::BasicDeviceInfo> swiftObj) {
+    this->swiftObj = swiftObj;
+}
+
+UnmanagedCascableCoreBasicAPI::BasicDeviceInfo::~BasicDeviceInfo() {}
+
+std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicDeviceInfo::getManufacturer() {
+    swift::Optional<swift::String> swiftResult = swiftObj->getManufacturer();
+    if (swiftResult) {
+        swift::String unwrapped = swiftResult.get();
+        return std::optional<std::string>((std::string)unwrapped);
+    } else {
+        return std::nullopt;
+    }
+}
+
+std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicDeviceInfo::getModel() {
+    swift::Optional<swift::String> swiftResult = swiftObj->getModel();
+    if (swiftResult) {
+        swift::String unwrapped = swiftResult.get();
+        return std::optional<std::string>((std::string)unwrapped);
+    } else {
+        return std::nullopt;
+    }
+}
+
+std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicDeviceInfo::getVersion() {
+    swift::Optional<swift::String> swiftResult = swiftObj->getVersion();
+    if (swiftResult) {
+        swift::String unwrapped = swiftResult.get();
+        return std::optional<std::string>((std::string)unwrapped);
+    } else {
+        return std::nullopt;
+    }
+}
+
+std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicDeviceInfo::getSerialNumber() {
+    swift::Optional<swift::String> swiftResult = swiftObj->getSerialNumber();
+    if (swiftResult) {
+        swift::String unwrapped = swiftResult.get();
+        return std::optional<std::string>((std::string)unwrapped);
+    } else {
+        return std::nullopt;
+    }
+}
+
+// Implementation of UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult
+
+UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::BasicCameraInitiatedTransferResult(std::shared_ptr<CascableCoreBasicAPI::BasicCameraInitiatedTransferResult> swiftObj) {
+    this->swiftObj = swiftObj;
+}
+
+UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::~BasicCameraInitiatedTransferResult() {}
+
+double UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getDateProduced() {
+    double swiftResult = swiftObj->getDateProduced();
+    return swiftResult;
+}
+
+bool UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::isOnlyDestinationForImage() {
+    bool swiftResult = swiftObj->isOnlyDestinationForImage();
+    return swiftResult;
+}
+
+std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getFileNameHint() {
+    swift::Optional<swift::String> swiftResult = swiftObj->getFileNameHint();
+    if (swiftResult) {
+        swift::String unwrapped = swiftResult.get();
+        return std::optional<std::string>((std::string)unwrapped);
+    } else {
+        return std::nullopt;
+    }
+}
+
+std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getSuggestedFileNameExtensionForRepresentation() {
+    swift::Optional<swift::String> swiftResult = swiftObj->getSuggestedFileNameExtensionForRepresentation();
+    if (swiftResult) {
+        swift::String unwrapped = swiftResult.get();
+        return std::optional<std::string>((std::string)unwrapped);
+    } else {
+        return std::nullopt;
+    }
+}
+
+std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getUtiForRepresentation() {
+    swift::Optional<swift::String> swiftResult = swiftObj->getUtiForRepresentation();
+    if (swiftResult) {
+        swift::String unwrapped = swiftResult.get();
+        return std::optional<std::string>((std::string)unwrapped);
+    } else {
+        return std::nullopt;
+    }
+}
+
+int UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getRawImageDataLength() {
+    swift::Int swiftResult = swiftObj->getRawImageDataLength();
+    return (int)swiftResult;
+}
+
+void UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::copyPixelData(uint8_t* pointer) {
+    uint8_t* arg0 = pointer;
+    swiftObj->copyPixelData(arg0);
+}
+
+// Implementation of UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame
+
+UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::BasicLiveViewFrame(std::shared_ptr<CascableCoreBasicAPI::BasicLiveViewFrame> swiftObj) {
+    this->swiftObj = swiftObj;
+}
+
+UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::~BasicLiveViewFrame() {}
+
+double UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::getDateProduced() {
+    double swiftResult = swiftObj->getDateProduced();
+    return swiftResult;
+}
+
+int UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::getRawPixelDataLength() {
+    swift::Int swiftResult = swiftObj->getRawPixelDataLength();
+    return (int)swiftResult;
+}
+
+void UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::copyPixelData(uint8_t* pointer) {
+    uint8_t* arg0 = pointer;
+    swiftObj->copyPixelData(arg0);
+}
+
+UnmanagedCascableCoreBasicAPI::BasicSize UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::getRawPixelSize() {
+    CascableCoreBasicAPI::BasicSize swiftResult = swiftObj->getRawPixelSize();
+    return UnmanagedCascableCoreBasicAPI::BasicSize(std::make_shared<CascableCoreBasicAPI::BasicSize>(swiftResult));
+}
+
 // Implementation of UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier
 
 UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier::BasicPropertyIdentifier(std::shared_ptr<CascableCoreBasicAPI::BasicPropertyIdentifier> swiftObj) {
@@ -341,6 +475,92 @@ unsigned int UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier::getRawValue
     return (unsigned int)swiftResult;
 }
 
+// Implementation of UnmanagedCascableCoreBasicAPI::BasicCameraProperty
+
+UnmanagedCascableCoreBasicAPI::BasicCameraProperty::BasicCameraProperty(std::shared_ptr<CascableCoreBasicAPI::BasicCameraProperty> swiftObj) {
+    this->swiftObj = swiftObj;
+}
+
+UnmanagedCascableCoreBasicAPI::BasicCameraProperty::~BasicCameraProperty() {}
+
+UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier UnmanagedCascableCoreBasicAPI::BasicCameraProperty::getIdentifier() {
+    CascableCoreBasicAPI::BasicPropertyIdentifier swiftResult = swiftObj->getIdentifier();
+    return UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier(std::make_shared<CascableCoreBasicAPI::BasicPropertyIdentifier>(swiftResult));
+}
+
+std::optional<UnmanagedCascableCoreBasicAPI::BasicCamera> UnmanagedCascableCoreBasicAPI::BasicCameraProperty::getCamera() {
+    swift::Optional<CascableCoreBasicAPI::BasicCamera> swiftResult = swiftObj->getCamera();
+    if (swiftResult) {
+        CascableCoreBasicAPI::BasicCamera unwrapped = swiftResult.get();
+        return std::optional<UnmanagedCascableCoreBasicAPI::BasicCamera>(UnmanagedCascableCoreBasicAPI::BasicCamera(std::make_shared<CascableCoreBasicAPI::BasicCamera>(unwrapped)));
+    } else {
+        return std::nullopt;
+    }
+}
+
+std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicCameraProperty::getLocalizedDisplayName() {
+    swift::Optional<swift::String> swiftResult = swiftObj->getLocalizedDisplayName();
+    if (swiftResult) {
+        swift::String unwrapped = swiftResult.get();
+        return std::optional<std::string>((std::string)unwrapped);
+    } else {
+        return std::nullopt;
+    }
+}
+
+std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> UnmanagedCascableCoreBasicAPI::BasicCameraProperty::getCurrentValue() {
+    swift::Optional<CascableCoreBasicAPI::BasicPropertyValue> swiftResult = swiftObj->getCurrentValue();
+    if (swiftResult) {
+        CascableCoreBasicAPI::BasicPropertyValue unwrapped = swiftResult.get();
+        return std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue>(UnmanagedCascableCoreBasicAPI::BasicPropertyValue(std::make_shared<CascableCoreBasicAPI::BasicPropertyValue>(unwrapped)));
+    } else {
+        return std::nullopt;
+    }
+}
+
+void UnmanagedCascableCoreBasicAPI::BasicCameraProperty::setCurrentValue(const std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> & value) {
+    swift::Optional<CascableCoreBasicAPI::BasicPropertyValue> arg0 = (value.has_value() ? swift::Optional<CascableCoreBasicAPI::BasicPropertyValue>::init(*value->swiftObj.get()) : swift::Optional<CascableCoreBasicAPI::BasicPropertyValue>::none());
+    swiftObj->setCurrentValue(arg0);
+}
+
+std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> UnmanagedCascableCoreBasicAPI::BasicCameraProperty::getPendingValue() {
+    swift::Optional<CascableCoreBasicAPI::BasicPropertyValue> swiftResult = swiftObj->getPendingValue();
+    if (swiftResult) {
+        CascableCoreBasicAPI::BasicPropertyValue unwrapped = swiftResult.get();
+        return std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue>(UnmanagedCascableCoreBasicAPI::BasicPropertyValue(std::make_shared<CascableCoreBasicAPI::BasicPropertyValue>(unwrapped)));
+    } else {
+        return std::nullopt;
+    }
+}
+
+void UnmanagedCascableCoreBasicAPI::BasicCameraProperty::setPendingValue(const std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> & value) {
+    swift::Optional<CascableCoreBasicAPI::BasicPropertyValue> arg0 = (value.has_value() ? swift::Optional<CascableCoreBasicAPI::BasicPropertyValue>::init(*value->swiftObj.get()) : swift::Optional<CascableCoreBasicAPI::BasicPropertyValue>::none());
+    swiftObj->setPendingValue(arg0);
+}
+
+std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> UnmanagedCascableCoreBasicAPI::BasicCameraProperty::getValidSettableValues() {
+    swift::Array<CascableCoreBasicAPI::BasicPropertyValue> swiftResult = swiftObj->getValidSettableValues();
+    std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> resultArray;
+    resultArray.reserve(swiftResult.getCount());
+    for (auto element : swiftResult) {
+        resultArray.push_back(UnmanagedCascableCoreBasicAPI::BasicPropertyValue(std::make_shared<CascableCoreBasicAPI::BasicPropertyValue>(element)));
+    }
+    return resultArray;
+}
+
+void UnmanagedCascableCoreBasicAPI::BasicCameraProperty::setValidSettableValues(std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> value) {
+    swift::Array<CascableCoreBasicAPI::BasicPropertyValue> arg0Array = swift::Array<CascableCoreBasicAPI::BasicPropertyValue>::init();
+    for (auto element: value) {
+        arg0Array.append(*element.swiftObj.get());
+    }
+    swiftObj->setValidSettableValues(arg0Array);
+}
+
+void UnmanagedCascableCoreBasicAPI::BasicCameraProperty::setValue(const UnmanagedCascableCoreBasicAPI::BasicPropertyValue & newValue) {
+    const CascableCoreBasicAPI::BasicPropertyValue & arg0 = *newValue.swiftObj.get();
+    swiftObj->setValue(arg0);
+}
+
 // Implementation of UnmanagedCascableCoreBasicAPI::BasicCamera
 
 UnmanagedCascableCoreBasicAPI::BasicCamera::BasicCamera(std::shared_ptr<CascableCoreBasicAPI::BasicCamera> swiftObj) {
@@ -534,226 +754,6 @@ void UnmanagedCascableCoreBasicAPI::BasicCameraDiscovery::stopDiscovery() {
     swiftObj->stopDiscovery();
 }
 
-// Implementation of UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult
-
-UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::BasicCameraInitiatedTransferResult(std::shared_ptr<CascableCoreBasicAPI::BasicCameraInitiatedTransferResult> swiftObj) {
-    this->swiftObj = swiftObj;
-}
-
-UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::~BasicCameraInitiatedTransferResult() {}
-
-double UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getDateProduced() {
-    double swiftResult = swiftObj->getDateProduced();
-    return swiftResult;
-}
-
-bool UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::isOnlyDestinationForImage() {
-    bool swiftResult = swiftObj->isOnlyDestinationForImage();
-    return swiftResult;
-}
-
-std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getFileNameHint() {
-    swift::Optional<swift::String> swiftResult = swiftObj->getFileNameHint();
-    if (swiftResult) {
-        swift::String unwrapped = swiftResult.get();
-        return std::optional<std::string>((std::string)unwrapped);
-    } else {
-        return std::nullopt;
-    }
-}
-
-std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getSuggestedFileNameExtensionForRepresentation() {
-    swift::Optional<swift::String> swiftResult = swiftObj->getSuggestedFileNameExtensionForRepresentation();
-    if (swiftResult) {
-        swift::String unwrapped = swiftResult.get();
-        return std::optional<std::string>((std::string)unwrapped);
-    } else {
-        return std::nullopt;
-    }
-}
-
-std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getUtiForRepresentation() {
-    swift::Optional<swift::String> swiftResult = swiftObj->getUtiForRepresentation();
-    if (swiftResult) {
-        swift::String unwrapped = swiftResult.get();
-        return std::optional<std::string>((std::string)unwrapped);
-    } else {
-        return std::nullopt;
-    }
-}
-
-int UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::getRawImageDataLength() {
-    swift::Int swiftResult = swiftObj->getRawImageDataLength();
-    return (int)swiftResult;
-}
-
-void UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult::copyPixelData(uint8_t* pointer) {
-    uint8_t* arg0 = pointer;
-    swiftObj->copyPixelData(arg0);
-}
-
-// Implementation of UnmanagedCascableCoreBasicAPI::BasicCameraProperty
-
-UnmanagedCascableCoreBasicAPI::BasicCameraProperty::BasicCameraProperty(std::shared_ptr<CascableCoreBasicAPI::BasicCameraProperty> swiftObj) {
-    this->swiftObj = swiftObj;
-}
-
-UnmanagedCascableCoreBasicAPI::BasicCameraProperty::~BasicCameraProperty() {}
-
-UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier UnmanagedCascableCoreBasicAPI::BasicCameraProperty::getIdentifier() {
-    CascableCoreBasicAPI::BasicPropertyIdentifier swiftResult = swiftObj->getIdentifier();
-    return UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier(std::make_shared<CascableCoreBasicAPI::BasicPropertyIdentifier>(swiftResult));
-}
-
-std::optional<UnmanagedCascableCoreBasicAPI::BasicCamera> UnmanagedCascableCoreBasicAPI::BasicCameraProperty::getCamera() {
-    swift::Optional<CascableCoreBasicAPI::BasicCamera> swiftResult = swiftObj->getCamera();
-    if (swiftResult) {
-        CascableCoreBasicAPI::BasicCamera unwrapped = swiftResult.get();
-        return std::optional<UnmanagedCascableCoreBasicAPI::BasicCamera>(UnmanagedCascableCoreBasicAPI::BasicCamera(std::make_shared<CascableCoreBasicAPI::BasicCamera>(unwrapped)));
-    } else {
-        return std::nullopt;
-    }
-}
-
-std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicCameraProperty::getLocalizedDisplayName() {
-    swift::Optional<swift::String> swiftResult = swiftObj->getLocalizedDisplayName();
-    if (swiftResult) {
-        swift::String unwrapped = swiftResult.get();
-        return std::optional<std::string>((std::string)unwrapped);
-    } else {
-        return std::nullopt;
-    }
-}
-
-std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> UnmanagedCascableCoreBasicAPI::BasicCameraProperty::getCurrentValue() {
-    swift::Optional<CascableCoreBasicAPI::BasicPropertyValue> swiftResult = swiftObj->getCurrentValue();
-    if (swiftResult) {
-        CascableCoreBasicAPI::BasicPropertyValue unwrapped = swiftResult.get();
-        return std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue>(UnmanagedCascableCoreBasicAPI::BasicPropertyValue(std::make_shared<CascableCoreBasicAPI::BasicPropertyValue>(unwrapped)));
-    } else {
-        return std::nullopt;
-    }
-}
-
-void UnmanagedCascableCoreBasicAPI::BasicCameraProperty::setCurrentValue(const std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> & value) {
-    swift::Optional<CascableCoreBasicAPI::BasicPropertyValue> arg0 = (value.has_value() ? swift::Optional<CascableCoreBasicAPI::BasicPropertyValue>::init(*value->swiftObj.get()) : swift::Optional<CascableCoreBasicAPI::BasicPropertyValue>::none());
-    swiftObj->setCurrentValue(arg0);
-}
-
-std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> UnmanagedCascableCoreBasicAPI::BasicCameraProperty::getPendingValue() {
-    swift::Optional<CascableCoreBasicAPI::BasicPropertyValue> swiftResult = swiftObj->getPendingValue();
-    if (swiftResult) {
-        CascableCoreBasicAPI::BasicPropertyValue unwrapped = swiftResult.get();
-        return std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue>(UnmanagedCascableCoreBasicAPI::BasicPropertyValue(std::make_shared<CascableCoreBasicAPI::BasicPropertyValue>(unwrapped)));
-    } else {
-        return std::nullopt;
-    }
-}
-
-void UnmanagedCascableCoreBasicAPI::BasicCameraProperty::setPendingValue(const std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> & value) {
-    swift::Optional<CascableCoreBasicAPI::BasicPropertyValue> arg0 = (value.has_value() ? swift::Optional<CascableCoreBasicAPI::BasicPropertyValue>::init(*value->swiftObj.get()) : swift::Optional<CascableCoreBasicAPI::BasicPropertyValue>::none());
-    swiftObj->setPendingValue(arg0);
-}
-
-std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> UnmanagedCascableCoreBasicAPI::BasicCameraProperty::getValidSettableValues() {
-    swift::Array<CascableCoreBasicAPI::BasicPropertyValue> swiftResult = swiftObj->getValidSettableValues();
-    std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> resultArray;
-    resultArray.reserve(swiftResult.getCount());
-    for (auto element : swiftResult) {
-        resultArray.push_back(UnmanagedCascableCoreBasicAPI::BasicPropertyValue(std::make_shared<CascableCoreBasicAPI::BasicPropertyValue>(element)));
-    }
-    return resultArray;
-}
-
-void UnmanagedCascableCoreBasicAPI::BasicCameraProperty::setValidSettableValues(std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> value) {
-    swift::Array<CascableCoreBasicAPI::BasicPropertyValue> arg0Array = swift::Array<CascableCoreBasicAPI::BasicPropertyValue>::init();
-    for (auto element: value) {
-        arg0Array.append(*element.swiftObj.get());
-    }
-    swiftObj->setValidSettableValues(arg0Array);
-}
-
-void UnmanagedCascableCoreBasicAPI::BasicCameraProperty::setValue(const UnmanagedCascableCoreBasicAPI::BasicPropertyValue & newValue) {
-    const CascableCoreBasicAPI::BasicPropertyValue & arg0 = *newValue.swiftObj.get();
-    swiftObj->setValue(arg0);
-}
-
-// Implementation of UnmanagedCascableCoreBasicAPI::BasicDeviceInfo
-
-UnmanagedCascableCoreBasicAPI::BasicDeviceInfo::BasicDeviceInfo(std::shared_ptr<CascableCoreBasicAPI::BasicDeviceInfo> swiftObj) {
-    this->swiftObj = swiftObj;
-}
-
-UnmanagedCascableCoreBasicAPI::BasicDeviceInfo::~BasicDeviceInfo() {}
-
-std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicDeviceInfo::getManufacturer() {
-    swift::Optional<swift::String> swiftResult = swiftObj->getManufacturer();
-    if (swiftResult) {
-        swift::String unwrapped = swiftResult.get();
-        return std::optional<std::string>((std::string)unwrapped);
-    } else {
-        return std::nullopt;
-    }
-}
-
-std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicDeviceInfo::getModel() {
-    swift::Optional<swift::String> swiftResult = swiftObj->getModel();
-    if (swiftResult) {
-        swift::String unwrapped = swiftResult.get();
-        return std::optional<std::string>((std::string)unwrapped);
-    } else {
-        return std::nullopt;
-    }
-}
-
-std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicDeviceInfo::getVersion() {
-    swift::Optional<swift::String> swiftResult = swiftObj->getVersion();
-    if (swiftResult) {
-        swift::String unwrapped = swiftResult.get();
-        return std::optional<std::string>((std::string)unwrapped);
-    } else {
-        return std::nullopt;
-    }
-}
-
-std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicDeviceInfo::getSerialNumber() {
-    swift::Optional<swift::String> swiftResult = swiftObj->getSerialNumber();
-    if (swiftResult) {
-        swift::String unwrapped = swiftResult.get();
-        return std::optional<std::string>((std::string)unwrapped);
-    } else {
-        return std::nullopt;
-    }
-}
-
-// Implementation of UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame
-
-UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::BasicLiveViewFrame(std::shared_ptr<CascableCoreBasicAPI::BasicLiveViewFrame> swiftObj) {
-    this->swiftObj = swiftObj;
-}
-
-UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::~BasicLiveViewFrame() {}
-
-double UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::getDateProduced() {
-    double swiftResult = swiftObj->getDateProduced();
-    return swiftResult;
-}
-
-int UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::getRawPixelDataLength() {
-    swift::Int swiftResult = swiftObj->getRawPixelDataLength();
-    return (int)swiftResult;
-}
-
-void UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::copyPixelData(uint8_t* pointer) {
-    uint8_t* arg0 = pointer;
-    swiftObj->copyPixelData(arg0);
-}
-
-UnmanagedCascableCoreBasicAPI::BasicSize UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame::getRawPixelSize() {
-    CascableCoreBasicAPI::BasicSize swiftResult = swiftObj->getRawPixelSize();
-    return UnmanagedCascableCoreBasicAPI::BasicSize(std::make_shared<CascableCoreBasicAPI::BasicSize>(swiftResult));
-}
-
 // Implementation of UnmanagedCascableCoreBasicAPI::BasicPropertyValue
 
 UnmanagedCascableCoreBasicAPI::BasicPropertyValue::BasicPropertyValue(std::shared_ptr<CascableCoreBasicAPI::BasicPropertyValue> swiftObj) {
@@ -775,6 +775,24 @@ std::optional<std::string> UnmanagedCascableCoreBasicAPI::BasicPropertyValue::ge
 std::string UnmanagedCascableCoreBasicAPI::BasicPropertyValue::getStringValue() {
     swift::String swiftResult = swiftObj->getStringValue();
     return (std::string)swiftResult;
+}
+
+// Implementation of UnmanagedCascableCoreBasicAPI::BasicSize
+
+UnmanagedCascableCoreBasicAPI::BasicSize::BasicSize(std::shared_ptr<CascableCoreBasicAPI::BasicSize> swiftObj) {
+    this->swiftObj = swiftObj;
+}
+
+UnmanagedCascableCoreBasicAPI::BasicSize::~BasicSize() {}
+
+double UnmanagedCascableCoreBasicAPI::BasicSize::getWidth() {
+    double swiftResult = swiftObj->getWidth();
+    return swiftResult;
+}
+
+double UnmanagedCascableCoreBasicAPI::BasicSize::getHeight() {
+    double swiftResult = swiftObj->getHeight();
+    return swiftResult;
 }
 
 // Implementation of UnmanagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration
@@ -832,23 +850,5 @@ void UnmanagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::setLiveVi
 
 void UnmanagedCascableCoreBasicAPI::BasicSimulatedCameraConfiguration::apply() {
     swiftObj->apply();
-}
-
-// Implementation of UnmanagedCascableCoreBasicAPI::BasicSize
-
-UnmanagedCascableCoreBasicAPI::BasicSize::BasicSize(std::shared_ptr<CascableCoreBasicAPI::BasicSize> swiftObj) {
-    this->swiftObj = swiftObj;
-}
-
-UnmanagedCascableCoreBasicAPI::BasicSize::~BasicSize() {}
-
-double UnmanagedCascableCoreBasicAPI::BasicSize::getWidth() {
-    double swiftResult = swiftObj->getWidth();
-    return swiftResult;
-}
-
-double UnmanagedCascableCoreBasicAPI::BasicSize::getHeight() {
-    double swiftResult = swiftObj->getHeight();
-    return swiftResult;
 }
 

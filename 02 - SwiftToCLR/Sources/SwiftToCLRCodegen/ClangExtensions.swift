@@ -22,7 +22,7 @@ extension CXTranslationUnit {
     }
 }
 
-extension CXString: CustomStringConvertible, CustomDebugStringConvertible {
+extension CXString: @retroactive CustomStringConvertible, @retroactive CustomDebugStringConvertible {
 
     public var description: String {
         return asString

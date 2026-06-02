@@ -9,12 +9,16 @@ struct WindowsPlatform {
     static var defaultSDKRoot: String = {
         let developerPath = findDeveloperPath()
         let platformsPath = findPlatforms(in: developerPath)
-        return [platformsPath, "Windows.platform", "Developer", "SDKs", "Windows.sdk"].joined(separator: pathSeparator)
+        return platformsPath.appendingPathComponent("Windows.platform")
+            .appendingPathComponent("Developer")
+            .appendingPathComponent("SDKs")
+            .appendingPathComponent("Windows.sdk")
+            .path
     }()
 
     static let pathSeparator: String = "\\"
 
-    static func findDeveloperPath() -> String {
+    static func findDeveloperPath() -> URL {
         // Dev snapshots seem to install into AppData.
         let userLocalDirectory = FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("AppData")
@@ -23,28 +27,33 @@ struct WindowsPlatform {
             .appendingPathComponent("Swift")
 
         if (try? userLocalDirectory.checkResourceIsReachable()) == true {
-            return userLocalDirectory.pathComponents.joined(separator: pathSeparator)
+            return userLocalDirectory
         }
 
         // Earlier/release builds install into <boot>/Library/Developer.
         // The assumption here is that the first drive not reserved for floppies is the boot drive.
         let volumes = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: [], options: .skipHiddenVolumes)
         let bootVolume = volumes?.compactMap({ $0.pathComponents.first }).first(where: { !$0.hasPrefix("A:") && !$0.hasPrefix("B:") })
-        return [(bootVolume ?? "C:"), "Library", "Developer"].joined(separator: pathSeparator)
+        let path: String = [(bootVolume ?? "C:"), "Library", "Developer"].joined(separator: pathSeparator)
+        return URL(filePath: path)
     }
 
-    static func findPlatforms(in developerPath: String) -> String {
-        let platformsPath = URL(fileURLWithPath: developerPath + pathSeparator + "Platforms")
-        guard let children = try? FileManager.default.contentsOfDirectory(
-            at: platformsPath,
-            includingPropertiesForKeys: [.isDirectoryKey],
-            options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants, .skipsPackageDescendants]
-        ) else {
-            fatalError("Developer path doesn't exist or contain any toolchains: " + developerPath)
+    static func findPlatforms(in developerPath: URL) -> URL {
+        let platformsPath = developerPath.appendingPathComponent("Platforms")
+        let children: [URL]
+        do {
+            children = try FileManager.default.contentsOfDirectory(
+                at: platformsPath,
+                includingPropertiesForKeys: [.isDirectoryKey],
+                options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants, .skipsPackageDescendants]
+            )
+        } catch {
+            fatalError("Developer path doesn't exist or contain any platforms: \(developerPath), error: \(error)")
         }
+
         let platformContainer = children.first(where: { (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true })
         let toolchainName = platformContainer?.lastPathComponent ?? "???"
-        return [developerPath, "Platforms", toolchainName].joined(separator: pathSeparator)
+        return developerPath.appendingPathComponent("Platforms").appendingPathComponent(toolchainName)
     }
 }
 

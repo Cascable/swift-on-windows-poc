@@ -29,7 +29,7 @@ namespace CascableCoreDemo
             discoveryView.Loaded += uiLoaded;
             discoveryView.ConnectedToCamera += connectedToCamera;
             string icon = Path.Combine(
-                Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).LocalPath),
+                Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().Location).LocalPath),
                 "Assets", "CoreIcon.ico"
             );
             this.AppWindow.SetIcon(icon);

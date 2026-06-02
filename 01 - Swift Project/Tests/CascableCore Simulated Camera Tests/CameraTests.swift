@@ -23,7 +23,7 @@ class CameraTests: XCTestCase, CameraDiscoveryProviderDelegate {
         wait(for: [waitedABitExpectation], timeout: 5.0)
 
         let camera: BasicCamera = try XCTUnwrap(basicDiscovery.visibleCameras.first)
-        print(camera.friendlyDisplayName)
+        print(camera.friendlyDisplayName ?? "(Unknown name)")
 
         camera.connect();
 

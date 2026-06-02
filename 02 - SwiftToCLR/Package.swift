@@ -63,10 +63,10 @@ var clangLinkerSettings: LinkerSetting {
 func findLibPath() -> String {
     let developerPath = findDeveloperPath()
     let toolchain = findToolchain(in: developerPath)
-    return [toolchain, "usr", "lib"].joined(separator: pathSeparator)
+    return toolchain.appendingPathComponent("usr").appendingPathComponent("lib").path
 }
 
-func findDeveloperPath() -> String {
+func findDeveloperPath() -> URL {
     // Dev snapshots seem to install into AppData.
     let userLocalDirectory = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent("AppData")
@@ -75,28 +75,33 @@ func findDeveloperPath() -> String {
         .appendingPathComponent("Swift")
 
     if (try? userLocalDirectory.checkResourceIsReachable()) == true {
-        return userLocalDirectory.pathComponents.joined(separator: pathSeparator)
+        return userLocalDirectory
     }
 
     // Earlier/release builds install into <boot>/Library/Developer.
     // The assumption here is that the first drive not reserved for floppies is the boot drive.
     let volumes = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: [], options: .skipHiddenVolumes)
     let bootVolume = volumes?.compactMap({ $0.pathComponents.first }).first(where: { !$0.hasPrefix("A:") && !$0.hasPrefix("B:") })
-    return [(bootVolume ?? "C:"), "Library", "Developer"].joined(separator: pathSeparator)
+    let path: String = [(bootVolume ?? "C:"), "Library", "Developer"].joined(separator: pathSeparator)
+    return URL(filePath: path)
 }
 
-func findToolchain(in developerPath: String) -> String {
-    let toolchainsPath = URL(fileURLWithPath: developerPath + pathSeparator + "Toolchains")
-    guard let children = try? FileManager.default.contentsOfDirectory(
-        at: toolchainsPath,
-        includingPropertiesForKeys: [.isDirectoryKey],
-        options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants, .skipsPackageDescendants]
-    ) else {
-        fatalError("Developer path doesn't exist or contain any toolchains: " + developerPath)
+func findToolchain(in developerPath: URL) -> URL {
+    let toolchainsPath = developerPath.appendingPathComponent("Toolchains")
+    let children: [URL]
+    do {
+        children = try FileManager.default.contentsOfDirectory(
+            at: toolchainsPath,
+            includingPropertiesForKeys: [.isDirectoryKey],
+            options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants, .skipsPackageDescendants]
+        )
+    } catch {
+        fatalError("Developer path doesn't exist or contain any toolchains: \(developerPath), with error: \(error)")
     }
+
     let toolchain = children.first(where: { (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true })
     let toolchainName = toolchain?.lastPathComponent ?? "???"
-    return [developerPath, "Toolchains", toolchainName].joined(separator: pathSeparator)
+    return toolchainsPath.appendingPathComponent(toolchainName)
 }
 
 #else

@@ -8,30 +8,72 @@
 #include <vector>
 
 namespace CascableCoreBasicAPI {
+    class BasicDeviceInfo;
+    class BasicCameraInitiatedTransferResult;
+    class BasicLiveViewFrame;
     class BasicPropertyIdentifier;
+    class BasicCameraProperty;
     class BasicCamera;
     class BasicCameraDiscovery;
-    class BasicCameraInitiatedTransferResult;
-    class BasicCameraProperty;
-    class BasicDeviceInfo;
-    class BasicLiveViewFrame;
     class BasicPropertyValue;
-    class BasicSimulatedCameraConfiguration;
     class BasicSize;
+    class BasicSimulatedCameraConfiguration;
 }
 
 namespace UnmanagedCascableCoreBasicAPI {
 
+    class BasicDeviceInfo;
+    class BasicCameraInitiatedTransferResult;
+    class BasicLiveViewFrame;
     class BasicPropertyIdentifier;
+    class BasicCameraProperty;
     class BasicCamera;
     class BasicCameraDiscovery;
-    class BasicCameraInitiatedTransferResult;
-    class BasicCameraProperty;
-    class BasicDeviceInfo;
-    class BasicLiveViewFrame;
     class BasicPropertyValue;
-    class BasicSimulatedCameraConfiguration;
     class BasicSize;
+    class BasicSimulatedCameraConfiguration;
+
+    class BasicDeviceInfo {
+    private:
+    public:
+        std::shared_ptr<CascableCoreBasicAPI::BasicDeviceInfo> swiftObj;
+        BasicDeviceInfo(std::shared_ptr<CascableCoreBasicAPI::BasicDeviceInfo> swiftObj);
+        ~BasicDeviceInfo();
+    
+        std::optional<std::string> getManufacturer();
+        std::optional<std::string> getModel();
+        std::optional<std::string> getVersion();
+        std::optional<std::string> getSerialNumber();
+    };
+
+    class BasicCameraInitiatedTransferResult {
+    private:
+    public:
+        std::shared_ptr<CascableCoreBasicAPI::BasicCameraInitiatedTransferResult> swiftObj;
+        BasicCameraInitiatedTransferResult(std::shared_ptr<CascableCoreBasicAPI::BasicCameraInitiatedTransferResult> swiftObj);
+        ~BasicCameraInitiatedTransferResult();
+    
+        double getDateProduced();
+        bool isOnlyDestinationForImage();
+        std::optional<std::string> getFileNameHint();
+        std::optional<std::string> getSuggestedFileNameExtensionForRepresentation();
+        std::optional<std::string> getUtiForRepresentation();
+        int getRawImageDataLength();
+        void copyPixelData(uint8_t* pointer);
+    };
+
+    class BasicLiveViewFrame {
+    private:
+    public:
+        std::shared_ptr<CascableCoreBasicAPI::BasicLiveViewFrame> swiftObj;
+        BasicLiveViewFrame(std::shared_ptr<CascableCoreBasicAPI::BasicLiveViewFrame> swiftObj);
+        ~BasicLiveViewFrame();
+    
+        double getDateProduced();
+        int getRawPixelDataLength();
+        void copyPixelData(uint8_t* pointer);
+        UnmanagedCascableCoreBasicAPI::BasicSize getRawPixelSize();
+    };
 
     class BasicPropertyIdentifier {
     private:
@@ -110,6 +152,25 @@ namespace UnmanagedCascableCoreBasicAPI {
         unsigned int getRawValue();
     };
 
+    class BasicCameraProperty {
+    private:
+    public:
+        std::shared_ptr<CascableCoreBasicAPI::BasicCameraProperty> swiftObj;
+        BasicCameraProperty(std::shared_ptr<CascableCoreBasicAPI::BasicCameraProperty> swiftObj);
+        ~BasicCameraProperty();
+    
+        UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier getIdentifier();
+        std::optional<UnmanagedCascableCoreBasicAPI::BasicCamera> getCamera();
+        std::optional<std::string> getLocalizedDisplayName();
+        std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> getCurrentValue();
+        void setCurrentValue(const std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> & value);
+        std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> getPendingValue();
+        void setPendingValue(const std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> & value);
+        std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> getValidSettableValues();
+        void setValidSettableValues(std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> value);
+        void setValue(const UnmanagedCascableCoreBasicAPI::BasicPropertyValue & newValue);
+    };
+
     class BasicCamera {
     private:
     public:
@@ -158,67 +219,6 @@ namespace UnmanagedCascableCoreBasicAPI {
         void stopDiscovery();
     };
 
-    class BasicCameraInitiatedTransferResult {
-    private:
-    public:
-        std::shared_ptr<CascableCoreBasicAPI::BasicCameraInitiatedTransferResult> swiftObj;
-        BasicCameraInitiatedTransferResult(std::shared_ptr<CascableCoreBasicAPI::BasicCameraInitiatedTransferResult> swiftObj);
-        ~BasicCameraInitiatedTransferResult();
-    
-        double getDateProduced();
-        bool isOnlyDestinationForImage();
-        std::optional<std::string> getFileNameHint();
-        std::optional<std::string> getSuggestedFileNameExtensionForRepresentation();
-        std::optional<std::string> getUtiForRepresentation();
-        int getRawImageDataLength();
-        void copyPixelData(uint8_t* pointer);
-    };
-
-    class BasicCameraProperty {
-    private:
-    public:
-        std::shared_ptr<CascableCoreBasicAPI::BasicCameraProperty> swiftObj;
-        BasicCameraProperty(std::shared_ptr<CascableCoreBasicAPI::BasicCameraProperty> swiftObj);
-        ~BasicCameraProperty();
-    
-        UnmanagedCascableCoreBasicAPI::BasicPropertyIdentifier getIdentifier();
-        std::optional<UnmanagedCascableCoreBasicAPI::BasicCamera> getCamera();
-        std::optional<std::string> getLocalizedDisplayName();
-        std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> getCurrentValue();
-        void setCurrentValue(const std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> & value);
-        std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> getPendingValue();
-        void setPendingValue(const std::optional<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> & value);
-        std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> getValidSettableValues();
-        void setValidSettableValues(std::vector<UnmanagedCascableCoreBasicAPI::BasicPropertyValue> value);
-        void setValue(const UnmanagedCascableCoreBasicAPI::BasicPropertyValue & newValue);
-    };
-
-    class BasicDeviceInfo {
-    private:
-    public:
-        std::shared_ptr<CascableCoreBasicAPI::BasicDeviceInfo> swiftObj;
-        BasicDeviceInfo(std::shared_ptr<CascableCoreBasicAPI::BasicDeviceInfo> swiftObj);
-        ~BasicDeviceInfo();
-    
-        std::optional<std::string> getManufacturer();
-        std::optional<std::string> getModel();
-        std::optional<std::string> getVersion();
-        std::optional<std::string> getSerialNumber();
-    };
-
-    class BasicLiveViewFrame {
-    private:
-    public:
-        std::shared_ptr<CascableCoreBasicAPI::BasicLiveViewFrame> swiftObj;
-        BasicLiveViewFrame(std::shared_ptr<CascableCoreBasicAPI::BasicLiveViewFrame> swiftObj);
-        ~BasicLiveViewFrame();
-    
-        double getDateProduced();
-        int getRawPixelDataLength();
-        void copyPixelData(uint8_t* pointer);
-        UnmanagedCascableCoreBasicAPI::BasicSize getRawPixelSize();
-    };
-
     class BasicPropertyValue {
     private:
     public:
@@ -228,6 +228,17 @@ namespace UnmanagedCascableCoreBasicAPI {
     
         std::optional<std::string> getLocalizedDisplayValue();
         std::string getStringValue();
+    };
+
+    class BasicSize {
+    private:
+    public:
+        std::shared_ptr<CascableCoreBasicAPI::BasicSize> swiftObj;
+        BasicSize(std::shared_ptr<CascableCoreBasicAPI::BasicSize> swiftObj);
+        ~BasicSize();
+    
+        double getWidth();
+        double getHeight();
     };
 
     class BasicSimulatedCameraConfiguration {
@@ -247,17 +258,6 @@ namespace UnmanagedCascableCoreBasicAPI {
         std::string getLiveViewImageContainerPath();
         void setLiveViewImageContainerPath(const std::string & value);
         void apply();
-    };
-
-    class BasicSize {
-    private:
-    public:
-        std::shared_ptr<CascableCoreBasicAPI::BasicSize> swiftObj;
-        BasicSize(std::shared_ptr<CascableCoreBasicAPI::BasicSize> swiftObj);
-        ~BasicSize();
-    
-        double getWidth();
-        double getHeight();
     };
 }
 

@@ -9,16 +9,61 @@ using namespace System::Collections::Generic;
 
 namespace ManagedCascableCoreBasicAPI {
 
+    ref class BasicDeviceInfo;
+    ref class BasicCameraInitiatedTransferResult;
+    ref class BasicLiveViewFrame;
     ref class BasicPropertyIdentifier;
+    ref class BasicCameraProperty;
     ref class BasicCamera;
     ref class BasicCameraDiscovery;
-    ref class BasicCameraInitiatedTransferResult;
-    ref class BasicCameraProperty;
-    ref class BasicDeviceInfo;
-    ref class BasicLiveViewFrame;
     ref class BasicPropertyValue;
-    ref class BasicSimulatedCameraConfiguration;
     ref class BasicSize;
+    ref class BasicSimulatedCameraConfiguration;
+
+    public ref class BasicDeviceInfo {
+    private:
+    internal:
+        UnmanagedCascableCoreBasicAPI::BasicDeviceInfo *wrappedObj;
+        BasicDeviceInfo(UnmanagedCascableCoreBasicAPI::BasicDeviceInfo *objectToTakeOwnershipOf);
+    public:
+        ~BasicDeviceInfo();
+    
+        System::String^ getManufacturer();
+        System::String^ getModel();
+        System::String^ getVersion();
+        System::String^ getSerialNumber();
+    };
+
+    public ref class BasicCameraInitiatedTransferResult {
+    private:
+    internal:
+        UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult *wrappedObj;
+        BasicCameraInitiatedTransferResult(UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult *objectToTakeOwnershipOf);
+    public:
+        ~BasicCameraInitiatedTransferResult();
+    
+        double getDateProduced();
+        bool isOnlyDestinationForImage();
+        System::String^ getFileNameHint();
+        System::String^ getSuggestedFileNameExtensionForRepresentation();
+        System::String^ getUtiForRepresentation();
+        int getRawImageDataLength();
+        void copyPixelData(uint8_t * pointer);
+    };
+
+    public ref class BasicLiveViewFrame {
+    private:
+    internal:
+        UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame *wrappedObj;
+        BasicLiveViewFrame(UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame *objectToTakeOwnershipOf);
+    public:
+        ~BasicLiveViewFrame();
+    
+        double getDateProduced();
+        int getRawPixelDataLength();
+        void copyPixelData(uint8_t * pointer);
+        ManagedCascableCoreBasicAPI::BasicSize^ getRawPixelSize();
+    };
 
     public ref class BasicPropertyIdentifier {
     private:
@@ -96,6 +141,26 @@ namespace ManagedCascableCoreBasicAPI {
         unsigned int getRawValue();
     };
 
+    public ref class BasicCameraProperty {
+    private:
+    internal:
+        UnmanagedCascableCoreBasicAPI::BasicCameraProperty *wrappedObj;
+        BasicCameraProperty(UnmanagedCascableCoreBasicAPI::BasicCameraProperty *objectToTakeOwnershipOf);
+    public:
+        ~BasicCameraProperty();
+    
+        ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^ getIdentifier();
+        ManagedCascableCoreBasicAPI::BasicCamera^ getCamera();
+        System::String^ getLocalizedDisplayName();
+        ManagedCascableCoreBasicAPI::BasicPropertyValue^ getCurrentValue();
+        void setCurrentValue(ManagedCascableCoreBasicAPI::BasicPropertyValue^ value);
+        ManagedCascableCoreBasicAPI::BasicPropertyValue^ getPendingValue();
+        void setPendingValue(ManagedCascableCoreBasicAPI::BasicPropertyValue^ value);
+        List<ManagedCascableCoreBasicAPI::BasicPropertyValue^>^ getValidSettableValues();
+        void setValidSettableValues(List<ManagedCascableCoreBasicAPI::BasicPropertyValue^>^ value);
+        void setValue(ManagedCascableCoreBasicAPI::BasicPropertyValue^ newValue);
+    };
+
     public ref class BasicCamera {
     private:
     internal:
@@ -147,71 +212,6 @@ namespace ManagedCascableCoreBasicAPI {
         void stopDiscovery();
     };
 
-    public ref class BasicCameraInitiatedTransferResult {
-    private:
-    internal:
-        UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult *wrappedObj;
-        BasicCameraInitiatedTransferResult(UnmanagedCascableCoreBasicAPI::BasicCameraInitiatedTransferResult *objectToTakeOwnershipOf);
-    public:
-        ~BasicCameraInitiatedTransferResult();
-    
-        double getDateProduced();
-        bool isOnlyDestinationForImage();
-        System::String^ getFileNameHint();
-        System::String^ getSuggestedFileNameExtensionForRepresentation();
-        System::String^ getUtiForRepresentation();
-        int getRawImageDataLength();
-        void copyPixelData(uint8_t * pointer);
-    };
-
-    public ref class BasicCameraProperty {
-    private:
-    internal:
-        UnmanagedCascableCoreBasicAPI::BasicCameraProperty *wrappedObj;
-        BasicCameraProperty(UnmanagedCascableCoreBasicAPI::BasicCameraProperty *objectToTakeOwnershipOf);
-    public:
-        ~BasicCameraProperty();
-    
-        ManagedCascableCoreBasicAPI::BasicPropertyIdentifier^ getIdentifier();
-        ManagedCascableCoreBasicAPI::BasicCamera^ getCamera();
-        System::String^ getLocalizedDisplayName();
-        ManagedCascableCoreBasicAPI::BasicPropertyValue^ getCurrentValue();
-        void setCurrentValue(ManagedCascableCoreBasicAPI::BasicPropertyValue^ value);
-        ManagedCascableCoreBasicAPI::BasicPropertyValue^ getPendingValue();
-        void setPendingValue(ManagedCascableCoreBasicAPI::BasicPropertyValue^ value);
-        List<ManagedCascableCoreBasicAPI::BasicPropertyValue^>^ getValidSettableValues();
-        void setValidSettableValues(List<ManagedCascableCoreBasicAPI::BasicPropertyValue^>^ value);
-        void setValue(ManagedCascableCoreBasicAPI::BasicPropertyValue^ newValue);
-    };
-
-    public ref class BasicDeviceInfo {
-    private:
-    internal:
-        UnmanagedCascableCoreBasicAPI::BasicDeviceInfo *wrappedObj;
-        BasicDeviceInfo(UnmanagedCascableCoreBasicAPI::BasicDeviceInfo *objectToTakeOwnershipOf);
-    public:
-        ~BasicDeviceInfo();
-    
-        System::String^ getManufacturer();
-        System::String^ getModel();
-        System::String^ getVersion();
-        System::String^ getSerialNumber();
-    };
-
-    public ref class BasicLiveViewFrame {
-    private:
-    internal:
-        UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame *wrappedObj;
-        BasicLiveViewFrame(UnmanagedCascableCoreBasicAPI::BasicLiveViewFrame *objectToTakeOwnershipOf);
-    public:
-        ~BasicLiveViewFrame();
-    
-        double getDateProduced();
-        int getRawPixelDataLength();
-        void copyPixelData(uint8_t * pointer);
-        ManagedCascableCoreBasicAPI::BasicSize^ getRawPixelSize();
-    };
-
     public ref class BasicPropertyValue {
     private:
     internal:
@@ -222,6 +222,18 @@ namespace ManagedCascableCoreBasicAPI {
     
         System::String^ getLocalizedDisplayValue();
         System::String^ getStringValue();
+    };
+
+    public ref class BasicSize {
+    private:
+    internal:
+        UnmanagedCascableCoreBasicAPI::BasicSize *wrappedObj;
+        BasicSize(UnmanagedCascableCoreBasicAPI::BasicSize *objectToTakeOwnershipOf);
+    public:
+        ~BasicSize();
+    
+        double getWidth();
+        double getHeight();
     };
 
     public ref class BasicSimulatedCameraConfiguration {
@@ -243,17 +255,5 @@ namespace ManagedCascableCoreBasicAPI {
         System::String^ getLiveViewImageContainerPath();
         void setLiveViewImageContainerPath(System::String^ value);
         void apply();
-    };
-
-    public ref class BasicSize {
-    private:
-    internal:
-        UnmanagedCascableCoreBasicAPI::BasicSize *wrappedObj;
-        BasicSize(UnmanagedCascableCoreBasicAPI::BasicSize *objectToTakeOwnershipOf);
-    public:
-        ~BasicSize();
-    
-        double getWidth();
-        double getHeight();
     };
 }

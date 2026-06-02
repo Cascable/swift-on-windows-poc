@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "type": "lldb",
+            "type": "swift",
             "request": "launch",
             "sourceLanguages": [
                 "swift"
@@ -9,11 +9,12 @@
             "args": [],
             "cwd": "${workspaceFolder:02 - SwiftToCLR}",
             "name": "Debug SwiftToCLR",
-            "program": "${workspaceFolder:02 - SwiftToCLR}\\.build\\debug\\SwiftToCLR.exe",
-            "preLaunchTask": "swift: Build Debug SwiftToCLR"
+            "preLaunchTask": "swift: Build Debug SwiftToCLR",
+            "target": "SwiftToCLR",
+            "configuration": "debug"
         },
         {
-            "type": "lldb",
+            "type": "swift",
             "request": "launch",
             "sourceLanguages": [
                 "swift"
@@ -21,8 +22,9 @@
             "args": [],
             "cwd": "${workspaceFolder:02 - SwiftToCLR}",
             "name": "Release SwiftToCLR",
-            "program": "${workspaceFolder:02 - SwiftToCLR}\\.build\\release\\SwiftToCLR.exe",
-            "preLaunchTask": "swift: Build Release SwiftToCLR"
+            "preLaunchTask": "swift: Build Release SwiftToCLR",
+            "target": "SwiftToCLR",
+            "configuration": "release"
         }
     ]
 }
