@@ -16,6 +16,16 @@ struct WindowsPlatform {
             .path
     }()
 
+    static var defaultCxxInteropHeaderContainerPath: String {
+        let developerPath = findDeveloperPath()
+        let toolchainsPath = findToolchains(in: developerPath)
+        return toolchainsPath
+            .appendingPathComponent("usr")
+            .appendingPathComponent("lib")
+            .appendingPathComponent("swift")
+            .path
+    }
+
     static let pathSeparator: String = "\\"
 
     static func findDeveloperPath() -> URL {
@@ -55,6 +65,24 @@ struct WindowsPlatform {
         let toolchainName = platformContainer?.lastPathComponent ?? "???"
         return developerPath.appendingPathComponent("Platforms").appendingPathComponent(toolchainName)
     }
+
+    static func findToolchains(in developerPath: URL) -> URL {
+        let platformsPath = developerPath.appendingPathComponent("Toolchains")
+        let children: [URL]
+        do {
+            children = try FileManager.default.contentsOfDirectory(
+                at: platformsPath,
+                includingPropertiesForKeys: [.isDirectoryKey],
+                options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants, .skipsPackageDescendants]
+            )
+        } catch {
+            fatalError("Developer path doesn't exist or contain any toolchains: \(developerPath), error: \(error)")
+        }
+
+        let platformContainer = children.first(where: { (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true })
+        let toolchainName = platformContainer?.lastPathComponent ?? "???"
+        return developerPath.appendingPathComponent("Toolchains").appendingPathComponent(toolchainName)
+    }
 }
 
 #else
@@ -66,6 +94,20 @@ struct MacOSPlatform {
     static var defaultSDKRoot: String {
         let developerPath = findDeveloperPath()
         return "\(developerPath)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+    }
+
+    static var defaultToolchainsRoot: String {
+        let developerPath = findDeveloperPath()
+        return "\(developerPath)/Toolchains/XcodeDefault.xctoolchain"
+    }
+
+     static var defaultCxxInteropHeaderContainerPath: String {
+        let developerPath = defaultToolchainsRoot
+        return developerPath
+            .appendingPathComponent("usr")
+            .appendingPathComponent("lib")
+            .appendingPathComponent("swift")
+            .path
     }
 
     private static func findDeveloperPath() -> String {

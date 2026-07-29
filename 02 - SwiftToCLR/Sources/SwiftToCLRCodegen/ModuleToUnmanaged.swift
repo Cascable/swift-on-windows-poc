@@ -5,12 +5,13 @@ import OrderedCollections
 public struct ModuleToUnmanagedOperation {
 
     public static func execute(inputHeaderPath: String, inputModuleName: String, wrappedObjectVariableName: String,
-                               outputNamespace: String, platformRoot: String?, cxxInteropContainerPath: String,
+                               outputNamespace: String, platformRoot: String?, cxxInteropContainerPath: String?,
                                verbose: Bool) throws -> [GeneratedFile] {
 
         // Config & Setup
 
         let sdkRootPath: String = platformRoot ?? Platform.defaultSDKRoot
+        let xccInteropContainer: String = cxxInteropContainerPath ?? Platform.defaultCxxInteropHeaderContainerPath
 
         // libclang seems to ignore inlined functions, which the generated module header adds to our methods via the
         // SWIFT_INLINE_THUNK macro. We pass in `-Dinline=` to "null out" the `inline` attribute.
@@ -21,7 +22,7 @@ public struct ModuleToUnmanagedOperation {
             "--language=c++",
             "-std=c++17",
             "-isysroot", sdkRootPath,
-            "-I\(cxxInteropContainerPath)",
+            "-I\(xccInteropContainer)",
             "-D_ALLOW_KEYWORD_MACROS",
             "-Dinline=",
         ]

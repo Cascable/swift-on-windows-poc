@@ -19,8 +19,8 @@ struct ModuleToUnmanagedCommand: ParsableCommand {
     @Option(name: .long, help: "The platform SDK root, for finding system headers. If omitted, a basic auto-detection will be used.")
     var platformRoot: String?
 
-    @Option(name: .customLong("cxx-interop"), help: "The directory containing the Swift C++ interop headers. It should be named 'swiftToCxx'.")
-    var cxxInteropHeaderDirectory: String
+    @Option(name: .customLong("cxx-interop"), help: "The directory containing the Swift C++ interop headers. It should be named 'swiftToCxx'. If omitted, a basic auto-detection will be used.")
+    var cxxInteropHeaderDirectory: String?
 
     @Option(name: .customLong("wrapped-object-name"), help: "The variable name of the wrapped object.")
     var wrappedObjectVariableName: String = "swiftObj"
@@ -43,7 +43,13 @@ struct ModuleToUnmanagedCommand: ParsableCommand {
 
         print("Using clang version:", clangVersionString())
 
-        let interopParent = URL(fileURLWithPath: cxxInteropHeaderDirectory).deletingLastPathComponent().path
+        let interopParent: String? = {
+            if let cxxInteropHeaderDirectory {
+                return URL(fileURLWithPath: cxxInteropHeaderDirectory).deletingLastPathComponent().path
+            } else {
+                return nil
+            }
+        }()
 
         let generatedFiles: [GeneratedFile] = try ModuleToUnmanagedOperation.execute(
             inputHeaderPath: inputHeader,

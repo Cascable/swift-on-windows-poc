@@ -22,11 +22,17 @@ struct SwiftToCLR: ParsableCommand {
     @Option(name: .long, help: "The input module name to target.")
     var inputModule: String
 
+    @Option(name: .customLong("unmanaged-namespace"), help: "The namespace for the unmanaged wrapper. If omitted, will be automatically derived from the input module name.")
+    var unmanagedNamespaceName: String?
+
+    @Option(name: .customLong("managed-namespace"), help: "The namespace for the managed wrapper. If omitted, will be automatically derived from the input module name.")
+    var managedNamespaceName: String?
+
     @Option(name: .long, help: "The platform SDK root, for finding system headers. If omitted, a basic auto-detection will be used.")
     var platformRoot: String?
 
-    @Option(name: .customLong("cxx-interop"), help: "The directory containing the Swift C++ interop headers. It should be named 'swiftToCxx'.")
-    var cxxInteropHeaderDirectory: String
+    @Option(name: .customLong("cxx-interop"), help: "The directory containing the Swift C++ interop headers. It should be named 'swiftToCxx'. If omitted, a basic auto-detection will be used.")
+    var cxxInteropHeaderDirectory: String?
 
     @Option(name: .shortAndLong, help: "The output directory. C++ implementation and header files will be emitted here, named after the input module.")
     var outputDirectory: String
@@ -35,6 +41,8 @@ struct SwiftToCLR: ParsableCommand {
     var verbose: Bool = false
 
     mutating func run() throws {
+
+        // TODO: Add custom unmanaged and managed namespace names
 
         guard FileManager.default.fileExists(atPath: inputHeader) else {
             throw ValidationError("Input file doesn't exist!")
@@ -46,9 +54,16 @@ struct SwiftToCLR: ParsableCommand {
 
         print("Using clang version:", clangVersionString())
 
-        let interopParent = URL(fileURLWithPath: cxxInteropHeaderDirectory).deletingLastPathComponent().path
-        let unmanagedWrapperNamespace: String = "Unmanaged" + inputModule
-        let managedWrapperNamespace: String = "Managed" + inputModule
+        let interopParent: String? = {
+            if let cxxInteropHeaderDirectory {
+                return URL(fileURLWithPath: cxxInteropHeaderDirectory).deletingLastPathComponent().path
+            } else {
+                return nil
+            }
+        }()
+
+        let unmanagedWrapperNamespace: String = (unmanagedNamespaceName ?? "Unmanaged" + inputModule)
+        let managedWrapperNamespace: String = (managedNamespaceName ?? "Managed" + inputModule)
 
         // First, we generate the "unmanaged" C++ API. This is for the Microsoft C++ compiler.
         let generatedUnmanagedFiles: [GeneratedFile] = try ModuleToUnmanagedOperation.execute(
