@@ -346,17 +346,41 @@ struct SwiftToUnmanagedTypeMappings {
             return "(unsigned int)\(name)"
         })
 
+    static let swiftConstVoidMapping: TypeMapping =
+        TypeMapping(wrappedTypeName: "const void *",
+                    wrapperTypeName: "const void *",
+                    convertWrapperToWrapped: { name, _ in
+            return name
+        }, convertWrappedToWrapper: { name, _ in
+            return name
+        })
+
+    static let swiftConstUInt8Mapping: TypeMapping =
+        TypeMapping(wrappedTypeName: "const uint8_t *",
+                    wrapperTypeName: "const uint8_t *",
+                    convertWrapperToWrapped: { name, _ in
+            return name
+        }, convertWrappedToWrapper: { name, _ in
+            return name
+        })
+
     static let mappingsBySwiftType: [String: TypeMapping] = [
         swiftStringMapping.wrappedTypeName: swiftStringMapping,
         swiftStringConstStdStringMapping.wrappedTypeName: swiftStringConstStdStringMapping,
         swiftIntMapping.wrappedTypeName: swiftIntMapping,
-        swiftUIntMapping.wrappedTypeName: swiftUIntMapping
+        swiftUIntMapping.wrappedTypeName: swiftUIntMapping,
+        "voidconst*": swiftConstVoidMapping,
+        "voidconst*_Nullable": swiftConstVoidMapping,
+        "uint8_tconst*": swiftConstUInt8Mapping
     ]
 
     static let mappingsByUnmanagedType: [String: TypeMapping] = [
         swiftStringMapping.wrapperTypeName: swiftStringMapping,
         swiftIntMapping.wrapperTypeName: swiftIntMapping,
-        swiftUIntMapping.wrapperTypeName: swiftUIntMapping
+        swiftUIntMapping.wrapperTypeName: swiftUIntMapping,
+        "voidconst*": swiftConstVoidMapping,
+        "voidconst*_Nullable": swiftConstVoidMapping,
+        "uint8_tconst*": swiftConstUInt8Mapping
     ]
 
     static func unmanagedMapping(from swiftTypeName: String) -> TypeMapping? {

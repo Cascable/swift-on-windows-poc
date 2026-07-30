@@ -1,7 +1,7 @@
 <Project>
 	<PropertyGroup>
 		<!-- We should figure out how to auto-find the Swift binaries. -->
-		<SwiftInstallVersion>6.3.2</SwiftInstallVersion>
+		<SwiftInstallVersion>6.3.3</SwiftInstallVersion>
 		<SwiftInstallRoot>C:\Users\dkennett\AppData\Local\Programs\Swift\</SwiftInstallRoot>
 		<SwiftSDKRoot>$(SwiftInstallRoot)Platforms\$(SwiftInstallVersion)\Windows.platform\Developer\SDKs\Windows.sdk\</SwiftSDKRoot>
 		<SwiftBinariesRoot Condition=" '$(Platform)' == 'x64'">$(SwiftSDKRoot)usr\lib\swift\windows\x86_64\</SwiftBinariesRoot>
